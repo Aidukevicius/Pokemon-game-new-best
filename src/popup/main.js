@@ -1,131 +1,76 @@
-// POPUP MAIN ENTRY POINT PLACEHOLDER
-// Main coordinator for tab-based popup UI (loaded as ES module)
+// POPUP MAIN ENTRY POINT
+// Main coordinator for tab-based popup UI
 
-// WHAT GOES HERE:
+console.log('[Main] Script loaded');
 
-/*
-IMPORTS:
-import { TabsNavigation } from './tabs-navigation.js';
 import { MainScreen } from './screens/main-screen.js';
-import { SearchScreen } from './screens/search-screen.js';
-import { PokedexScreen } from './screens/pokedex-screen.js';
-import { StorageScreen } from './screens/storage-screen.js';
-import { ShopScreen } from './screens/shop-screen.js';
-import { SettingsScreen } from './screens/settings-screen.js';
-import { StorageService } from '../shared/services/StorageService.js';
 
-APP STRUCTURE:
-The popup has 6 screens, only one visible at a time:
-1. Main (catch) - Default
-2. Search - Find specific Pokemon
-3. Pokedex - View collection
-4. Storage - Manage items
-5. Shop - Buy items and trade
-6. Settings - Preferences
+console.log('[Main] MainScreen imported');
 
-Bottom tabs switch between screens
+// Simple implementation for now - just show MainScreen
+async function initializeApp() {
+  console.log('[Main] Initializing app...');
+  
+  try {
+    const screensContainer = document.getElementById('screens');
+    const tabButtons = document.querySelectorAll('.tab-button');
 
-INITIALIZATION:
+    console.log('[Main] Found screens container:', screensContainer);
+    console.log('[Main] Found tab buttons:', tabButtons.length);
 
-document.addEventListener('DOMContentLoaded', async () => {
-  // 1. Get container elements
-  const appContainer = document.getElementById('app');
-  const screensContainer = document.getElementById('screens');
-  const tabsContainer = document.getElementById('tabs');
-  
-  // 2. Initialize StorageService
-  const storageService = new StorageService();
-  await storageService.initialize();
-  
-  // 3. Create all screen instances
-  const screens = {
-    main: new MainScreen(screensContainer),
-    search: new SearchScreen(screensContainer),
-    pokedex: new PokedexScreen(screensContainer),
-    storage: new StorageScreen(screensContainer),
-    shop: new ShopScreen(screensContainer),
-    settings: new SettingsScreen(screensContainer)
-  };
-  
-  // 4. Initialize each screen
-  for (const screen of Object.values(screens)) {
-    await screen.initialize();
-    screen.hide(); // Hide all initially
-  }
-  
-  // 5. Create tabs navigation
-  const tabs = new TabsNavigation(tabsContainer);
-  tabs.render();
-  
-  // 6. Show default screen (main)
-  screens.main.show();
-  tabs.setActiveTab('main');
-  
-  // 7. Listen for tab changes
-  tabs.on('tabchange', (event) => {
-    // Hide all screens
-    Object.values(screens).forEach(screen => screen.hide());
+    // Initialize main screen
+    console.log('[Main] Creating MainScreen...');
+    const mainScreen = new MainScreen(screensContainer);
     
-    // Show selected screen
-    const selectedScreen = screens[event.tabId];
-    if (selectedScreen) {
-      selectedScreen.show();
-    }
-  });
-});
+    console.log('[Main] Initializing MainScreen...');
+    await mainScreen.initialize();
+    
+    console.log('[Main] Showing MainScreen...');
+    mainScreen.show();
 
-SCREEN COORDINATION:
+    console.log('[Main] Setting up tab listeners...');
+    // Tab switching logic
+    tabButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        // Remove active class from all tabs
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        
+        // Add active class to clicked tab
+        button.classList.add('active');
 
-switchScreen(fromScreenId, toScreenId)
-- Hide current screen with fade-out animation
-- Show new screen with fade-in animation
-- Update tab navigation active state
-- Maybe play screen transition sound
+        // For now, only main screen is implemented
+        const tabId = button.dataset.tab;
+        if (tabId === 'main') {
+          mainScreen.show();
+        } else {
+          // Other screens not implemented yet
+          screensContainer.innerHTML = `
+            <div class="snes-container" style="margin: 20px; text-align: center;">
+              <h2 style="font-size: 12px; margin-bottom: 12px;">${button.querySelector('.tab-label').textContent}</h2>
+              <p style="font-size: 8px;">Coming soon! 🚧</p>
+            </div>
+          `;
+        }
+      });
+    });
+    
+    console.log('[Main] App initialized successfully!');
+  } catch (error) {
+    console.error('[Main] Error initializing app:', error);
+    document.getElementById('screens').innerHTML = `
+      <div style="padding: 20px; color: red;">
+        <h3>Error loading app</h3>
+        <p>${error.message}</p>
+        <pre>${error.stack}</pre>
+      </div>
+    `;
+  }
+}
 
-updateAllScreens(playerData)
-- Called when player data changes
-- Update all screens with new data
-- Each screen refreshes its display
-
-EVENT FLOW EXAMPLE:
-1. User catches Pokemon in MainScreen
-2. MainScreen emits 'pokemonCaught' event
-3. main.js listens and:
-   - Updates PlayerData in storage
-   - Calls updateAllScreens()
-   - PokedexScreen refreshes (new Pokemon)
-   - StorageScreen refreshes (less Pokeballs)
-   - ShopScreen refreshes (more coins)
-
-GLOBAL EVENT LISTENERS:
-
-Listen for events from screens:
-- 'pokemonCaught' - Update all relevant screens
-- 'itemPurchased' - Update storage and balance
-- 'settingsChanged' - Apply new settings globally
-
-LIFECYCLE:
-
-initialize()
-- Set up all screens
-- Load initial data
-- Show default screen
-
-cleanup()
-- Remove event listeners
-- Called when popup closes (if needed)
-
-ERROR HANDLING:
-- Try/catch around initialization
-- Display error screen if something fails
-- "Oops! Something went wrong" with SNES styling
-- Option to reset data
-
-LAYOUT MANAGEMENT:
-- Screens container: Full height minus tabs (640px - 60px = 580px)
-- Tabs: Fixed at bottom (60px)
-- Each screen: Scrollable if content exceeds 580px
-
-EXPORTS:
-(Main entry point, no exports needed)
-*/
+// Run when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+  // DOM already loaded
+  initializeApp();
+}

@@ -6,44 +6,47 @@
     <title>PokéBrowse</title>
     
     <!-- SNES CSS Framework -->
-    <!-- Link to: https://snes-css.sadlative.com/ CDN or local copy -->
-    <!-- <link rel="stylesheet" href="path-to-snes-css"> -->
+    <link href="https://unpkg.com/snes.css/snes.css" rel="stylesheet" />
     
     <!-- Custom Styles -->
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <!-- PLACEHOLDER: Main app container (360x640px) -->
+<body style="margin: 0; padding: 0;">
+    <!-- Main app container (360x640px) -->
     <div id="app" class="app-container">
         
-        <!-- Screens Container (360x580px - leaves 60px for tabs) -->
+        <!-- Screens Container -->
         <div id="screens" class="screens-container">
-            <!-- All screens render here -->
-            <!-- Only one visible at a time -->
-            <!-- 
-            Screens managed by JavaScript:
-            - MainScreen
-            - SearchScreen
-            - PokedexScreen
-            - StorageScreen
-            - ShopScreen
-            - SettingsScreen
-            -->
+            <!-- MainScreen renders here -->
         </div>
         
-        <!-- Bottom Tabs Navigation (360x60px - fixed bottom) -->
-        <div id="tabs" class="tabs-container">
-            <!-- TabsNavigation component renders here -->
-            <!--
-            Tabs:
-            🎮 Catch
-            🔍 Search
-            📖 Pokédex
-            🎒 Items
-            🏪 Shop
-            ⚙️ Settings
-            -->
-        </div>
+        <!-- Bottom Tabs Navigation -->
+        <nav class="tabs-navigation">
+            <button class="tab-button active" data-tab="main">
+                <span class="tab-icon">🎮</span>
+                <span class="tab-label">Companion</span>
+            </button>
+            <button class="tab-button" data-tab="search">
+                <span class="tab-icon">🔍</span>
+                <span class="tab-label">Search</span>
+            </button>
+            <button class="tab-button" data-tab="pokedex">
+                <span class="tab-icon">📖</span>
+                <span class="tab-label">Pokédex</span>
+            </button>
+            <button class="tab-button" data-tab="storage">
+                <span class="tab-icon">🎒</span>
+                <span class="tab-label">Items</span>
+            </button>
+            <button class="tab-button" data-tab="shop">
+                <span class="tab-icon">🏪</span>
+                <span class="tab-label">Shop</span>
+            </button>
+            <button class="tab-button" data-tab="settings">
+                <span class="tab-icon">⚙️</span>
+                <span class="tab-label">Settings</span>
+            </button>
+        </nav>
         
     </div>
     

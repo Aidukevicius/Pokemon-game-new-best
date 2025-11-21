@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <div id="screens" class="screens-container">
+            <div style="padding: 20px;">
+                <h1 style="font-size: 16px;">Testing...</h1>
+                <p id="status">Waiting for JavaScript...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('status').textContent = 'JavaScript is working!';
+        console.log('Basic script loaded');
+    </script>
+    
+    <script type="module">
+        console.log('ES Module loaded');
+        import { MainScreen } from './src/popup/screens/main-screen.js';
+        console.log('MainScreen imported');
+        document.getElementById('status').textContent = 'MainScreen imported successfully!';
+    </script>
+</body>
+</html>

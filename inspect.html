@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inspect</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <div id="screens" class="screens-container"></div>
+        <div class="tabs-container">TABS HERE</div>
+    </div>
+    
+    <pre id="output" style="position: fixed; top: 0; right: 0; background: white; padding: 10px; border: 2px solid red; max-width: 400px; max-height: 600px; overflow: auto; font-size: 10px;"></pre>
+    
+    <script type="module">
+        import { MainScreen } from './src/popup/screens/main-screen.js';
+        
+        const screensContainer = document.getElementById('screens');
+        const output = document.getElementById('output');
+        
+        const mainScreen = new MainScreen(screensContainer);
+        await mainScreen.initialize();
+        mainScreen.show();
+        
+        output.textContent = 'Container HTML:\n\n' + screensContainer.innerHTML.substring(0, 2000);
+        output.textContent += '\n\n...truncated';
+        output.textContent += '\n\nContainer styles:';
+        output.textContent += '\n  display: ' + window.getComputedStyle(screensContainer).display;
+        output.textContent += '\n  width: ' + screensContainer.offsetWidth;
+        output.textContent += '\n  height: ' + screensContainer.offsetHeight;
+        
+        const mainScreenDiv = screensContainer.querySelector('.main-screen');
+        if (mainScreenDiv) {
+            output.textContent += '\n\nMain screen div styles:';
+            output.textContent += '\n  display: ' + window.getComputedStyle(mainScreenDiv).display;
+            output.textContent += '\n  visibility: ' + window.getComputedStyle(mainScreenDiv).visibility;
+            output.textContent += '\n  opacity: ' + window.getComputedStyle(mainScreenDiv).opacity;
+            output.textContent += '\n  width: ' + mainScreenDiv.offsetWidth;
+            output.textContent += '\n  height: ' + mainScreenDiv.offsetHeight;
+        }
+    </script>
+</body>
+</html>
