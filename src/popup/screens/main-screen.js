@@ -3,12 +3,14 @@
 
 import { StorageService } from '../../shared/services/StorageService.js';
 import { SpriteService } from '../../shared/services/SpriteService.js';
+import { ThreeJSRenderer } from '../../shared/services/ThreeJSRenderer.js';
 
 export class MainScreen {
   constructor(containerElement) {
     this.container = containerElement;
     this.storageService = new StorageService();
     this.spriteService = new SpriteService();
+    this.threeRenderer = null;
     this.companionPokemon = null;
     this.healthInterval = null;
   }
@@ -47,13 +49,13 @@ export class MainScreen {
     }
   }
 
-  render() {
+  async render() {
     this.container.innerHTML = `
       <div class="main-screen">
         <!-- Pokemon Display Card -->
         <div class="snes-container companion-card">
           <!-- Pokemon 3D Model / Sprite -->
-          <div class="pokemon-display">
+          <div class="pokemon-display" id="pokemonDisplay">
             ${this.render3DModel()}
           </div>
 
@@ -125,6 +127,31 @@ export class MainScreen {
     `;
 
     this.attachEventListeners();
+    
+    // Try to load 3D model if available
+    const modelPath = this.spriteService.get3DModelPath(this.companionPokemon.id);
+    if (modelPath) {
+      await this.load3DModel(modelPath);
+    }
+  }
+
+  async load3DModel(modelPath) {
+    try {
+      const displayContainer = this.container.querySelector('#pokemonDisplay');
+      if (!displayContainer) return;
+
+      // Clear existing content
+      displayContainer.innerHTML = '<div class="model-container" id="threeContainer"></div>';
+      
+      const threeContainer = displayContainer.querySelector('#threeContainer');
+      this.threeRenderer = new ThreeJSRenderer(threeContainer);
+      await this.threeRenderer.initialize();
+      await this.threeRenderer.loadModel(modelPath);
+    } catch (error) {
+      console.error('Failed to load 3D model:', error);
+      // Fall back to 2D sprite
+      this.render3DModel();
+    }
   }
 
   render3DModel() {
@@ -305,6 +332,9 @@ export class MainScreen {
   destroy() {
     if (this.healthInterval) {
       clearInterval(this.healthInterval);
+    }
+    if (this.threeRenderer) {
+      this.threeRenderer.destroy();
     }
   }
 }

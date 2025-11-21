@@ -35,6 +35,16 @@
   justify-content: center;
 }
 
+#threeContainer {
+  width: 200px;
+  height: 200px;
+}
+
+#threeContainer canvas {
+  display: block;
+  border-radius: 8px;
+}
+
 .pokemon-sprite-hq {
   width: 200px;
   height: 200px;
