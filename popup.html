@@ -13,47 +13,39 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- PLACEHOLDER: Main mobile-shaped container (360x640px) -->
-    
-    <!-- HEADER SECTION -->
-    <!-- 
-    - Game title "PokéBrowse" with pixel font
-    - SNES-style header bar
-    - Maybe small Pokéball icon
-    -->
-    
-    <!-- ENCOUNTER DISPLAY AREA -->
-    <!--
-    Container managed by EncounterScreen component
-    - Pokemon sprite image
-    - Pokemon name
-    - Pokemon level
-    - Pokemon type badge(s)
-    - "A wild [Pokemon] appeared!" text
-    -->
-    
-    <!-- ACTION BUTTONS -->
-    <!--
-    SNES-style buttons:
-    - "Throw Pokéball" button (primary action)
-    - "Run Away" button (secondary action)
-    - Both should use SNES CSS button styles
-    - Both disabled during animations
-    -->
-    
-    <!-- STATS BAR (Bottom) -->
-    <!--
-    Container managed by StatsDisplay component
-    - Pokéball icon + count
-    - Caught Pokemon count / Total count
-    - Fixed to bottom of popup
-    -->
-    
-    <!-- COLLECTION BUTTON -->
-    <!--
-    - Small button to view Pokédex
-    - Opens collection view (future feature)
-    -->
+    <!-- PLACEHOLDER: Main app container (360x640px) -->
+    <div id="app" class="app-container">
+        
+        <!-- Screens Container (360x580px - leaves 60px for tabs) -->
+        <div id="screens" class="screens-container">
+            <!-- All screens render here -->
+            <!-- Only one visible at a time -->
+            <!-- 
+            Screens managed by JavaScript:
+            - MainScreen
+            - SearchScreen
+            - PokedexScreen
+            - StorageScreen
+            - ShopScreen
+            - SettingsScreen
+            -->
+        </div>
+        
+        <!-- Bottom Tabs Navigation (360x60px - fixed bottom) -->
+        <div id="tabs" class="tabs-container">
+            <!-- TabsNavigation component renders here -->
+            <!--
+            Tabs:
+            🎮 Catch
+            🔍 Search
+            📖 Pokédex
+            🎒 Items
+            🏪 Shop
+            ⚙️ Settings
+            -->
+        </div>
+        
+    </div>
     
     <!-- Load main script as ES module -->
     <script type="module" src="src/popup/main.js"></script>

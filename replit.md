@@ -1,25 +1,35 @@
 # PokéBrowse - Pokemon Chrome Extension
 
 ## Project Overview
-A lofi SNES-style Pokemon catching game implemented as a Chrome extension. Users can encounter and catch Pokemon while browsing the web, with a retro aesthetic inspired by https://snes-css.sadlative.com/.
+A lofi SNES-style Pokemon catching game implemented as a Chrome extension. Users can encounter and catch Pokemon while browsing the web. Features a mobile-shaped popup (360x640px) with tab-based navigation for different screens.
 
 ## Current State (November 21, 2025)
-**Phase**: Modular File Structure with Placeholders
-- Complete modular architecture following separation of concerns
-- Each file has ONE clear responsibility
-- ES module system for clean imports
-- Mobile-shaped popup design (360x640px)
+**Phase**: Complete Modular Tab-Based Architecture with Placeholders
+- Tab navigation system with 6 screens
+- Each screen has dedicated component file
+- SNES-style aesthetic design
+- Mobile-shaped popup (360x580px screens + 60px tabs)
 - Preview server configured for Replit testing
 
 ## Architecture
 
-### Modular Structure
-The project uses a service-oriented architecture with clear separation:
+### Tab-Based Navigation Structure
+The app uses a **tab navigation pattern** with 6 main screens:
+
+1. **🎮 Main (Catch)** - Default screen for encountering/catching Pokemon
+2. **🔍 Search** - Find specific Pokemon by name, type, or rarity
+3. **📖 Pokédex** - View and manage caught Pokemon collection
+4. **🎒 Storage** - Manage inventory items (Pokéballs, potions, etc.)
+5. **🏪 Shop** - Buy items with PokéCoins, trading system
+6. **⚙️ Settings** - Preferences, audio, data management
+
+### File Organization
 
 **Popup Runtime** (`src/popup/`)
-- Entry point and UI coordination
-- Component-based UI (encounter screen, stats display)
-- DOM manipulation isolated in ui-controller
+- `main.js` - Tab coordinator and app entry point
+- `tabs-navigation.js` - Bottom tab menu component
+- `screens/` - Individual screen components (6 files, one per tab)
+- UI helper components (ui-controller, encounter-screen, stats-display)
 
 **Background Runtime** (`src/background/`)
 - Service worker for browsing tracking
@@ -35,26 +45,47 @@ The project uses a service-oriented architecture with clear separation:
 ### Tech Stack
 - Vanilla JavaScript with ES Modules
 - Chrome Extension Manifest V3
+- Tab-based navigation pattern
 - Chrome APIs: Storage, Tabs, Notifications
 - HTML5/CSS3 with SNES CSS Framework
 - Optional: PokeAPI for sprites
 
-## File Organization Principle
+## Module Responsibilities
 
-Each file follows single responsibility:
-- `EncounterService.js` - ONLY encounter generation logic
-- `CatchService.js` - ONLY catching mechanics
-- `SpriteService.js` - ONLY sprite/API connections
-- `StorageService.js` - ONLY Chrome storage abstraction
-- `PokemonRepository.js` - ONLY Pokemon data access
+### Screen Components (One per tab)
+Each screen file has ONE clear purpose:
+- `main-screen.js` - Encounter and catching interface ONLY
+- `search-screen.js` - Pokemon search and filtering ONLY
+- `pokedex-screen.js` - Collection viewing ONLY
+- `storage-screen.js` - Item inventory management ONLY
+- `shop-screen.js` - Purchasing and trading ONLY
+- `settings-screen.js` - Preferences and data management ONLY
+
+### Shared Services (Business Logic)
+- `EncounterService.js` - Encounter generation logic ONLY
+- `CatchService.js` - Catching mechanics ONLY
+- `SpriteService.js` - Sprite/API connections ONLY
+- `StorageService.js` - Chrome storage abstraction ONLY
+- `PokemonRepository.js` - Pokemon data access ONLY
 
 This makes code:
-- Easy to find
-- Easy to test
-- Easy to maintain
-- Easy to extend
+- Easy to find (catch logic? → CatchService.js)
+- Easy to test (isolated responsibilities)
+- Easy to maintain (changes don't affect other modules)
+- Easy to extend (add new features without touching existing code)
 
 ## Development Workflow
+
+### Layout Dimensions
+- Total popup: 360x640px (mobile-shaped)
+- Screens container: 360x580px (scrollable content area)
+- Tabs navigation: 360x60px (fixed at bottom)
+
+### Screen Switching
+- Only one screen visible at a time
+- TabsNavigation emits 'tabchange' events
+- main.js coordinator hides all screens, shows selected screen
+- Smooth fade transitions between screens
 
 ### Preview in Replit
 The preview server runs on port 5000 displaying `preview.html`, which embeds popup.html in a 360x640px mobile frame.
@@ -65,23 +96,49 @@ The preview server runs on port 5000 displaying `preview.html`, which embeds pop
 3. Load unpacked extension from this directory
 
 ## Recent Changes
-- **2025-11-21**: Redesigned with modular architecture per user feedback
+- **2025-11-21**: Added tab-based navigation system
+- **2025-11-21**: Created 6 separate screen component files
+- **2025-11-21**: Added tabs-navigation.js for bottom tab menu
+- **2025-11-21**: Updated main.js as tab coordinator
+- **2025-11-21**: Updated popup.html structure for tabs + screens
+- **2025-11-21**: Updated styles.css with tab styling guidelines
+- **2025-11-21**: Designed modular architecture per user feedback
 - **2025-11-21**: Created service-oriented structure with clear separation of concerns
-- **2025-11-21**: Organized into runtime-specific folders (popup, background, shared)
-- **2025-11-21**: Added detailed placeholder descriptions in each module
-- **2025-11-21**: Set up ES module imports system
-- **2025-11-21**: Updated manifest.json to use modular entry points
 
 ## User Preferences
 - Prefers highly modular file structure
 - Wants each file to have one clear purpose
 - Likes separation of concerns (encounter logic, catching logic, sprite connections all separate)
+- Wants tab-based navigation with multiple screens (search, pokedex, items, shop, settings)
+- Mobile-shaped interface (360x640px)
+- SNES lofi aesthetic
+
+## Design Decisions
+
+### Why Tabs Instead of Single Screen?
+- More features and functionality
+- Familiar mobile app pattern
+- Clear separation of concerns (each screen = one purpose)
+- Easy to navigate between different functions
+- Better organization of features
+
+### Why Bottom Tabs?
+- Mobile-friendly (thumb-accessible)
+- Consistent with mobile app conventions
+- Always visible (no menu needed)
+- SNES aesthetic works well with button-style tabs
+
+### Why Mobile-Shaped?
+- Chrome extension popups work best in compact layouts
+- 360x640px is familiar smartphone size
+- Easy to design for one fixed dimension
+- SNES aesthetic fits well in contained space
 
 ## Next Steps
 1. Implement Pokemon database with actual data
-2. Fill in service logic (starting with EncounterService and CatchService)
-3. Build popup HTML structure with SNES styling
-4. Implement CSS with lofi aesthetic
-5. Connect services in popup/main.js
+2. Fill in TabsNavigation rendering logic
+3. Implement each screen's UI and logic
+4. Build SNES-style CSS
+5. Connect screens in main.js coordinator
 6. Source or create Pokemon sprite assets
 7. Add sound effects
