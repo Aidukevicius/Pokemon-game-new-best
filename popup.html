@@ -1,32 +1,61 @@
-<!-- POPUP.HTML PLACEHOLDER -->
-<!-- This is the main mobile-shaped screen (360x640px) for the Chrome extension -->
-
-<!-- STRUCTURE SHOULD INCLUDE: -->
-<!-- 
-  - DOCTYPE and HTML boilerplate
-  - Link to snes-css framework CDN
-  - Link to styles.css for custom styling
-  - Mobile viewport dimensions (360x640px)
-  
-  MAIN SCREEN LAYOUT:
-  - Header section with game title "PokéBrowse" in retro pixel font
-  - Current Pokemon encounter display area with:
-    * Pokemon sprite placeholder
-    * Pokemon name
-    * Pokemon info (level, type)
-  - Action buttons section:
-    * "Throw Pokéball" button (SNES-style)
-    * "Run Away" button (SNES-style)
-  - Bottom stats bar showing:
-    * Pokéballs remaining
-    * Total Pokemon caught
-  - Collection/Pokédex button to view caught Pokemon
-  
-  - Script tag linking to popup.js
-  
-  STYLING NOTES:
-  - Use SNES-style borders and button styles from snes-css
-  - Retro pixel font for all text
-  - Limited color palette (lofi aesthetic)
-  - Box shadows and borders to create depth
--->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=360, initial-scale=1.0">
+    <title>PokéBrowse</title>
+    
+    <!-- SNES CSS Framework -->
+    <!-- Link to: https://snes-css.sadlative.com/ CDN or local copy -->
+    <!-- <link rel="stylesheet" href="path-to-snes-css"> -->
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- PLACEHOLDER: Main mobile-shaped container (360x640px) -->
+    
+    <!-- HEADER SECTION -->
+    <!-- 
+    - Game title "PokéBrowse" with pixel font
+    - SNES-style header bar
+    - Maybe small Pokéball icon
+    -->
+    
+    <!-- ENCOUNTER DISPLAY AREA -->
+    <!--
+    Container managed by EncounterScreen component
+    - Pokemon sprite image
+    - Pokemon name
+    - Pokemon level
+    - Pokemon type badge(s)
+    - "A wild [Pokemon] appeared!" text
+    -->
+    
+    <!-- ACTION BUTTONS -->
+    <!--
+    SNES-style buttons:
+    - "Throw Pokéball" button (primary action)
+    - "Run Away" button (secondary action)
+    - Both should use SNES CSS button styles
+    - Both disabled during animations
+    -->
+    
+    <!-- STATS BAR (Bottom) -->
+    <!--
+    Container managed by StatsDisplay component
+    - Pokéball icon + count
+    - Caught Pokemon count / Total count
+    - Fixed to bottom of popup
+    -->
+    
+    <!-- COLLECTION BUTTON -->
+    <!--
+    - Small button to view Pokédex
+    - Opens collection view (future feature)
+    -->
+    
+    <!-- Load main script as ES module -->
+    <script type="module" src="src/popup/main.js"></script>
+</body>
+</html>

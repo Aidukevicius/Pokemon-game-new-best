@@ -4,35 +4,60 @@
 A lofi SNES-style Pokemon catching game implemented as a Chrome extension. Users can encounter and catch Pokemon while browsing the web, with a retro aesthetic inspired by https://snes-css.sadlative.com/.
 
 ## Current State (November 21, 2025)
-**Phase**: File Structure Setup (Placeholders)
-- All core files created with detailed placeholder descriptions
+**Phase**: Modular File Structure with Placeholders
+- Complete modular architecture following separation of concerns
+- Each file has ONE clear responsibility
+- ES module system for clean imports
 - Mobile-shaped popup design (360x640px)
 - Preview server configured for Replit testing
 
 ## Architecture
 
-### File Structure
-- `manifest.json` - Chrome Extension V3 configuration
-- `popup.html` - Main mobile UI (360x640px) 
-- `popup.js` - Popup interface logic
-- `background.js` - Service worker for browsing activity tracking
-- `storage.js` - Chrome Storage API utilities
-- `pokemon-data.js` - Pokemon database
-- `styles.css` - SNES-style lofi aesthetic
-- `preview.html` - Replit preview wrapper page
-- `assets/` - Sprites, icons, and sounds
+### Modular Structure
+The project uses a service-oriented architecture with clear separation:
+
+**Popup Runtime** (`src/popup/`)
+- Entry point and UI coordination
+- Component-based UI (encounter screen, stats display)
+- DOM manipulation isolated in ui-controller
+
+**Background Runtime** (`src/background/`)
+- Service worker for browsing tracking
+- Tab navigation monitoring
+- Notification and badge management
+
+**Shared Modules** (`src/shared/`)
+- **Services**: Business logic (encounter, catch, sprite, storage, repository)
+- **Data**: Pokemon database
+- **Constants**: Game configuration
+- **Utils**: Helper functions (random, formatting)
 
 ### Tech Stack
-- Vanilla JavaScript with Chrome Extension APIs
-- HTML5/CSS3
-- SNES CSS Framework (to be integrated)
-- Chrome Storage API
-- Chrome Tabs API
+- Vanilla JavaScript with ES Modules
+- Chrome Extension Manifest V3
+- Chrome APIs: Storage, Tabs, Notifications
+- HTML5/CSS3 with SNES CSS Framework
+- Optional: PokeAPI for sprites
+
+## File Organization Principle
+
+Each file follows single responsibility:
+- `EncounterService.js` - ONLY encounter generation logic
+- `CatchService.js` - ONLY catching mechanics
+- `SpriteService.js` - ONLY sprite/API connections
+- `StorageService.js` - ONLY Chrome storage abstraction
+- `PokemonRepository.js` - ONLY Pokemon data access
+
+This makes code:
+- Easy to find
+- Easy to test
+- Easy to maintain
+- Easy to extend
 
 ## Development Workflow
 
 ### Preview in Replit
-The preview server runs on port 5000 and displays `preview.html`, which embeds the popup.html in a mobile-shaped frame.
+The preview server runs on port 5000 displaying `preview.html`, which embeds popup.html in a 360x640px mobile frame.
 
 ### Install in Chrome (Future)
 1. Go to `chrome://extensions/`
@@ -40,13 +65,23 @@ The preview server runs on port 5000 and displays `preview.html`, which embeds t
 3. Load unpacked extension from this directory
 
 ## Recent Changes
-- **2025-11-21**: Created complete file structure with placeholder descriptions
-- **2025-11-21**: Set up Python preview server on port 5000
-- **2025-11-21**: Documented project structure and architecture
+- **2025-11-21**: Redesigned with modular architecture per user feedback
+- **2025-11-21**: Created service-oriented structure with clear separation of concerns
+- **2025-11-21**: Organized into runtime-specific folders (popup, background, shared)
+- **2025-11-21**: Added detailed placeholder descriptions in each module
+- **2025-11-21**: Set up ES module imports system
+- **2025-11-21**: Updated manifest.json to use modular entry points
+
+## User Preferences
+- Prefers highly modular file structure
+- Wants each file to have one clear purpose
+- Likes separation of concerns (encounter logic, catching logic, sprite connections all separate)
 
 ## Next Steps
-1. Implement actual manifest.json configuration
-2. Build popup.html with SNES-style layout
-3. Create CSS styling with lofi aesthetic
-4. Add JavaScript game logic
-5. Source or create Pokemon sprite assets
+1. Implement Pokemon database with actual data
+2. Fill in service logic (starting with EncounterService and CatchService)
+3. Build popup HTML structure with SNES styling
+4. Implement CSS with lofi aesthetic
+5. Connect services in popup/main.js
+6. Source or create Pokemon sprite assets
+7. Add sound effects

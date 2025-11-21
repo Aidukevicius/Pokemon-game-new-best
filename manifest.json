@@ -1,13 +1,36 @@
 {
-  "PLACEHOLDER": "Chrome Extension Manifest V3 configuration goes here",
-  "description": "This file should contain:",
-  "items": [
-    "Extension name, version, and description",
-    "Manifest version 3 declaration",
-    "Permissions for storage and tabs API",
-    "Action configuration pointing to popup.html",
-    "Background service worker pointing to background.js",
-    "Icons configuration for different sizes (16x16, 48x48, 128x128)",
-    "Content security policy if needed"
-  ]
+  "manifest_version": 3,
+  "name": "PokéBrowse",
+  "version": "1.0.0",
+  "description": "Catch Pokemon while browsing the web! A lofi SNES-style Pokemon game.",
+  
+  "permissions": [
+    "storage",
+    "tabs",
+    "notifications"
+  ],
+  
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+  },
+  
+  "background": {
+    "service_worker": "src/background/main.js",
+    "type": "module"
+  },
+  
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+  
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
 }
