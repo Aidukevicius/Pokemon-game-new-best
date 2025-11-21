@@ -128,35 +128,19 @@ export class MainScreen {
   }
 
   render3DModel() {
-    const modelUrl = this.spriteService.get3DModelUrl(this.companionPokemon.id);
+    const highQualityUrl = this.spriteService.getHighQualitySpriteUrl(this.companionPokemon.id);
     
-    if (modelUrl) {
-      // Use 3D animated sprite if available
-      return `
-        <div class="model-container">
-          <img 
-            id="pokemon3DSprite"
-            src="${modelUrl}"
-            alt="${this.companionPokemon.name}"
-            class="pokemon-3d-sprite"
-            onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${this.companionPokemon.id}.png'; this.className='pokemon-sprite pixel-art';"
-          />
-        </div>
-      `;
-    } else {
-      // Fallback to 2D sprite
-      return `
-        <div class="model-container">
-          <img 
-            id="pokemonSprite"
-            src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${this.companionPokemon.id}.png"
-            alt="${this.companionPokemon.name}"
-            class="pokemon-sprite pixel-art"
-            onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${this.companionPokemon.id}.png'"
-          />
-        </div>
-      `;
-    }
+    return `
+      <div class="model-container">
+        <img 
+          id="pokemonSprite"
+          src="${highQualityUrl}"
+          alt="${this.companionPokemon.name}"
+          class="pokemon-sprite-hq"
+          onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${this.companionPokemon.id}.png'"
+        />
+      </div>
+    `;
   }
 
   getHealthColorClass() {

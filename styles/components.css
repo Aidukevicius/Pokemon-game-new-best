@@ -1,0 +1,81 @@
+
+/* Components - Reusable UI elements */
+
+.snes-container {
+  background: #fff;
+  border: 3px solid #475569;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 4px 4px 0 rgba(71, 85, 105, 0.3);
+  margin-bottom: 12px;
+}
+
+.snes-button {
+  background: #94a3b8;
+  border: 3px solid #475569;
+  border-radius: 6px;
+  padding: 12px 8px;
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #fff;
+  text-align: center;
+  box-shadow: 3px 3px 0 #475569;
+  transition: all 0.1s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.snes-button:hover {
+  background: #64748b;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #475569;
+}
+
+.snes-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #475569;
+}
+
+.button-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.button-text {
+  font-size: 6px;
+  text-transform: uppercase;
+}
+
+.status-message {
+  display: none;
+  background: #1e293b;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 7px;
+  margin: 8px 0;
+  animation: messageSlide 0.3s ease;
+}
+
+.status-message.success {
+  background: #22c55e;
+}
+
+.status-message.error {
+  background: #ef4444;
+}
+
+@keyframes messageSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

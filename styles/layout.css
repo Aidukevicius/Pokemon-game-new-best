@@ -1,0 +1,77 @@
+
+/* Layout - App container and screens */
+
+.app-container {
+  width: 360px;
+  height: 640px;
+  margin: 0 auto;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #e4e4e4;
+}
+
+.screens-container {
+  width: 100%;
+  height: 580px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  position: relative;
+  background: #e4e4e4;
+}
+
+.screens-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.screens-container::-webkit-scrollbar-track {
+  background: #e4e4e4;
+}
+
+.screens-container::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 4px;
+}
+
+.screens-container::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+.tabs-container,
+.tabs-navigation {
+  width: 100%;
+  height: 60px;
+  background: #e4e4e4;
+  border-top: 3px solid #475569;
+  flex-shrink: 0;
+}
+
+.screen {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.screen.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 768px) {
+  .app-container {
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+}
