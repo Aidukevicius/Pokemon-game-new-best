@@ -131,17 +131,16 @@ export class MainScreen {
     const modelUrl = this.spriteService.get3DModelUrl(this.companionPokemon.id);
     
     if (modelUrl) {
-      // Use 3D model if available
+      // Use 3D animated sprite if available
       return `
         <div class="model-container">
-          <iframe 
-            id="pokemon3DModel"
+          <img 
+            id="pokemon3DSprite"
             src="${modelUrl}"
-            class="pokemon-3d-model"
-            frameborder="0"
-            allow="autoplay; fullscreen; xr-spatial-tracking"
-            allowfullscreen
-          ></iframe>
+            alt="${this.companionPokemon.name}"
+            class="pokemon-3d-sprite"
+            onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${this.companionPokemon.id}.png'; this.className='pokemon-sprite pixel-art';"
+          />
         </div>
       `;
     } else {

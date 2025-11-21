@@ -120,13 +120,14 @@ body {
   position: relative;
 }
 
-/* 3D Model Styling */
-.pokemon-3d-model {
-  width: 100%;
-  height: 100%;
+/* 3D Animated Sprite (GIF) */
+.pokemon-3d-sprite {
+  width: 180px;
+  height: 180px;
   display: block;
-  border: none;
-  border-radius: 8px;
+  margin: 10px auto;
+  image-rendering: auto;
+  filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.3));
 }
 
 /* Fallback 2D Sprite */
