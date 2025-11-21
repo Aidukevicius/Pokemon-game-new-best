@@ -1,16 +1,69 @@
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Inspect</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            gap: 20px;
+            min-height: 100vh;
+        }
+
+        .preview-wrapper {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            align-self: flex-start;
+        }
+
+        .preview-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .preview-header h1 {
+            font-size: 18px;
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+
+        .preview-header p {
+            font-size: 12px;
+            margin: 0;
+            color: #666;
+        }
+
+        .phone-frame {
+            width: 360px;
+            height: 640px;
+            border: 3px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 <body>
-    <div class="app-container">
-        <div id="screens" class="screens-container"></div>
-        <div class="tabs-container">TABS HERE</div>
+    <div class="preview-wrapper">
+        <div class="preview-header">
+            <h1>📱 Main Screen Preview</h1>
+            <p>Mobile size: 360x640px</p>
+        </div>
+        <div class="phone-frame">
+            <div class="app-container">
+                <div id="screens" class="screens-container"></div>
+                <div class="tabs-container">TABS HERE</div>
+            </div>
+        </div>
     </div>
     
-    <pre id="output" style="position: fixed; top: 0; right: 0; background: white; padding: 10px; border: 2px solid red; max-width: 400px; max-height: 600px; overflow: auto; font-size: 10px;"></pre>
+    <pre id="output" style="background: white; padding: 15px; border: 2px solid #333; border-radius: 8px; max-width: 400px; max-height: 600px; overflow: auto; font-size: 10px; font-family: monospace; align-self: flex-start;"></pre>
     
     <script type="module">
         import { MainScreen } from './src/popup/screens/main-screen.js';
