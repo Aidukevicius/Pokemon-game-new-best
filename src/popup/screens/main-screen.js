@@ -3,14 +3,12 @@
 
 import { StorageService } from '../../shared/services/StorageService.js';
 import { SpriteService } from '../../shared/services/SpriteService.js';
-import { ThreeJSRenderer } from '../../shared/services/ThreeJSRenderer.js';
 
 export class MainScreen {
   constructor(containerElement) {
     this.container = containerElement;
     this.storageService = new StorageService();
     this.spriteService = new SpriteService();
-    this.threeRenderer = null;
     this.companionPokemon = null;
     this.healthInterval = null;
   }
@@ -127,47 +125,39 @@ export class MainScreen {
     `;
 
     this.attachEventListeners();
-    
-    // Try to load 3D model if available
-    const modelPath = this.spriteService.get3DModelPath(this.companionPokemon.id);
-    if (modelPath) {
-      await this.load3DModel(modelPath);
-    }
-  }
-
-  async load3DModel(modelPath) {
-    try {
-      const displayContainer = this.container.querySelector('#pokemonDisplay');
-      if (!displayContainer) return;
-
-      // Clear existing content
-      displayContainer.innerHTML = '<div class="model-container" id="threeContainer"></div>';
-      
-      const threeContainer = displayContainer.querySelector('#threeContainer');
-      this.threeRenderer = new ThreeJSRenderer(threeContainer);
-      await this.threeRenderer.initialize();
-      await this.threeRenderer.loadModel(modelPath);
-    } catch (error) {
-      console.error('Failed to load 3D model:', error);
-      // Fall back to 2D sprite
-      this.render3DModel();
-    }
   }
 
   render3DModel() {
-    const highQualityUrl = this.spriteService.getHighQualitySpriteUrl(this.companionPokemon.id);
+    const model3DUrl = this.spriteService.get3DModelUrl(this.companionPokemon.id);
+    const fallbackUrl = this.spriteService.getHighQualitySpriteUrl(this.companionPokemon.id);
     
-    return `
-      <div class="model-container">
-        <img 
-          id="pokemonSprite"
-          src="${highQualityUrl}"
-          alt="${this.companionPokemon.name}"
-          class="pokemon-sprite-hq"
-          onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${this.companionPokemon.id}.png'"
-        />
-      </div>
-    `;
+    if (model3DUrl) {
+      // Use 3D animated GIF sprite
+      return `
+        <div class="model-container">
+          <img 
+            id="pokemonSprite"
+            src="${model3DUrl}"
+            alt="${this.companionPokemon.name}"
+            class="pokemon-sprite-3d"
+            onerror="this.src='${fallbackUrl}'; this.className='pokemon-sprite-hq';"
+          />
+        </div>
+      `;
+    } else {
+      // Fall back to high-quality 2D sprite
+      return `
+        <div class="model-container">
+          <img 
+            id="pokemonSprite"
+            src="${fallbackUrl}"
+            alt="${this.companionPokemon.name}"
+            class="pokemon-sprite-hq"
+            onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${this.companionPokemon.id}.png'"
+          />
+        </div>
+      `;
+    }
   }
 
   getHealthColorClass() {
@@ -332,9 +322,6 @@ export class MainScreen {
   destroy() {
     if (this.healthInterval) {
       clearInterval(this.healthInterval);
-    }
-    if (this.threeRenderer) {
-      this.threeRenderer.destroy();
     }
   }
 }

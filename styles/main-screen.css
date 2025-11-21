@@ -21,8 +21,8 @@
 
 .pokemon-display {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 160px;
+  height: 160px;
   margin: 0 auto 12px;
 }
 
@@ -33,26 +33,32 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-#threeContainer {
-  width: 200px;
-  height: 200px;
-}
-
-#threeContainer canvas {
-  display: block;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
   border-radius: 8px;
 }
 
+.pokemon-sprite-3d {
+  width: 140px;
+  height: 140px;
+  display: block;
+  margin: 0 auto;
+  image-rendering: auto;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+  transition: transform 0.3s ease;
+}
+
+.pokemon-sprite-3d:hover {
+  transform: scale(1.1);
+}
+
 .pokemon-sprite-hq {
-  width: 200px;
-  height: 200px;
+  width: 140px;
+  height: 140px;
   display: block;
   margin: 0 auto;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
-  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2));
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
   transition: transform 0.3s ease;
 }
 
