@@ -37,33 +37,20 @@
   border-radius: 8px;
 }
 
-.pokemon-sprite-3d {
+.pokemon-sprite {
   width: 140px;
   height: 140px;
   display: block;
   margin: 0 auto;
-  image-rendering: auto;
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-  transition: transform 0.3s ease;
-}
-
-.pokemon-sprite-3d:hover {
-  transform: scale(1.1);
-}
-
-.pokemon-sprite-hq {
-  width: 140px;
-  height: 140px;
-  display: block;
-  margin: 0 auto;
-  image-rendering: -webkit-optimize-contrast;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
   transition: transform 0.3s ease;
 }
 
-.pokemon-sprite-hq:hover {
-  transform: scale(1.05);
+.pokemon-sprite:hover {
+  transform: scale(1.1);
 }
 
 .pokemon-info {

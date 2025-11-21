@@ -128,36 +128,21 @@ export class MainScreen {
   }
 
   render3DModel() {
-    const model3DUrl = this.spriteService.get3DModelUrl(this.companionPokemon.id);
-    const fallbackUrl = this.spriteService.getHighQualitySpriteUrl(this.companionPokemon.id);
+    const spriteUrl = this.spriteService.getSpriteUrl(this.companionPokemon.id);
+    const animatedUrl = this.spriteService.getAnimatedSpriteUrl(this.companionPokemon.id);
+    const fallbackUrl = this.spriteService.getDefaultSpriteUrl(this.companionPokemon.id);
     
-    if (model3DUrl) {
-      // Use 3D animated GIF sprite
-      return `
-        <div class="model-container">
-          <img 
-            id="pokemonSprite"
-            src="${model3DUrl}"
-            alt="${this.companionPokemon.name}"
-            class="pokemon-sprite-3d"
-            onerror="this.src='${fallbackUrl}'; this.className='pokemon-sprite-hq';"
-          />
-        </div>
-      `;
-    } else {
-      // Fall back to high-quality 2D sprite
-      return `
-        <div class="model-container">
-          <img 
-            id="pokemonSprite"
-            src="${fallbackUrl}"
-            alt="${this.companionPokemon.name}"
-            class="pokemon-sprite-hq"
-            onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${this.companionPokemon.id}.png'"
-          />
-        </div>
-      `;
-    }
+    return `
+      <div class="model-container">
+        <img 
+          id="pokemonSprite"
+          src="${spriteUrl}"
+          alt="${this.companionPokemon.name}"
+          class="pokemon-sprite"
+          onerror="this.src='${fallbackUrl}';"
+        />
+      </div>
+    `;
   }
 
   getHealthColorClass() {
