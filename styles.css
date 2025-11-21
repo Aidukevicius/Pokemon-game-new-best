@@ -1,0 +1,46 @@
+/* STYLES.CSS PLACEHOLDER */
+/* Custom styles for the Pokemon Chrome Extension - SNES lofi aesthetic */
+
+/* WHAT GOES HERE: */
+
+/* 
+MOBILE DIMENSIONS:
+- Set body/container width to 360px
+- Set body/container height to 640px
+- Prevent scrolling and overflow
+
+SNES-STYLE THEME:
+- Color palette: Warm grays, muted colors (lofi vibe)
+- Primary colors: #e4e4e4, #94a3b8, #475569
+- Accent colors: #ef4444 (Pokéball red), #3b82f6 (water blue)
+- Background: Subtle texture or gradient
+
+RETRO ELEMENTS:
+- Pixel borders (2-3px solid borders)
+- Box shadows for depth (inset shadows on containers)
+- Scanline effect overlay (optional)
+- CRT screen curvature effect (subtle)
+
+LAYOUT STYLING:
+- Header area styling (top 80px)
+- Pokemon display card (center, ~300px height)
+- Button container (bottom section)
+- Stats bar (fixed bottom, ~60px)
+
+BUTTON STYLES:
+- SNES controller button appearance
+- Hover states with slight color shift
+- Active/pressed state animations
+- Pixel-perfect borders
+
+TYPOGRAPHY:
+- Retro pixel font imports
+- Text shadow for depth
+- Proper sizing hierarchy
+
+ANIMATIONS:
+- Pokemon appear animation (fade in + slight bounce)
+- Button press animations
+- Pokéball throw animation keyframes
+- Catch success/fail animations
+*/

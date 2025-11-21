@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PokéBrowse Extension Preview</title>
+    <style>
+        /* PREVIEW PAGE STYLING */
+        /* This page is for viewing the extension popup in Replit's webview */
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        
+        .preview-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .preview-header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .extension-frame {
+            width: 360px;
+            height: 640px;
+            border: 3px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-container">
+        <div class="preview-header">
+            <h1>🎮 PokéBrowse Extension Preview</h1>
+            <p>Mobile-shaped view (360x640px)</p>
+        </div>
+        
+        <div class="extension-frame">
+            <iframe src="popup.html"></iframe>
+        </div>
+        
+        <div class="info">
+            <strong>Preview Mode:</strong> This shows how the extension popup will look.
+            The actual extension will open as a popup when you click the icon in Chrome.
+        </div>
+    </div>
+</body>
+</html>

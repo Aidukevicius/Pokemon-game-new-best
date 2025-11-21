@@ -1,0 +1,13 @@
+{
+  "PLACEHOLDER": "Chrome Extension Manifest V3 configuration goes here",
+  "description": "This file should contain:",
+  "items": [
+    "Extension name, version, and description",
+    "Manifest version 3 declaration",
+    "Permissions for storage and tabs API",
+    "Action configuration pointing to popup.html",
+    "Background service worker pointing to background.js",
+    "Icons configuration for different sizes (16x16, 48x48, 128x128)",
+    "Content security policy if needed"
+  ]
+}
