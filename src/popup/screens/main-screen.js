@@ -50,11 +50,6 @@ export class MainScreen {
   render() {
     this.container.innerHTML = `
       <div class="main-screen">
-        <!-- Header -->
-        <div class="snes-container companion-header">
-          <h2 class="pixel-text">My Companion</h2>
-        </div>
-
         <!-- Pokemon Display Card -->
         <div class="snes-container companion-card">
           <!-- Pokemon 3D Model / Sprite -->
@@ -133,20 +128,36 @@ export class MainScreen {
   }
 
   render3DModel() {
-    // Use pixelated sprite for SNES aesthetic
-    // 3D models would be loaded from external URLs when available
-    return `
-      <div class="model-container">
-        <!-- Pokemon Sprite (pixelated SNES style) -->
-        <img 
-          id="pokemonSprite"
-          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${this.companionPokemon.id}.png"
-          alt="${this.companionPokemon.name}"
-          class="pokemon-sprite pixel-art"
-          onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${this.companionPokemon.id}.png'"
-        />
-      </div>
-    `;
+    const modelUrl = this.spriteService.get3DModelUrl(this.companionPokemon.id);
+    
+    if (modelUrl) {
+      // Use 3D model if available
+      return `
+        <div class="model-container">
+          <iframe 
+            id="pokemon3DModel"
+            src="${modelUrl}"
+            class="pokemon-3d-model"
+            frameborder="0"
+            allow="autoplay; fullscreen; xr-spatial-tracking"
+            allowfullscreen
+          ></iframe>
+        </div>
+      `;
+    } else {
+      // Fallback to 2D sprite
+      return `
+        <div class="model-container">
+          <img 
+            id="pokemonSprite"
+            src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${this.companionPokemon.id}.png"
+            alt="${this.companionPokemon.name}"
+            class="pokemon-sprite pixel-art"
+            onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${this.companionPokemon.id}.png'"
+          />
+        </div>
+      `;
+    }
   }
 
   getHealthColorClass() {
