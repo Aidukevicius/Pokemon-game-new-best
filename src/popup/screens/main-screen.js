@@ -67,22 +67,6 @@ export class MainScreen {
           </div>
         </div>
 
-        <!-- Interaction Buttons -->
-        <div class="interaction-buttons">
-          <button class="snes-button feed-button" data-action="feed">
-            <span class="button-icon">🍎</span>
-            <span class="button-text">Feed</span>
-          </button>
-          <button class="snes-button play-button" data-action="play">
-            <span class="button-icon">🎮</span>
-            <span class="button-text">Play</span>
-          </button>
-          <button class="snes-button heal-button" data-action="heal">
-            <span class="button-icon">💊</span>
-            <span class="button-text">Heal</span>
-          </button>
-        </div>
-
         <!-- Stats Section -->
         <div class="snes-container companion-stats">
           <!-- Health Bar -->
@@ -114,16 +98,24 @@ export class MainScreen {
           </div>
         </div>
 
+        <!-- Pokemon Storage Section -->
+        <div class="snes-container pokemon-storage">
+          <div class="storage-header">
+            <h3 class="storage-title">Pokemon Storage</h3>
+            <span class="storage-count">${await this.getPokemonCount()}/151</span>
+          </div>
+          
+          <div class="favorite-slots">
+            ${await this.renderFavoriteSlots()}
+          </div>
+          
+          <button class="snes-button view-all-button" data-action="view-storage">
+            <span class="button-text">View All Pokemon</span>
+          </button>
+        </div>
+
         <!-- Status Messages -->
         <div class="status-message" id="statusMessage"></div>
-
-        <!-- Info Footer -->
-        <div class="snes-container companion-info">
-          <p class="info-text">
-            💡 Your companion gains XP when you catch Pokemon!
-            Keep them healthy and happy for better bonuses.
-          </p>
-        </div>
       </div>
     `;
 
@@ -168,45 +160,48 @@ export class MainScreen {
   }
 
   attachEventListeners() {
-    const feedBtn = this.container.querySelector('[data-action="feed"]');
-    const playBtn = this.container.querySelector('[data-action="play"]');
-    const healBtn = this.container.querySelector('[data-action="heal"]');
-
-    feedBtn?.addEventListener('click', () => this.feedPokemon());
-    playBtn?.addEventListener('click', () => this.playWithPokemon());
-    healBtn?.addEventListener('click', () => this.healPokemon());
+    const viewStorageBtn = this.container.querySelector('[data-action="view-storage"]');
+    viewStorageBtn?.addEventListener('click', () => this.openStorage());
   }
 
-  async feedPokemon() {
-    // Restore 20 health and 10 happiness
-    this.companionPokemon.health = Math.min(100, this.companionPokemon.health + 20);
-    this.companionPokemon.happiness = Math.min(100, this.companionPokemon.happiness + 10);
-    this.companionPokemon.lastFed = Date.now();
-
-    await this.saveCompanion();
-    this.showMessage(`${this.companionPokemon.name} enjoyed the food! ❤️`, 'success');
-    this.updateDisplay();
+  async getPokemonCount() {
+    const collection = await this.storageService.get('pokemon_collection');
+    return collection ? collection.length : 0;
   }
 
-  async playWithPokemon() {
-    // Increase happiness, slight health decrease
-    this.companionPokemon.happiness = Math.min(100, this.companionPokemon.happiness + 15);
-    this.companionPokemon.health = Math.max(0, this.companionPokemon.health - 5);
-    this.companionPokemon.lastInteraction = Date.now();
-
-    await this.saveCompanion();
-    this.showMessage(`${this.companionPokemon.name} is having fun! 🎮`, 'success');
-    this.updateDisplay();
-  }
-
-  async healPokemon() {
-    // Check if player has potions (future: check inventory)
-    // For now, just heal
-    this.companionPokemon.health = 100;
+  async renderFavoriteSlots() {
+    const collection = await this.storageService.get('pokemon_collection');
+    const favorites = collection ? collection.slice(0, 6) : [];
     
-    await this.saveCompanion();
-    this.showMessage(`${this.companionPokemon.name} is fully healed! 💊`, 'success');
-    this.updateDisplay();
+    let slotsHTML = '';
+    for (let i = 0; i < 6; i++) {
+      if (favorites[i]) {
+        const pokemon = favorites[i];
+        const spriteUrl = this.spriteService.getDefaultSpriteUrl(pokemon.id);
+        slotsHTML += `
+          <div class="pokemon-slot filled">
+            <img src="${spriteUrl}" alt="${pokemon.name}" class="slot-sprite">
+            <span class="slot-level">Lv.${pokemon.level}</span>
+          </div>
+        `;
+      } else {
+        slotsHTML += `
+          <div class="pokemon-slot empty">
+            <span class="empty-icon">?</span>
+          </div>
+        `;
+      }
+    }
+    
+    return slotsHTML;
+  }
+
+  openStorage() {
+    // Trigger navigation to storage tab
+    const storageTab = document.querySelector('[data-tab="storage"]');
+    if (storageTab) {
+      storageTab.click();
+    }
   }
 
   async addExperience(amount) {
