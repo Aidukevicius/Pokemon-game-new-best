@@ -67,6 +67,22 @@ export class MainScreen {
           </div>
         </div>
 
+        <!-- Interaction Buttons -->
+        <div class="interaction-buttons">
+          <button class="snes-button feed-button" data-action="feed">
+            <span class="button-icon">🍎</span>
+            <span class="button-text">Feed</span>
+          </button>
+          <button class="snes-button play-button" data-action="play">
+            <span class="button-icon">🎮</span>
+            <span class="button-text">Play</span>
+          </button>
+          <button class="snes-button heal-button" data-action="heal">
+            <span class="button-icon">💊</span>
+            <span class="button-text">Heal</span>
+          </button>
+        </div>
+
         <!-- Stats Section -->
         <div class="snes-container companion-stats">
           <!-- Health Bar -->
@@ -96,22 +112,6 @@ export class MainScreen {
             <span class="stat-label">Mood</span>
             <span class="happiness-hearts">${this.renderHearts()}</span>
           </div>
-        </div>
-
-        <!-- Interaction Buttons -->
-        <div class="interaction-buttons">
-          <button class="snes-button feed-button" data-action="feed">
-            <span class="button-icon">🍎</span>
-            <span class="button-text">Feed</span>
-          </button>
-          <button class="snes-button play-button" data-action="play">
-            <span class="button-icon">🎮</span>
-            <span class="button-text">Play</span>
-          </button>
-          <button class="snes-button heal-button" data-action="heal">
-            <span class="button-icon">💊</span>
-            <span class="button-text">Heal</span>
-          </button>
         </div>
 
         <!-- Status Messages -->
