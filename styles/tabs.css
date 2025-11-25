@@ -13,6 +13,12 @@
 .tab-button {
   display: flex;
   flex-direction: column;
+
+.tab-button[data-tab="collection"] .tab-icon {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><rect x="6" y="2" width="8" height="2" fill="%23000"/><rect x="4" y="4" width="2" height="2" fill="%23000"/><rect x="14" y="4" width="2" height="2" fill="%23000"/><rect x="2" y="6" width="2" height="8" fill="%23000"/><rect x="16" y="6" width="2" height="8" fill="%23000"/><rect x="4" y="6" width="12" height="8" fill="%23fbbf24"/><rect x="6" y="8" width="8" height="4" fill="%23fcd34d"/><circle cx="10" cy="10" r="1.5" fill="%23dc2626"/><rect x="4" y="14" width="2" height="2" fill="%23000"/><rect x="14" y="14" width="2" height="2" fill="%23000"/><rect x="6" y="16" width="8" height="2" fill="%23000"/></svg>') center/contain no-repeat;
+}
+
+
   align-items: center;
   justify-content: center;
   gap: 2px;

@@ -197,10 +197,10 @@ export class MainScreen {
   }
 
   openStorage() {
-    // Trigger navigation to pokedex tab to view all caught Pokemon
-    const pokedexTab = document.querySelector('[data-tab="pokedex"]');
-    if (pokedexTab) {
-      pokedexTab.click();
+    // Trigger navigation to collection tab to view all caught Pokemon
+    const collectionTab = document.querySelector('[data-tab="collection"]');
+    if (collectionTab) {
+      collectionTab.click();
     }
   }
 
