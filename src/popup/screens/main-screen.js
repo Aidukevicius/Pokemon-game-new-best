@@ -52,6 +52,9 @@ export class MainScreen {
       <div class="main-screen">
         <!-- Pokemon Display Card -->
         <div class="snes-container companion-card">
+          <!-- Game Boy Power LED -->
+          <div class="power-led" title="Power"></div>
+          
           <!-- Pokemon 3D Model / Sprite -->
           <div class="pokemon-display" id="pokemonDisplay">
             ${this.render3DModel()}
