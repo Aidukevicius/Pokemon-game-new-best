@@ -3,11 +3,13 @@
 
 .main-screen {
   padding: 16px;
+  padding-bottom: 76px;
   display: flex !important;
   flex-direction: column;
   gap: 12px;
   height: 100%;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .companion-card {
