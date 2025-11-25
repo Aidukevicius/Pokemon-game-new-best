@@ -196,12 +196,27 @@ export class MainScreen {
     return slotsHTML;
   }
 
-  openStorage() {
-    // Trigger navigation to collection tab to view all caught Pokemon
-    const collectionTab = document.querySelector('[data-tab="collection"]');
-    if (collectionTab) {
-      collectionTab.click();
-    }
+  async openStorage() {
+    // Show collection as an overlay/modal
+    const { CollectionScreen } = await import('./collection-screen.js');
+    const overlay = document.createElement('div');
+    overlay.className = 'collection-overlay';
+    overlay.innerHTML = `
+      <div class="collection-modal">
+        <button class="close-modal" data-action="close">✕</button>
+        <div id="collectionContent"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    const collectionContent = overlay.querySelector('#collectionContent');
+    const collectionScreen = new CollectionScreen(collectionContent);
+    await collectionScreen.initialize();
+    collectionScreen.show();
+    
+    overlay.querySelector('.close-modal').addEventListener('click', () => {
+      overlay.remove();
+    });
   }
 
   async addExperience(amount) {

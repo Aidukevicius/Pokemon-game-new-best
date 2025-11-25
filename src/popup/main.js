@@ -2,11 +2,9 @@
 // Initialize popup UI and manage screen navigation
 
 import { MainScreen } from './screens/main-screen.js';
-import { CollectionScreen } from './screens/collection-screen.js';
 
 console.log('[Main] Script loaded');
 console.log('[Main] MainScreen imported');
-console.log('[Main] CollectionScreen imported');
 
 // Simple implementation for now - just show MainScreen
 async function initializeApp() {
@@ -25,13 +23,6 @@ async function initializeApp() {
 
     console.log('[Main] Initializing MainScreen...');
     await mainScreen.initialize();
-
-    console.log('[Main] Creating CollectionScreen...');
-    const collectionScreen = new CollectionScreen(screensContainer);
-
-    console.log('[Main] Initializing CollectionScreen...');
-    await collectionScreen.initialize();
-    collectionScreen.hide();
 
     console.log('[Main] Showing MainScreen...');
     mainScreen.show();
@@ -52,13 +43,10 @@ async function initializeApp() {
 
         // Hide all screens
         mainScreen.hide();
-        collectionScreen.hide();
 
         // Show selected screen
         if (tabName === 'main') {
           mainScreen.show();
-        } else if (tabName === 'collection') {
-          collectionScreen.show();
         } else {
           // Placeholder for other screens
           console.log('[Main] Other screens not implemented yet');
