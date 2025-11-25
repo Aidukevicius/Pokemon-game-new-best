@@ -197,10 +197,10 @@ export class MainScreen {
   }
 
   openStorage() {
-    // Trigger navigation to storage tab
-    const storageTab = document.querySelector('[data-tab="storage"]');
-    if (storageTab) {
-      storageTab.click();
+    // Trigger navigation to pokedex tab to view all caught Pokemon
+    const pokedexTab = document.querySelector('[data-tab="pokedex"]');
+    if (pokedexTab) {
+      pokedexTab.click();
     }
   }
 
