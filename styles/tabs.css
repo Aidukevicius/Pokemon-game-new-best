@@ -22,6 +22,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 10px;
+  position: relative;
 }
 
 .tab-button:hover {
@@ -36,8 +37,38 @@
 }
 
 .tab-icon {
-  font-size: 16px;
-  line-height: 1;
+  width: 20px;
+  height: 20px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  position: relative;
+  display: block;
+}
+
+/* Pixelated Pokemon-themed icons */
+.tab-button[data-tab="main"] .tab-icon {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><rect x="8" y="2" width="4" height="2" fill="%23000"/><rect x="6" y="4" width="2" height="2" fill="%23000"/><rect x="12" y="4" width="2" height="2" fill="%23000"/><rect x="4" y="6" width="2" height="2" fill="%23000"/><rect x="14" y="6" width="2" height="2" fill="%23000"/><rect x="4" y="8" width="2" height="4" fill="%23000"/><rect x="14" y="8" width="2" height="4" fill="%23000"/><rect x="6" y="8" width="8" height="4" fill="%23ff0000"/><rect x="2" y="10" width="2" height="2" fill="%23000"/><rect x="16" y="10" width="2" height="2" fill="%23000"/><rect x="4" y="12" width="2" height="2" fill="%23000"/><rect x="14" y="12" width="2" height="2" fill="%23000"/><rect x="6" y="12" width="8" height="2" fill="%23fff"/><rect x="6" y="14" width="2" height="2" fill="%23000"/><rect x="12" y="14" width="2" height="2" fill="%23000"/><rect x="8" y="14" width="4" height="2" fill="%23fff"/><rect x="8" y="16" width="4" height="2" fill="%23000"/><circle cx="10" cy="11" r="1.5" fill="%23000"/></svg>') center/contain no-repeat;
+}
+
+.tab-button[data-tab="search"] .tab-icon {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><rect x="6" y="4" width="2" height="2" fill="%23000"/><rect x="12" y="4" width="2" height="2" fill="%23000"/><rect x="4" y="6" width="2" height="6" fill="%23000"/><rect x="14" y="6" width="2" height="6" fill="%23000"/><rect x="6" y="6" width="8" height="6" fill="%23ffc107"/><rect x="6" y="12" width="2" height="2" fill="%23000"/><rect x="12" y="12" width="2" height="2" fill="%23000"/><rect x="8" y="12" width="4" height="2" fill="%23ffc107"/><rect x="14" y="12" width="2" height="2" fill="%23000"/><rect x="16" y="14" width="2" height="2" fill="%23000"/><rect x="18" y="16" width="2" height="2" fill="%23000"/><circle cx="10" cy="9" r="1" fill="%23000"/></svg>') center/contain no-repeat;
+}
+
+.tab-button[data-tab="pokedex"] .tab-icon {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><rect x="4" y="2" width="12" height="2" fill="%23000"/><rect x="2" y="4" width="2" height="14" fill="%23000"/><rect x="16" y="4" width="2" height="14" fill="%23000"/><rect x="4" y="4" width="12" height="6" fill="%23dc2626"/><rect x="4" y="10" width="12" height="2" fill="%23000"/><rect x="4" y="12" width="12" height="6" fill="%23f3f4f6"/><rect x="8" y="6" width="4" height="2" fill="%23000"/><rect x="6" y="14" width="2" height="2" fill="%23000"/><rect x="12" y="14" width="2" height="2" fill="%23000"/><rect x="8" y="14" width="4" height="2" fill="%2322c55e"/><rect x="4" y="18" width="12" height="2" fill="%23000"/></svg>') center/contain no-repeat;
+}
+
+.tab-button[data-tab="storage"] .tab-icon {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><rect x="4" y="4" width="2" height="2" fill="%23000"/><rect x="14" y="4" width="2" height="2" fill="%23000"/><rect x="2" y="6" width="2" height="10" fill="%23000"/><rect x="16" y="6" width="2" height="10" fill="%23000"/><rect x="4" y="6" width="12" height="10" fill="%238b4513"/><rect x="6" y="8" width="8" height="6" fill="%23a0522d"/><rect x="9" y="10" width="2" height="4" fill="%23000"/><rect x="4" y="16" width="12" height="2" fill="%23000"/><rect x="6" y="6" width="8" height="2" fill="%23654321"/></svg>') center/contain no-repeat;
+}
+
+.tab-button[data-tab="shop"] .tab-icon {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><rect x="6" y="3" width="8" height="2" fill="%23000"/><rect x="4" y="5" width="2" height="2" fill="%23000"/><rect x="14" y="5" width="2" height="2" fill="%23000"/><rect x="2" y="7" width="2" height="2" fill="%23000"/><rect x="16" y="7" width="2" height="2" fill="%23000"/><rect x="4" y="7" width="12" height="2" fill="%23fbbf24"/><rect x="2" y="9" width="16" height="2" fill="%23fbbf24"/><rect x="4" y="11" width="2" height="6" fill="%23000"/><rect x="14" y="11" width="2" height="6" fill="%23000"/><rect x="6" y="11" width="8" height="6" fill="%23dc2626"/><rect x="4" y="17" width="12" height="2" fill="%23000"/><rect x="9" y="13" width="2" height="2" fill="%23fbbf24"/></svg>') center/contain no-repeat;
+}
+
+.tab-button[data-tab="settings"] .tab-icon {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><rect x="8" y="2" width="4" height="2" fill="%23000"/><rect x="6" y="4" width="2" height="2" fill="%23000"/><rect x="12" y="4" width="2" height="2" fill="%23000"/><rect x="4" y="6" width="2" height="2" fill="%23000"/><rect x="14" y="6" width="2" height="2" fill="%23000"/><rect x="2" y="8" width="2" height="4" fill="%23000"/><rect x="16" y="8" width="2" height="4" fill="%23000"/><rect x="6" y="8" width="8" height="4" fill="%2364748b"/><rect x="4" y="12" width="2" height="2" fill="%23000"/><rect x="14" y="12" width="2" height="2" fill="%23000"/><rect x="6" y="14" width="2" height="2" fill="%23000"/><rect x="12" y="14" width="2" height="2" fill="%23000"/><rect x="8" y="16" width="4" height="2" fill="%23000"/><circle cx="10" cy="10" r="2" fill="%23000"/><circle cx="10" cy="10" r="1" fill="%23fff"/></svg>') center/contain no-repeat;
 }
 
 .tab-label {
