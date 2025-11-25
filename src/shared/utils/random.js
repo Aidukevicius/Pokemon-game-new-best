@@ -1,66 +1,69 @@
-// RANDOM UTILITIES PLACEHOLDER
-// Random number generation helpers
+// Random utility functions for game mechanics
 
-// WHAT GOES HERE:
+/**
+ * Generate random integer between min and max (inclusive)
+ */
+export function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-/*
-RANDOM NUMBER FUNCTIONS:
+/**
+ * Generate random float between min and max
+ */
+export function getRandomFloat(min, max) {
+  return Math.random() * (max - min) + min;
+}
 
-export function getRandomInt(min, max)
-- Generate random integer between min and max (inclusive)
-- Example: getRandomInt(1, 100) returns 1-100
-- Formula: Math.floor(Math.random() * (max - min + 1)) + min
+/**
+ * Weighted random choice from arrays
+ * @param {Array} options - Array of options to choose from
+ * @param {Array} weights - Array of weights corresponding to options
+ * @returns {*} Selected option
+ */
+export function weightedRandomChoice(options, weights) {
+  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+  let random = Math.random() * totalWeight;
+  
+  for (let i = 0; i < options.length; i++) {
+    random -= weights[i];
+    if (random <= 0) {
+      return options[i];
+    }
+  }
+  
+  return options[options.length - 1];
+}
 
-export function getRandomFloat(min, max)
-- Generate random float between min and max
-- Example: getRandomFloat(0, 1) returns 0.0-1.0
-- Formula: Math.random() * (max - min) + min
+/**
+ * Get random element from array
+ */
+export function getRandomFromArray(array) {
+  return array[getRandomInt(0, array.length - 1)];
+}
 
-export function weightedRandomChoice(options)
-- Select random item based on weights
-- Example input: [
-    { value: 'common', weight: 60 },
-    { value: 'rare', weight: 10 }
-  ]
-- Returns the value of selected item
-- Algorithm:
-  1. Sum all weights
-  2. Generate random number 0 to totalWeight
-  3. Iterate through options, subtracting weights
-  4. Return when sum exceeds random number
+/**
+ * Return true with given probability (0-1)
+ */
+export function chance(probability) {
+  return Math.random() < probability;
+}
 
-export function shuffle(array)
-- Fisher-Yates shuffle algorithm
-- Randomly shuffle array in place
-- Returns shuffled array
+/**
+ * Shuffle array in place (Fisher-Yates)
+ */
+export function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
 
-export function getRandomFromArray(array)
-- Pick random element from array
-- Example: getRandomFromArray(['a', 'b', 'c'])
-- Returns random element
-
-export function chance(probability)
-- Random boolean based on probability
-- Example: chance(0.75) returns true 75% of the time
-- Takes probability 0-1
-- Returns boolean
-
-export function rollDice(sides)
-- Simulate dice roll
-- Example: rollDice(6) returns 1-6
-- Returns integer 1 to sides (inclusive)
-
-USAGE EXAMPLES:
-
-// Generate Pokemon level
-const level = getRandomInt(1, 100);
-
-// Check if Pokemon caught
-const catchSuccess = chance(0.65); // 65% catch rate
-
-// Select rarity
-const rarity = weightedRandomChoice([
-  { value: 'common', weight: 60 },
-  { value: 'rare', weight: 10 }
-]);
-*/
+/**
+ * Roll dice with given number of sides
+ */
+export function rollDice(sides) {
+  return getRandomInt(1, sides);
+}
