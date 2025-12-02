@@ -6,6 +6,9 @@
   gap: 12px;
   height: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .collection-header {
@@ -52,6 +55,9 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
   flex: 1;
+  max-width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .collection-card {
@@ -62,6 +68,8 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .collection-card:hover {
