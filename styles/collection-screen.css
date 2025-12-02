@@ -1,5 +1,5 @@
 .collection-screen {
-  padding: 16px;
+  padding: 16px 12px;
   padding-bottom: 20px;
   display: flex;
   flex-direction: column;
@@ -52,11 +52,10 @@
 
 .collection-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   flex: 1;
-  max-width: 100%;
-  margin: 0 auto;
+  width: 100%;
   box-sizing: border-box;
 }
 
