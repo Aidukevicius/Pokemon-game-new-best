@@ -26,7 +26,7 @@ export class MainScreen {
   async loadCompanionData() {
     // Load companion Pokemon from storage
     const data = await this.storageService.get('companion');
-    
+
     if (!data) {
       // Create default starter companion (Pikachu)
       this.companionPokemon = {
@@ -51,14 +51,14 @@ export class MainScreen {
     const pokemonCount = await this.getPokemonCount();
     const favoriteSlotsHTML = await this.renderFavoriteSlots();
     console.log('[MainScreen] Favorite slots HTML:', favoriteSlotsHTML);
-    
+
     this.container.innerHTML = `
       <div class="main-screen">
         <!-- Pokemon Display Card -->
         <div class="snes-container companion-card">
           <!-- Game Boy Power LED -->
           <div class="power-led" title="Power"></div>
-          
+
           <!-- Pokemon 3D Model / Sprite -->
           <div class="pokemon-display" id="pokemonDisplay">
             ${this.render3DModel()}
@@ -108,11 +108,11 @@ export class MainScreen {
             <h3 class="storage-title">Pokemon Storage</h3>
             <span class="storage-count">${pokemonCount}/151</span>
           </div>
-          
+
           <div class="favorite-slots">
             ${favoriteSlotsHTML}
           </div>
-          
+
           <button class="snes-button view-all-button" data-action="view-storage">
             <span class="button-text">View All Pokemon</span>
           </button>
@@ -130,7 +130,7 @@ export class MainScreen {
     const spriteUrl = this.spriteService.getSpriteUrl(this.companionPokemon.id);
     const animatedUrl = this.spriteService.getAnimatedSpriteUrl(this.companionPokemon.id);
     const fallbackUrl = this.spriteService.getDefaultSpriteUrl(this.companionPokemon.id);
-    
+
     return `
       <div class="model-container">
         <img 
@@ -159,7 +159,7 @@ export class MainScreen {
     const happiness = this.companionPokemon.happiness;
     const fullHearts = Math.floor(happiness / 20); // 5 hearts max
     const emptyHearts = 5 - fullHearts;
-    
+
     return '❤️'.repeat(fullHearts) + '🤍'.repeat(emptyHearts);
   }
 
@@ -176,7 +176,7 @@ export class MainScreen {
   async renderFavoriteSlots() {
     const collection = await this.storageService.get('pokemon_collection');
     const favorites = collection ? collection.slice(0, 6) : [];
-    
+
     let slotsHTML = '';
     for (let i = 0; i < 6; i++) {
       if (favorites[i]) {
@@ -195,7 +195,7 @@ export class MainScreen {
         `;
       }
     }
-    
+
     return slotsHTML;
   }
 
@@ -211,12 +211,12 @@ export class MainScreen {
       </div>
     `;
     document.body.appendChild(overlay);
-    
+
     const collectionContent = overlay.querySelector('#collectionContent');
     const collectionScreen = new CollectionScreen(collectionContent);
     await collectionScreen.initialize();
     collectionScreen.show();
-    
+
     overlay.querySelector('.close-modal').addEventListener('click', () => {
       overlay.remove();
     });
@@ -255,7 +255,7 @@ export class MainScreen {
       if (hoursWithoutFood > 1) {
         this.companionPokemon.health = Math.max(0, this.companionPokemon.health - 1);
         this.companionPokemon.happiness = Math.max(0, this.companionPokemon.happiness - 1);
-        
+
         await this.saveCompanion();
         this.updateDisplay();
       }

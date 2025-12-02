@@ -22,14 +22,14 @@ db.init_app(app)
 
 class Pokemon(db.Model):
     __tablename__ = 'pokemon'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     pokemon_id = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String(100), nullable=False)
     level = db.Column(db.Integer, default=1)
     caught_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_favorite = db.Column(db.Boolean, default=False)
-    
+
     def to_dict(self):
         return {
             'id': self.pokemon_id,
@@ -43,7 +43,7 @@ class Pokemon(db.Model):
 
 class Companion(db.Model):
     __tablename__ = 'companion'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     pokemon_id = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String(100), nullable=False)
@@ -55,7 +55,7 @@ class Companion(db.Model):
     happiness = db.Column(db.Integer, default=100)
     last_fed = db.Column(db.DateTime, default=datetime.utcnow)
     last_interaction = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     def to_dict(self):
         return {
             'id': self.pokemon_id,
@@ -96,16 +96,21 @@ def get_pokemon_collection():
 
 @app.route('/api/pokemon', methods=['POST'])
 def add_pokemon():
+    # Check if storage limit reached (100 Pokemon max)
+    current_count = Pokemon.query.count()
+    if current_count >= 100:
+        return jsonify({'error': 'Storage limit reached. Maximum 100 Pokemon allowed.'}), 400
+
     data = request.json
-    pokemon = Pokemon(
-        pokemon_id=data.get('id'),
-        name=data.get('name'),
+    new_pokemon = Pokemon(
+        pokemon_id=data['id'],
+        name=data['name'],
         level=data.get('level', 1),
-        is_favorite=data.get('is_favorite', False)
+        caught_at=datetime.fromisoformat(data['caughtAt'].replace('Z', '+00:00')) if 'caughtAt' in data else datetime.now()
     )
-    db.session.add(pokemon)
+    db.session.add(new_pokemon)
     db.session.commit()
-    return jsonify(pokemon.to_dict()), 201
+    return jsonify(new_pokemon.to_dict()), 201
 
 
 @app.route('/api/pokemon/<int:db_id>', methods=['DELETE'])
@@ -142,7 +147,7 @@ def update_companion():
     if not companion:
         companion = Companion(pokemon_id=25, name='Pikachu')
         db.session.add(companion)
-    
+
     if 'level' in data:
         companion.level = data['level']
     if 'health' in data:
@@ -159,7 +164,7 @@ def update_companion():
         companion.last_fed = datetime.fromtimestamp(data['lastFed'] / 1000)
     if 'lastInteraction' in data:
         companion.last_interaction = datetime.fromtimestamp(data['lastInteraction'] / 1000)
-    
+
     db.session.commit()
     return jsonify(companion.to_dict())
 
@@ -174,7 +179,7 @@ def seed_pokemon():
         {'id': 39, 'name': 'Jigglypuff', 'level': 8},
         {'id': 133, 'name': 'Eevee', 'level': 12},
     ]
-    
+
     for p in test_pokemon:
         existing = Pokemon.query.filter_by(pokemon_id=p['id']).first()
         if not existing:
@@ -184,7 +189,7 @@ def seed_pokemon():
                 level=p['level']
             )
             db.session.add(pokemon)
-    
+
     db.session.commit()
     return jsonify({'message': 'Test Pokemon added', 'count': len(test_pokemon)})
 
