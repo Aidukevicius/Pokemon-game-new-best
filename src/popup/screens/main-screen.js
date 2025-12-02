@@ -185,7 +185,6 @@ export class MainScreen {
         slotsHTML += `
           <div class="pokemon-slot filled" title="${pokemon.name} Lv.${pokemon.level}">
             <img src="${spriteUrl}" alt="${pokemon.name}" class="slot-sprite" />
-            <span class="slot-name">${pokemon.name.slice(0, 3)}</span>
           </div>
         `;
       } else {
