@@ -353,13 +353,13 @@
 
 /* Pokemon Slot Sprites */
 .slot-sprite {
-  width: 32px;
-  height: 32px;
+  width: 48px;
+  height: 48px;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
   display: block;
-  margin: 0 auto 2px;
+  margin: 0 auto;
 }
 
 .pokemon-slot.filled {
