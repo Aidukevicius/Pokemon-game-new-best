@@ -3,13 +3,16 @@
 ## Project Overview
 A lofi SNES-style Pokemon catching game implemented as a Chrome extension. Users can encounter and catch Pokemon while browsing the web. Features a mobile-shaped popup (360x640px) with tab-based navigation for different screens.
 
-## Current State (November 21, 2025)
-**Phase**: Complete Modular Tab-Based Architecture with Placeholders
+## Current State (December 2, 2025)
+**Phase**: Database Integration Complete
+- PostgreSQL database connected via Flask backend
+- 6 test Pokemon seeded (Bulbasaur, Charmander, Squirtle, Pikachu, Jigglypuff, Eevee)
 - Tab navigation system with 6 screens
 - Each screen has dedicated component file
 - SNES-style aesthetic design
-- Mobile-shaped popup (360x580px screens + 60px tabs)
+- Mobile-shaped popup (280x500px in preview mode)
 - Preview server configured for Replit testing
+- Storage displays Pokemon count and filled slots with emoji icons
 
 ## Architecture
 
@@ -96,6 +99,12 @@ The preview server runs on port 5000 displaying `preview.html`, which embeds pop
 3. Load unpacked extension from this directory
 
 ## Recent Changes
+- **2025-12-02**: Integrated PostgreSQL database with Flask backend
+- **2025-12-02**: Created server.py with Pokemon model and REST API endpoints
+- **2025-12-02**: Seeded 6 test Pokemon to database
+- **2025-12-02**: Updated StorageService.js to fetch from database API
+- **2025-12-02**: Fixed storage slot CSS grid (3 columns, proper sizing)
+- **2025-12-02**: Added emoji icons for Pokemon in storage slots
 - **2025-11-21**: Added tab-based navigation system
 - **2025-11-21**: Created 6 separate screen component files
 - **2025-11-21**: Added tabs-navigation.js for bottom tab menu
