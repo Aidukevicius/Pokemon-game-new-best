@@ -65,7 +65,6 @@ export class CollectionScreen {
     
     return sorted.map(pokemon => {
       const spriteUrl = this.spriteService.getDefaultSpriteUrl(pokemon.id);
-      const caughtDate = new Date(pokemon.caughtAt).toLocaleDateString();
       
       return `
         <div class="collection-card snes-container" data-catch-id="${pokemon.catchId}">
@@ -77,7 +76,6 @@ export class CollectionScreen {
             <h4 class="card-name">${pokemon.name}</h4>
             <div class="card-details">
               <span class="detail-badge">Lv.${pokemon.level}</span>
-              <span class="detail-date">${caughtDate}</span>
             </div>
           </div>
         </div>
