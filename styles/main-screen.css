@@ -342,3 +342,22 @@
   flex: 1;
   overflow-y: auto;
 }
+
+
+/* Pokemon Slot Sprites */
+.slot-sprite {
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  display: block;
+  margin: 0 auto 2px;
+}
+
+.pokemon-slot.filled {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

@@ -177,18 +177,14 @@ export class MainScreen {
     const collection = await this.storageService.get('pokemon_collection');
     const favorites = collection ? collection.slice(0, 6) : [];
     
-    const pokemonEmojis = {
-      1: '🌿', 4: '🔥', 7: '💧', 25: '⚡', 39: '🎀', 133: '🦊',
-    };
-    
     let slotsHTML = '';
     for (let i = 0; i < 6; i++) {
       if (favorites[i]) {
         const pokemon = favorites[i];
-        const emoji = pokemonEmojis[pokemon.id] || '✨';
+        const spriteUrl = this.spriteService.getDefaultSpriteUrl(pokemon.id);
         slotsHTML += `
           <div class="pokemon-slot filled" title="${pokemon.name} Lv.${pokemon.level}">
-            <span class="slot-icon">${emoji}</span>
+            <img src="${spriteUrl}" alt="${pokemon.name}" class="slot-sprite" />
             <span class="slot-name">${pokemon.name.slice(0, 3)}</span>
           </div>
         `;
