@@ -17,7 +17,7 @@ export class MainScreen {
     console.log('[MainScreen] Initializing...');
     await this.loadCompanionData();
     console.log('[MainScreen] Companion data loaded:', this.companionPokemon);
-    this.render();
+    await this.render();
     console.log('[MainScreen] Render complete');
     this.startHealthDecay();
     console.log('[MainScreen] Health decay started');
@@ -48,6 +48,10 @@ export class MainScreen {
   }
 
   async render() {
+    const pokemonCount = await this.getPokemonCount();
+    const favoriteSlotsHTML = await this.renderFavoriteSlots();
+    console.log('[MainScreen] Favorite slots HTML:', favoriteSlotsHTML);
+    
     this.container.innerHTML = `
       <div class="main-screen">
         <!-- Pokemon Display Card -->
@@ -102,11 +106,11 @@ export class MainScreen {
         <div class="snes-container pokemon-storage">
           <div class="storage-header">
             <h3 class="storage-title">Pokemon Storage</h3>
-            <span class="storage-count">${await this.getPokemonCount()}/151</span>
+            <span class="storage-count">${pokemonCount}/151</span>
           </div>
           
           <div class="favorite-slots">
-            ${await this.renderFavoriteSlots()}
+            ${favoriteSlotsHTML}
           </div>
           
           <button class="snes-button view-all-button" data-action="view-storage">
@@ -173,15 +177,19 @@ export class MainScreen {
     const collection = await this.storageService.get('pokemon_collection');
     const favorites = collection ? collection.slice(0, 6) : [];
     
+    const pokemonEmojis = {
+      1: '🌿', 4: '🔥', 7: '💧', 25: '⚡', 39: '🎀', 133: '🦊',
+    };
+    
     let slotsHTML = '';
     for (let i = 0; i < 6; i++) {
       if (favorites[i]) {
         const pokemon = favorites[i];
-        const spriteUrl = this.spriteService.getDefaultSpriteUrl(pokemon.id);
+        const emoji = pokemonEmojis[pokemon.id] || '✨';
         slotsHTML += `
-          <div class="pokemon-slot filled">
-            <img src="${spriteUrl}" alt="${pokemon.name}" class="slot-sprite">
-            <span class="slot-level">Lv.${pokemon.level}</span>
+          <div class="pokemon-slot filled" title="${pokemon.name} Lv.${pokemon.level}">
+            <span class="slot-icon">${emoji}</span>
+            <span class="slot-name">${pokemon.name.slice(0, 3)}</span>
           </div>
         `;
       } else {

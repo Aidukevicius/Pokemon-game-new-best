@@ -1,13 +1,32 @@
-// STORAGE SERVICE
-// Abstraction layer for Chrome Storage API (and localStorage fallback)
-
 export class StorageService {
   constructor() {
-    // Check if Chrome storage is available, otherwise use localStorage
     this.useChrome = typeof chrome !== 'undefined' && chrome.storage;
+    this.apiBase = '';
   }
 
   async get(key) {
+    if (key === 'pokemon_collection') {
+      try {
+        const response = await fetch(`${this.apiBase}/api/pokemon`);
+        if (response.ok) {
+          return await response.json();
+        }
+      } catch (e) {
+        console.log('[StorageService] API not available, using local storage');
+      }
+    }
+    
+    if (key === 'companion') {
+      try {
+        const response = await fetch(`${this.apiBase}/api/companion`);
+        if (response.ok) {
+          return await response.json();
+        }
+      } catch (e) {
+        console.log('[StorageService] API not available, using local storage');
+      }
+    }
+    
     if (this.useChrome) {
       return new Promise((resolve) => {
         chrome.storage.local.get([key], (result) => {
@@ -15,13 +34,27 @@ export class StorageService {
         });
       });
     } else {
-      // Fallback to localStorage for testing
       const value = localStorage.getItem(key);
       return value ? JSON.parse(value) : null;
     }
   }
 
   async set(key, value) {
+    if (key === 'companion') {
+      try {
+        const response = await fetch(`${this.apiBase}/api/companion`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(value)
+        });
+        if (response.ok) {
+          return;
+        }
+      } catch (e) {
+        console.log('[StorageService] API not available, using local storage');
+      }
+    }
+    
     if (this.useChrome) {
       return new Promise((resolve) => {
         chrome.storage.local.set({ [key]: value }, () => {
@@ -29,28 +62,46 @@ export class StorageService {
         });
       });
     } else {
-      // Fallback to localStorage for testing
       localStorage.setItem(key, JSON.stringify(value));
       return Promise.resolve();
     }
   }
 
-  async initialize() {
-    // Check if storage exists, set defaults if needed
-    const companion = await this.get('companion');
-    if (!companion) {
-      await this.set('companion', {
-        id: 25,
-        name: 'Pikachu',
-        level: 1,
-        health: 100,
-        maxHealth: 100,
-        experience: 0,
-        experienceToNext: 100,
-        lastFed: Date.now(),
-        lastInteraction: Date.now(),
-        happiness: 100
+  async addPokemon(pokemon) {
+    try {
+      const response = await fetch(`${this.apiBase}/api/pokemon`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pokemon)
       });
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (e) {
+      console.log('[StorageService] API not available for adding pokemon');
+    }
+    return null;
+  }
+
+  async seedTestPokemon() {
+    try {
+      const response = await fetch(`${this.apiBase}/api/seed`, {
+        method: 'POST'
+      });
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (e) {
+      console.log('[StorageService] Could not seed test pokemon');
+    }
+    return null;
+  }
+
+  async initialize() {
+    try {
+      await this.seedTestPokemon();
+    } catch (e) {
+      console.log('[StorageService] Initialization skipped');
     }
   }
 }
