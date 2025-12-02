@@ -1,4 +1,3 @@
-
 .collection-screen {
   padding: 16px;
   padding-bottom: 20px;
@@ -151,4 +150,16 @@
   font-size: 8px;
   color: #94a3b8;
   margin: 0;
+}
+
+#collectionContent {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+#collectionContent::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
