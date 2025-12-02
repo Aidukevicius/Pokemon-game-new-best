@@ -353,8 +353,8 @@
 
 /* Pokemon Slot Sprites */
 .slot-sprite {
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
