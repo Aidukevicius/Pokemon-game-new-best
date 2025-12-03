@@ -46,7 +46,7 @@ export class PokemonDetailModal {
           </div>
           <div class="detail-info">
             <span class="pokemon-number">#${String(pokemon.id).padStart(3, '0')}</span>
-            <h2 class="detail-name">${pokemon.name}</h2>
+            <h2 class="detail-name" ${pokemon.name.length > 10 ? 'data-long="true"' : ''}>${pokemon.name}</h2>
             <div class="detail-types">${typesBadges}</div>
             <span class="detail-level">Level ${pokemon.level}</span>
           </div>

@@ -117,11 +117,17 @@
   margin: 2px 0 4px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  hyphens: auto;
   max-width: 100%;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transform-origin: left center;
+}
+
+.detail-name[data-long="true"] {
+  font-size: clamp(8px, 11px, 13px);
+  letter-spacing: 0.1px;
 }
 
 .detail-types {
