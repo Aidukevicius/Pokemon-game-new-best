@@ -713,8 +713,14 @@
   flex-shrink: 0;
 }
 
-.stat-mod {
+.stat-mod, .stat-item-mod {
   width: 10px;
   text-align: center;
   font-size: 10px;
+  flex-shrink: 0;
+}
+
+.stat-row-detail.stat-item-boosted .stat-item-mod {
+  color: #f39c12;
+  font-weight: bold;
 }

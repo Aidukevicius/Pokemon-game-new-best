@@ -238,10 +238,10 @@ export class PokemonDetailModal {
       const stat = stats[key];
       const percentage = Math.min((stat.calculated / maxStat) * 100, 100);
       const color = STAT_COLORS[key];
-      const hasItemBonus = stat.itemBonus && stat.itemBonus > 1;
+      const hasItemBonus = stat.itemBonus && stat.itemBonus > 1.0;
       const modClass = stat.modifier > 1 ? 'stat-boosted' : stat.modifier < 1 ? 'stat-lowered' : '';
       const itemClass = hasItemBonus ? 'stat-item-boosted' : '';
-      const modSymbol = stat.modifier > 1 ? '↑' : stat.modifier < 1 ? '↓' : '';
+      const modSymbol = stat.modifier > 1.0 ? '↑' : stat.modifier < 1.0 ? '↓' : '';
       const itemSymbol = hasItemBonus ? '◆' : '';
       
       return `
