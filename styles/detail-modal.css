@@ -209,7 +209,7 @@
   flex: 1;
 }
 
-.stat-total, .ev-total, .iv-rating {
+.stat-total, .ev-total, .iv-total, .iv-rating {
   font-size: 8px;
   color: #666;
   background: #fff;
