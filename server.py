@@ -74,6 +74,12 @@ class Pokemon(db.Model):
     sp_attack_ev = db.Column(db.Integer, default=0)
     sp_defense_ev = db.Column(db.Integer, default=0)
     speed_ev = db.Column(db.Integer, default=0)
+    hp_iv = db.Column(db.Integer, default=15)
+    attack_iv = db.Column(db.Integer, default=15)
+    defense_iv = db.Column(db.Integer, default=15)
+    sp_attack_iv = db.Column(db.Integer, default=15)
+    sp_defense_iv = db.Column(db.Integer, default=15)
+    speed_iv = db.Column(db.Integer, default=15)
 
     def to_dict(self):
         return {
@@ -94,6 +100,14 @@ class Pokemon(db.Model):
                 'spAttack': self.sp_attack_ev,
                 'spDefense': self.sp_defense_ev,
                 'speed': self.speed_ev
+            },
+            'ivs': {
+                'hp': self.hp_iv,
+                'attack': self.attack_iv,
+                'defense': self.defense_iv,
+                'spAttack': self.sp_attack_iv,
+                'spDefense': self.sp_defense_iv,
+                'speed': self.speed_iv
             }
         }
 
@@ -120,6 +134,12 @@ class Companion(db.Model):
     sp_attack_ev = db.Column(db.Integer, default=0)
     sp_defense_ev = db.Column(db.Integer, default=0)
     speed_ev = db.Column(db.Integer, default=0)
+    hp_iv = db.Column(db.Integer, default=15)
+    attack_iv = db.Column(db.Integer, default=15)
+    defense_iv = db.Column(db.Integer, default=15)
+    sp_attack_iv = db.Column(db.Integer, default=15)
+    sp_defense_iv = db.Column(db.Integer, default=15)
+    speed_iv = db.Column(db.Integer, default=15)
 
     def to_dict(self):
         return {
@@ -142,6 +162,14 @@ class Companion(db.Model):
                 'spAttack': self.sp_attack_ev,
                 'spDefense': self.sp_defense_ev,
                 'speed': self.speed_ev
+            },
+            'ivs': {
+                'hp': self.hp_iv,
+                'attack': self.attack_iv,
+                'defense': self.defense_iv,
+                'spAttack': self.sp_attack_iv,
+                'spDefense': self.sp_defense_iv,
+                'speed': self.speed_iv
             }
         }
 
@@ -304,6 +332,16 @@ def update_companion():
     return jsonify(companion.to_dict())
 
 
+def generate_random_ivs():
+    return {
+        'hp': random.randint(0, 31),
+        'attack': random.randint(0, 31),
+        'defense': random.randint(0, 31),
+        'spAttack': random.randint(0, 31),
+        'spDefense': random.randint(0, 31),
+        'speed': random.randint(0, 31)
+    }
+
 @app.route('/api/seed', methods=['POST'])
 def seed_pokemon():
     test_pokemon = [
@@ -323,6 +361,7 @@ def seed_pokemon():
     
     for p in test_pokemon:
         evs = p.get('evs', {})
+        ivs = generate_random_ivs()
         pokemon = Pokemon(
             pokemon_id=p['id'],
             name=p['name'],
@@ -334,12 +373,18 @@ def seed_pokemon():
             defense_ev=evs.get('defense', 0),
             sp_attack_ev=evs.get('spAttack', 0),
             sp_defense_ev=evs.get('spDefense', 0),
-            speed_ev=evs.get('speed', 0)
+            speed_ev=evs.get('speed', 0),
+            hp_iv=ivs['hp'],
+            attack_iv=ivs['attack'],
+            defense_iv=ivs['defense'],
+            sp_attack_iv=ivs['spAttack'],
+            sp_defense_iv=ivs['spDefense'],
+            speed_iv=ivs['speed']
         )
         db.session.add(pokemon)
 
     db.session.commit()
-    return jsonify({'message': 'Test Pokemon added', 'count': len(test_pokemon)})
+    return jsonify({'message': 'Test Pokemon added with random IVs', 'count': len(test_pokemon)})
 
 
 @app.route('/api/natures', methods=['GET'])

@@ -4,15 +4,16 @@
 A lofi SNES-style Pokemon catching game implemented as a Chrome extension. Users can encounter and catch Pokemon while browsing the web. Features a mobile-shaped popup (360x640px) with tab-based navigation for different screens.
 
 ## Current State (December 3, 2025)
-**Phase**: Pokemon Detail Cards Complete
+**Phase**: Individual Values (IVs) Complete
 - PostgreSQL database connected via Flask backend
-- 10 test Pokemon seeded with full stats, natures, items, and EVs
-- Pokemon detail modal with comprehensive stat display
-- Canonical Pokemon stat formulas (HP, Attack, Defense, Sp. Atk, Sp. Def, Speed)
+- 10 test Pokemon seeded with full stats, natures, items, EVs, and random IVs
+- Pokemon detail modal with comprehensive stat display including IVs
+- Canonical Pokemon stat formulas using individual IVs (0-31 range)
+- IV rating system (Outstanding, Relatively Superior, Above Average, Decent)
 - Nature system with +10%/-10% stat modifiers
 - EV (Effort Value) tracking per stat (510 total cap, 252 per stat)
 - Item slot display for held items
-- Click handlers on Pokemon slots to open detail cards
+- Fixed click handlers on Pokemon slots to open detail cards
 - Tab navigation system with 6 screens
 - SNES-style aesthetic with retro detail-modal.css styling
 - Mobile-shaped popup (280x500px in preview mode)
@@ -102,15 +103,18 @@ The preview server runs on port 5000 displaying `preview.html`, which embeds pop
 3. Load unpacked extension from this directory
 
 ## Recent Changes
+- **2025-12-03**: Added Individual Values (IVs) system with random 0-31 values per stat
+- **2025-12-03**: Created IV rating system (Outstanding, Relatively Superior, Above Average, Decent)
+- **2025-12-03**: Fixed Pokemon slot click handlers by using in-memory collection
+- **2025-12-03**: Added IV columns to database (hp_iv, attack_iv, defense_iv, etc.)
+- **2025-12-03**: Updated stats calculation to use individual IVs per Pokemon
+- **2025-12-03**: Added IVs section to detail modal with visual bars and total display
 - **2025-12-03**: Added Pokemon detail card modal with full stats display
 - **2025-12-03**: Implemented canonical Pokemon stat formulas (IV/EV/nature)
 - **2025-12-03**: Created stats.js utility with nature modifiers and stat calculations
 - **2025-12-03**: Added EV tracking (6 stats, 510 total cap) with visual bars
 - **2025-12-03**: Added item slot system for held items
 - **2025-12-03**: Created detail-modal.css with SNES-style retro design
-- **2025-12-03**: Extended database schema with nature, item, and 6 EV columns
-- **2025-12-03**: Seeded 10 Pokemon with full data (including Mewtwo, Dragonite, Gengar)
-- **2025-12-03**: Added click handlers to main-screen and collection-screen for modals
 - **2025-12-02**: Integrated PostgreSQL database with Flask backend
 - **2025-12-02**: Created server.py with Pokemon model and REST API endpoints
 - **2025-11-21**: Added tab-based navigation system

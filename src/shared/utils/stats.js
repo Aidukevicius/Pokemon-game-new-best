@@ -47,6 +47,7 @@ export const STAT_COLORS = {
 };
 
 const DEFAULT_IV = 15;
+const MAX_IV = 31;
 
 export function calculateHP(baseStat, level, ev = 0, iv = DEFAULT_IV) {
   return Math.floor(((2 * baseStat + iv + Math.floor(ev / 4)) * level) / 100) + level + 10;
@@ -55,6 +56,19 @@ export function calculateHP(baseStat, level, ev = 0, iv = DEFAULT_IV) {
 export function calculateStat(baseStat, level, ev = 0, iv = DEFAULT_IV, natureMod = 1.0) {
   const base = Math.floor(((2 * baseStat + iv + Math.floor(ev / 4)) * level) / 100) + 5;
   return Math.floor(base * natureMod);
+}
+
+export function getTotalIVs(ivs) {
+  if (!ivs) return DEFAULT_IV * 6;
+  return (ivs.hp || DEFAULT_IV) + (ivs.attack || DEFAULT_IV) + (ivs.defense || DEFAULT_IV) + 
+         (ivs.spAttack || DEFAULT_IV) + (ivs.spDefense || DEFAULT_IV) + (ivs.speed || DEFAULT_IV);
+}
+
+export function getIVRating(totalIVs) {
+  if (totalIVs >= 151) return { label: 'Outstanding!', color: '#ffd700' };
+  if (totalIVs >= 121) return { label: 'Relatively Superior', color: '#9b59b6' };
+  if (totalIVs >= 91) return { label: 'Above Average', color: '#3498db' };
+  return { label: 'Decent', color: '#888888' };
 }
 
 export function getNatureModifier(nature, statKey) {
@@ -88,6 +102,7 @@ export function calculateAllStats(pokemon) {
   const level = pokemon.level || 1;
   const nature = pokemon.nature || 'Hardy';
   const evs = pokemon.evs || { hp: 0, attack: 0, defense: 0, spAttack: 0, spDefense: 0, speed: 0 };
+  const ivs = pokemon.ivs || { hp: DEFAULT_IV, attack: DEFAULT_IV, defense: DEFAULT_IV, spAttack: DEFAULT_IV, spDefense: DEFAULT_IV, speed: DEFAULT_IV };
   
   const baseStats = baseData.baseStats;
   
@@ -95,37 +110,43 @@ export function calculateAllStats(pokemon) {
     hp: {
       base: baseStats.hp,
       ev: evs.hp,
-      calculated: calculateHP(baseStats.hp, level, evs.hp),
+      iv: ivs.hp,
+      calculated: calculateHP(baseStats.hp, level, evs.hp, ivs.hp),
       modifier: 1.0
     },
     attack: {
       base: baseStats.attack,
       ev: evs.attack,
-      calculated: calculateStat(baseStats.attack, level, evs.attack, DEFAULT_IV, getNatureModifier(nature, 'attack')),
+      iv: ivs.attack,
+      calculated: calculateStat(baseStats.attack, level, evs.attack, ivs.attack, getNatureModifier(nature, 'attack')),
       modifier: getNatureModifier(nature, 'attack')
     },
     defense: {
       base: baseStats.defense,
       ev: evs.defense,
-      calculated: calculateStat(baseStats.defense, level, evs.defense, DEFAULT_IV, getNatureModifier(nature, 'defense')),
+      iv: ivs.defense,
+      calculated: calculateStat(baseStats.defense, level, evs.defense, ivs.defense, getNatureModifier(nature, 'defense')),
       modifier: getNatureModifier(nature, 'defense')
     },
     spAttack: {
       base: baseStats.spAttack,
       ev: evs.spAttack,
-      calculated: calculateStat(baseStats.spAttack, level, evs.spAttack, DEFAULT_IV, getNatureModifier(nature, 'spAttack')),
+      iv: ivs.spAttack,
+      calculated: calculateStat(baseStats.spAttack, level, evs.spAttack, ivs.spAttack, getNatureModifier(nature, 'spAttack')),
       modifier: getNatureModifier(nature, 'spAttack')
     },
     spDefense: {
       base: baseStats.spDefense,
       ev: evs.spDefense,
-      calculated: calculateStat(baseStats.spDefense, level, evs.spDefense, DEFAULT_IV, getNatureModifier(nature, 'spDefense')),
+      iv: ivs.spDefense,
+      calculated: calculateStat(baseStats.spDefense, level, evs.spDefense, ivs.spDefense, getNatureModifier(nature, 'spDefense')),
       modifier: getNatureModifier(nature, 'spDefense')
     },
     speed: {
       base: baseStats.speed,
       ev: evs.speed,
-      calculated: calculateStat(baseStats.speed, level, evs.speed, DEFAULT_IV, getNatureModifier(nature, 'speed')),
+      iv: ivs.speed,
+      calculated: calculateStat(baseStats.speed, level, evs.speed, ivs.speed, getNatureModifier(nature, 'speed')),
       modifier: getNatureModifier(nature, 'speed')
     }
   };

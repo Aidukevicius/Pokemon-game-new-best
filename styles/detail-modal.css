@@ -209,13 +209,17 @@
   flex: 1;
 }
 
-.stat-total, .ev-total {
+.stat-total, .ev-total, .iv-rating {
   font-size: 8px;
   color: #666;
   background: #fff;
   padding: 2px 6px;
   border-radius: 3px;
   border: 1px solid #ccc;
+}
+
+.iv-rating {
+  font-weight: bold;
 }
 
 .nature-info {
@@ -239,19 +243,19 @@
   color: #666;
 }
 
-.stats-grid, .evs-grid {
+.stats-grid, .evs-grid, .ivs-grid {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.stat-row-detail, .ev-row {
+.stat-row-detail, .ev-row, .iv-row {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.stat-name, .ev-name {
+.stat-name, .ev-name, .iv-name {
   font-size: 7px;
   text-transform: uppercase;
   color: #555;
@@ -259,12 +263,12 @@
   flex-shrink: 0;
 }
 
-.stat-bar-container, .ev-bar-container {
+.stat-bar-container, .ev-bar-container, .iv-bar-container {
   flex: 1;
   height: 10px;
 }
 
-.stat-bar-bg, .ev-bar-bg {
+.stat-bar-bg, .ev-bar-bg, .iv-bar-bg {
   width: 100%;
   height: 100%;
   background: #ccc;
@@ -273,19 +277,52 @@
   overflow: hidden;
 }
 
-.stat-bar-fill, .ev-bar-fill {
+.stat-bar-fill, .ev-bar-fill, .iv-bar-fill {
   height: 100%;
   border-radius: 1px;
   transition: width 0.3s ease;
 }
 
-.stat-value-num, .ev-value {
+.stat-value-num, .ev-value, .iv-value {
   font-size: 9px;
   font-weight: bold;
   color: #333;
   width: 28px;
   text-align: right;
   flex-shrink: 0;
+}
+
+.iv-row.iv-perfect .iv-name,
+.iv-row.iv-perfect .iv-value {
+  color: #ffd700;
+  text-shadow: 0 0 2px rgba(255, 215, 0, 0.5);
+}
+
+.iv-row.iv-zero .iv-name,
+.iv-row.iv-zero .iv-value {
+  color: #e74c3c;
+}
+
+.iv-total-display {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #ccc;
+}
+
+.iv-total-label {
+  font-size: 8px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.iv-total-value {
+  font-size: 10px;
+  font-weight: bold;
+  color: #333;
 }
 
 .stat-mod {

@@ -1,6 +1,6 @@
 import { SpriteService } from '../../shared/services/SpriteService.js';
 import { getPokemonById } from '../../shared/data/pokemon-database.js';
-import { calculateAllStats, getNatureDescription, STAT_NAMES, STAT_COLORS, getTotalEVs, getStatTotal } from '../../shared/utils/stats.js';
+import { calculateAllStats, getNatureDescription, STAT_NAMES, STAT_COLORS, getTotalEVs, getStatTotal, getTotalIVs, getIVRating } from '../../shared/utils/stats.js';
 
 export class PokemonDetailModal {
   constructor() {
@@ -34,6 +34,8 @@ export class PokemonDetailModal {
     const spriteUrl = this.spriteService.getDefaultSpriteUrl(pokemon.id);
     const natureDesc = getNatureDescription(pokemon.nature);
     const totalEVs = getTotalEVs(pokemon.evs);
+    const totalIVs = getTotalIVs(pokemon.ivs);
+    const ivRating = getIVRating(totalIVs);
     const statTotal = getStatTotal(stats);
     
     this.overlay.innerHTML = `
@@ -82,6 +84,21 @@ export class PokemonDetailModal {
           </div>
           <div class="evs-grid">
             ${this.renderEVBars(pokemon.evs)}
+          </div>
+        </div>
+        
+        <div class="detail-section ivs-section">
+          <div class="section-header">
+            <span class="section-icon">★</span>
+            <span class="section-title">Individual Values (IVs)</span>
+            <span class="iv-rating" style="color: ${ivRating.color}">${ivRating.label}</span>
+          </div>
+          <div class="ivs-grid">
+            ${this.renderIVBars(pokemon.ivs)}
+          </div>
+          <div class="iv-total-display">
+            <span class="iv-total-label">Total IVs:</span>
+            <span class="iv-total-value">${totalIVs}/186</span>
           </div>
         </div>
         
@@ -183,6 +200,36 @@ export class PokemonDetailModal {
             </div>
           </div>
           <span class="ev-value">${ev}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  renderIVBars(ivs) {
+    const statOrder = ['hp', 'attack', 'defense', 'spAttack', 'spDefense', 'speed'];
+    const maxIV = 31;
+    const defaultIV = 15;
+    
+    if (!ivs) {
+      ivs = { hp: defaultIV, attack: defaultIV, defense: defaultIV, spAttack: defaultIV, spDefense: defaultIV, speed: defaultIV };
+    }
+    
+    return statOrder.map(key => {
+      const iv = ivs[key] !== undefined ? ivs[key] : defaultIV;
+      const percentage = Math.min((iv / maxIV) * 100, 100);
+      const color = STAT_COLORS[key];
+      const isPerfect = iv === 31;
+      const isZero = iv === 0;
+      
+      return `
+        <div class="iv-row ${isPerfect ? 'iv-perfect' : ''} ${isZero ? 'iv-zero' : ''}">
+          <span class="iv-name">${STAT_NAMES[key]}</span>
+          <div class="iv-bar-container">
+            <div class="iv-bar-bg">
+              <div class="iv-bar-fill" style="width: ${percentage}%; background: ${color}"></div>
+            </div>
+          </div>
+          <span class="iv-value">${iv}</span>
         </div>
       `;
     }).join('');

@@ -54,8 +54,8 @@ export class MainScreen {
   }
 
   async render() {
-    const pokemonCount = await this.getPokemonCount();
-    const favoriteSlotsHTML = await this.renderFavoriteSlots();
+    const pokemonCount = this.getPokemonCount();
+    const favoriteSlotsHTML = this.renderFavoriteSlots();
     console.log('[MainScreen] Favorite slots HTML:', favoriteSlotsHTML);
 
     this.container.innerHTML = `
@@ -197,14 +197,12 @@ export class MainScreen {
     }
   }
 
-  async getPokemonCount() {
-    const collection = await this.storageService.get('pokemon_collection');
-    return collection ? collection.length : 0;
+  getPokemonCount() {
+    return this.pokemonCollection.length;
   }
 
-  async renderFavoriteSlots() {
-    const collection = await this.storageService.get('pokemon_collection');
-    const favorites = collection ? collection.slice(0, 6) : [];
+  renderFavoriteSlots() {
+    const favorites = this.pokemonCollection.slice(0, 6);
 
     let slotsHTML = '';
     for (let i = 0; i < 6; i++) {
