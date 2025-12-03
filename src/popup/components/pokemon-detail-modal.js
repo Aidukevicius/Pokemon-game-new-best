@@ -2,6 +2,45 @@ import { SpriteService } from '../../shared/services/SpriteService.js';
 import { getPokemonById } from '../../shared/data/pokemon-database.js';
 import { calculateAllStats, getNatureDescription, STAT_NAMES, STAT_COLORS, getTotalEVs, getStatTotal, getTotalIVs, getIVRating } from '../../shared/utils/stats.js';
 
+const ITEM_SPRITES = {
+  'Leftovers': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/leftovers.png',
+  'Choice Band': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/choice-band.png',
+  'Choice Specs': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/choice-specs.png',
+  'Choice Scarf': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/choice-scarf.png',
+  'Life Orb': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/life-orb.png',
+  'Focus Sash': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/focus-sash.png',
+  'Rocky Helmet': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/rocky-helmet.png',
+  'Assault Vest': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/assault-vest.png',
+  'Eviolite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/eviolite.png',
+  'Black Sludge': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/black-sludge.png',
+  'Sitrus Berry': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/sitrus-berry.png',
+  'Lum Berry': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/lum-berry.png',
+  'Oran Berry': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/oran-berry.png',
+  'Exp. Share': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/exp-share.png',
+  'Lucky Egg': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/lucky-egg.png',
+  'Soothe Bell': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/soothe-bell.png',
+  'Macho Brace': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/macho-brace.png',
+  'Power Bracer': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-bracer.png',
+  'Power Belt': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-belt.png',
+  'Power Lens': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-lens.png',
+  'Power Band': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-band.png',
+  'Power Anklet': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-anklet.png',
+  'Power Weight': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-weight.png',
+  'Miracle Seed': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/miracle-seed.png',
+  'Charcoal': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/charcoal.png',
+  'Mystic Water': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/mystic-water.png',
+  'Light Ball': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/light-ball.png',
+  'Everstone': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/everstone.png',
+  'Dragon Fang': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/dragon-fang.png',
+  'Spell Tag': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/spell-tag.png',
+  'Dragon Scale': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/dragon-scale.png',
+  'Twisted Spoon': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/twisted-spoon.png'
+};
+
+function getItemSprite(itemName) {
+  return ITEM_SPRITES[itemName] || null;
+}
+
 export class PokemonDetailModal {
   constructor() {
     this.spriteService = new SpriteService();
@@ -108,7 +147,10 @@ export class PokemonDetailModal {
           </div>
           <div class="item-slot ${pokemon.item ? 'has-item' : 'empty'}">
             ${pokemon.item ? `
-              <span class="item-icon">⬟</span>
+              ${getItemSprite(pokemon.item) ? 
+                `<img src="${getItemSprite(pokemon.item)}" alt="${pokemon.item}" class="held-item-sprite">` :
+                `<span class="item-icon">⬟</span>`
+              }
               <span class="item-name">${pokemon.item}</span>
             ` : `
               <span class="empty-slot-text">No item equipped</span>

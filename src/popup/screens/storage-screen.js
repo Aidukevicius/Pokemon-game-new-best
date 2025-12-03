@@ -1,127 +1,315 @@
-// ITEM STORAGE SCREEN COMPONENT PLACEHOLDER
-// View and manage inventory items (Pokeballs, potions, etc.)
+import { SpriteService } from '../../shared/services/SpriteService.js';
+import { showPokemonDetail } from '../components/pokemon-detail-modal.js';
 
-// WHAT GOES HERE:
+export class StorageScreen {
+  constructor(containerElement) {
+    this.container = containerElement;
+    this.spriteService = new SpriteService();
+    this.items = [];
+    this.pokemon = [];
+    this.selectedItem = null;
+    this.selectedPokemon = null;
+    this.mode = 'inventory';
+  }
 
-/*
-CLASS: StorageScreen
+  async initialize() {
+    console.log('[StorageScreen] Initializing...');
+    await this.loadData();
+    this.render();
+  }
 
-RESPONSIBILITIES:
-- Display all items in inventory
-- Show item quantities
-- Use/equip items
-- Item descriptions
-- Manage inventory
+  async loadData() {
+    try {
+      const [itemsRes, pokemonRes] = await Promise.all([
+        fetch('/api/items'),
+        fetch('/api/pokemon')
+      ]);
+      this.items = await itemsRes.json();
+      this.pokemon = await pokemonRes.json();
+      console.log('[StorageScreen] Loaded items:', this.items.length, 'Pokemon:', this.pokemon.length);
+    } catch (error) {
+      console.error('[StorageScreen] Error loading data:', error);
+      this.items = [];
+      this.pokemon = [];
+    }
+  }
 
-IMPORTS:
-import { StorageService } from '../../shared/services/StorageService.js';
-import { ItemRepository } from '../../shared/services/ItemRepository.js'; // Future service
+  render() {
+    this.container.innerHTML = `
+      <div class="storage-screen">
+        <div class="snes-container storage-header">
+          <h2 class="storage-title">Item Bag</h2>
+          <div class="storage-tabs">
+            <button class="storage-tab-btn ${this.mode === 'inventory' ? 'active' : ''}" data-mode="inventory">Inventory</button>
+            <button class="storage-tab-btn ${this.mode === 'equip' ? 'active' : ''}" data-mode="equip">Equip</button>
+          </div>
+        </div>
 
-ITEM TYPES:
-- Pokéballs (standard catching item)
-- Great Balls (higher catch rate) - Future
-- Ultra Balls (very high catch rate) - Future
-- Potions (heal Pokemon) - Future
-- Berries (increase catch rate) - Future
-- Rare Candies (level up Pokemon) - Future
+        <div class="storage-content">
+          ${this.mode === 'inventory' ? this.renderInventory() : this.renderEquipMode()}
+        </div>
 
-METHODS:
+        ${this.selectedItem ? this.renderItemDetail() : ''}
+      </div>
+    `;
 
-constructor(containerElement)
-- Store reference to storage container
-- Initialize StorageService
-- Load item data
+    this.attachEventListeners();
+  }
 
-async initialize()
-- Load inventory from storage
-- Render item grid
+  renderInventory() {
+    if (this.items.length === 0) {
+      return `
+        <div class="empty-state">
+          <div class="empty-icon">🎒</div>
+          <h3 class="empty-title">Your Bag is Empty</h3>
+          <p class="empty-text">Collect items to fill your bag!</p>
+          <button class="snes-btn seed-items-btn" id="seedItemsBtn">Add Starter Items</button>
+        </div>
+      `;
+    }
 
-render()
-- Build storage interface:
-  * Header with "Item Storage" title
-  * Item grid (2-3 columns)
-  * Item details panel
-- SNES-style inventory boxes
+    const categories = this.groupByCategory();
+    
+    return `
+      <div class="items-list">
+        ${Object.entries(categories).map(([category, items]) => `
+          <div class="item-category">
+            <h3 class="category-title">${this.getCategoryName(category)}</h3>
+            <div class="items-grid">
+              ${items.map(item => this.renderItemCard(item)).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
 
-async loadInventory()
-- Get all items from storage
-- Return items object: { pokeballs: 20, greatBalls: 5, ... }
+  renderItemCard(item) {
+    const isSelected = this.selectedItem?.itemId === item.itemId;
+    return `
+      <div class="item-card ${isSelected ? 'selected' : ''}" data-item-id="${item.itemId}">
+        <img src="${item.sprite}" alt="${item.name}" class="item-sprite" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 30 30%22><text y=%2220%22 font-size=%2216%22>📦</text></svg>'">
+        <span class="item-name">${item.name}</span>
+        <span class="item-quantity">x${item.quantity}</span>
+      </div>
+    `;
+  }
 
-displayItems(inventory)
-- Render grid of item cards
-- Each card shows:
-  * Item icon/sprite
-  * Item name
-  * Quantity
-  * Click to view details
+  renderItemDetail() {
+    const item = this.selectedItem;
+    return `
+      <div class="item-detail-panel snes-container">
+        <div class="item-detail-header">
+          <img src="${item.sprite}" alt="${item.name}" class="item-detail-sprite">
+          <div class="item-detail-info">
+            <h3 class="item-detail-name">${item.name}</h3>
+            <span class="item-detail-quantity">Owned: ${item.quantity}</span>
+          </div>
+        </div>
+        <p class="item-detail-description">${item.description}</p>
+        <div class="item-detail-actions">
+          <button class="snes-btn equip-btn" data-action="equip-item">Equip to Pokemon</button>
+        </div>
+      </div>
+    `;
+  }
 
-showItemDetail(itemId)
-- Display detailed view:
-  * Large item icon
-  * Item name
-  * Description
-  * Quantity owned
-  * "Use" or "Equip" button (if applicable)
-- Show in side panel or modal
+  renderEquipMode() {
+    return `
+      <div class="equip-mode">
+        <div class="equip-section">
+          <h3 class="section-title">Select Item</h3>
+          <div class="items-mini-grid">
+            ${this.items.map(item => `
+              <div class="item-mini-card ${this.selectedItem?.itemId === item.itemId ? 'selected' : ''}" 
+                   data-item-id="${item.itemId}" data-mode="select-item">
+                <img src="${item.sprite}" alt="${item.name}" class="item-mini-sprite">
+                <span class="item-mini-qty">x${item.quantity}</span>
+              </div>
+            `).join('')}
+            <div class="item-mini-card unequip-card ${this.selectedItem === 'unequip' ? 'selected' : ''}" 
+                 data-item-id="unequip" data-mode="select-item">
+              <span class="unequip-icon">✕</span>
+              <span class="item-mini-name">Unequip</span>
+            </div>
+          </div>
+        </div>
 
-useItem(itemId)
-- Handle item usage
-- For Pokéballs: Nothing (passive item)
-- For potions: Select Pokemon to heal
-- Update quantity
-- Save to storage
+        <div class="equip-section">
+          <h3 class="section-title">Select Pokemon</h3>
+          <div class="pokemon-equip-grid">
+            ${this.pokemon.map(p => {
+              const spriteUrl = this.spriteService.getDefaultSpriteUrl(p.id);
+              const itemId = p.item ? this.getItemIdByName(p.item) : null;
+              const itemSprite = itemId ? this.getItemSprite(itemId) : null;
+              
+              return `
+                <div class="pokemon-equip-card ${this.selectedPokemon?.db_id === p.db_id ? 'selected' : ''}" 
+                     data-pokemon-db-id="${p.db_id}">
+                  <img src="${spriteUrl}" alt="${p.name}" class="pokemon-equip-sprite">
+                  <span class="pokemon-equip-name">${p.name}</span>
+                  <div class="pokemon-held-item">
+                    ${itemSprite ? `<img src="${itemSprite}" class="held-item-icon" alt="${p.item}">` : '<span class="no-item">-</span>'}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
 
-showEmptyState()
-- Display when no items
-- Message: "Your bag is empty!"
-- Tip: "Buy items in the shop"
+        ${this.selectedItem && this.selectedPokemon ? `
+          <div class="equip-confirm">
+            <button class="snes-btn confirm-equip-btn" id="confirmEquipBtn">
+              ${this.selectedItem === 'unequip' ? `Remove item from ${this.selectedPokemon.name}` : `Give ${this.selectedItem.name} to ${this.selectedPokemon.name}`}
+            </button>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
 
-updateQuantity(itemId, newQuantity)
-- Update displayed quantity
-- Animate change (+1, -1)
+  groupByCategory() {
+    const groups = {};
+    for (const item of this.items) {
+      const cat = item.category || 'other';
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(item);
+    }
+    return groups;
+  }
 
-show()
-- Make storage screen visible
-- Refresh inventory
+  getCategoryName(category) {
+    const names = {
+      'hold': 'Hold Items',
+      'berry': 'Berries',
+      'training': 'Training Items',
+      'other': 'Other'
+    };
+    return names[category] || category;
+  }
 
-hide()
-- Hide storage screen
+  getItemIdByName(name) {
+    for (const item of this.items) {
+      if (item.name === name) return item.itemId;
+    }
+    return null;
+  }
 
-HTML STRUCTURE:
-<div class="storage-screen">
-  <div class="storage-header">
-    <h2>Item Storage</h2>
-    <p>Manage your items</p>
-  </div>
-  
-  <div class="items-grid">
-    <div class="item-card">
-      <img src="pokeball-icon.png" alt="Pokéball">
-      <span class="item-name">Pokéball</span>
-      <span class="item-quantity">x20</span>
-    </div>
-    <!-- More items -->
-  </div>
-  
-  <div class="item-detail-panel">
-    <!-- Selected item details -->
-  </div>
-</div>
+  getItemSprite(itemId) {
+    const item = this.items.find(i => i.itemId === itemId);
+    return item?.sprite || null;
+  }
 
-STYLING NOTES:
-- Grid layout: 2-3 items per row
-- Item cards: Square with item icon
-- Quantity badge in corner
-- SNES-style borders and shadows
-- Selected item: highlighted border
-- Grayed out if quantity = 0
+  attachEventListeners() {
+    const modeTabs = this.container.querySelectorAll('.storage-tab-btn');
+    modeTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        this.mode = tab.dataset.mode;
+        this.selectedItem = null;
+        this.selectedPokemon = null;
+        this.render();
+      });
+    });
 
-FUTURE FEATURES:
-- Item categories/tabs
-- Sort by type, quantity, name
-- Item combinations
-- Sell items
+    const seedBtn = this.container.querySelector('#seedItemsBtn');
+    if (seedBtn) {
+      seedBtn.addEventListener('click', async () => {
+        await this.seedItems();
+      });
+    }
 
-EXPORTS:
-export class StorageScreen { ... }
-*/
+    const itemCards = this.container.querySelectorAll('.item-card');
+    itemCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const itemId = card.dataset.itemId;
+        this.selectedItem = this.items.find(i => i.itemId === itemId);
+        this.render();
+      });
+    });
+
+    const equipBtn = this.container.querySelector('[data-action="equip-item"]');
+    if (equipBtn) {
+      equipBtn.addEventListener('click', () => {
+        this.mode = 'equip';
+        this.render();
+      });
+    }
+
+    const miniItemCards = this.container.querySelectorAll('[data-mode="select-item"]');
+    miniItemCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const itemId = card.dataset.itemId;
+        if (itemId === 'unequip') {
+          this.selectedItem = 'unequip';
+        } else {
+          this.selectedItem = this.items.find(i => i.itemId === itemId);
+        }
+        this.render();
+      });
+    });
+
+    const pokemonCards = this.container.querySelectorAll('.pokemon-equip-card');
+    pokemonCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const dbId = parseInt(card.dataset.pokemonDbId);
+        this.selectedPokemon = this.pokemon.find(p => p.db_id === dbId);
+        this.render();
+      });
+    });
+
+    const confirmBtn = this.container.querySelector('#confirmEquipBtn');
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', async () => {
+        await this.equipItem();
+      });
+    }
+  }
+
+  async seedItems() {
+    try {
+      const res = await fetch('/api/items/seed', { method: 'POST' });
+      if (res.ok) {
+        await this.loadData();
+        this.render();
+      }
+    } catch (error) {
+      console.error('[StorageScreen] Error seeding items:', error);
+    }
+  }
+
+  async equipItem() {
+    if (!this.selectedPokemon) return;
+
+    try {
+      const itemId = this.selectedItem === 'unequip' ? null : this.selectedItem.itemId;
+      
+      const res = await fetch(`/api/pokemon/${this.selectedPokemon.db_id}/equip`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemId })
+      });
+
+      if (res.ok) {
+        await this.loadData();
+        this.selectedItem = null;
+        this.selectedPokemon = null;
+        this.render();
+      } else {
+        const error = await res.json();
+        console.error('[StorageScreen] Equip error:', error);
+        alert(error.error || 'Failed to equip item');
+      }
+    } catch (error) {
+      console.error('[StorageScreen] Error equipping item:', error);
+    }
+  }
+
+  show() {
+    this.container.style.display = 'block';
+    this.loadData().then(() => this.render());
+  }
+
+  hide() {
+    this.container.style.display = 'none';
+  }
+}

@@ -387,6 +387,13 @@
   color: #d4a017;
 }
 
+.held-item-sprite {
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
 .item-name {
   font-size: 10px;
   font-weight: bold;

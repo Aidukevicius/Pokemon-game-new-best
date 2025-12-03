@@ -1,0 +1,404 @@
+/* Storage/Items Screen Styles */
+
+.storage-screen {
+  padding: 8px;
+  height: calc(100% - 60px);
+  overflow-y: auto;
+}
+
+.storage-header {
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.storage-title {
+  font-size: 14px;
+  margin: 0;
+  color: #333;
+}
+
+.storage-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.storage-tab-btn {
+  background: #e0e0e0;
+  border: 2px solid #888;
+  padding: 4px 10px;
+  font-size: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.storage-tab-btn.active {
+  background: #4a90d9;
+  color: white;
+  border-color: #2a6099;
+}
+
+.storage-tab-btn:hover:not(.active) {
+  background: #d0d0d0;
+}
+
+.storage-content {
+  min-height: 200px;
+}
+
+/* Items List */
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item-category {
+  background: rgba(255,255,255,0.5);
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.category-title {
+  font-size: 11px;
+  color: #666;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 4px;
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+/* Item Card */
+.item-card {
+  background: linear-gradient(135deg, #fff 0%, #f5f5f5 100%);
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.item-card:hover {
+  border-color: #4a90d9;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.item-card.selected {
+  border-color: #e74c3c;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.3);
+}
+
+.item-sprite {
+  width: 30px;
+  height: 30px;
+  image-rendering: pixelated;
+  margin-bottom: 2px;
+}
+
+.item-name {
+  font-size: 8px;
+  text-align: center;
+  color: #333;
+  line-height: 1.1;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-quantity {
+  font-size: 9px;
+  color: #666;
+  background: #e0e0e0;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-top: 2px;
+}
+
+/* Item Detail Panel */
+.item-detail-panel {
+  position: fixed;
+  bottom: 70px;
+  left: 8px;
+  right: 8px;
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+  z-index: 100;
+  animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.item-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.item-detail-sprite {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+  background: #f0f0f0;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.item-detail-info {
+  flex: 1;
+}
+
+.item-detail-name {
+  font-size: 14px;
+  margin: 0 0 4px 0;
+  color: #333;
+}
+
+.item-detail-quantity {
+  font-size: 11px;
+  color: #666;
+}
+
+.item-detail-description {
+  font-size: 11px;
+  color: #555;
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
+
+.item-detail-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.item-detail-actions .snes-btn {
+  flex: 1;
+  padding: 8px;
+  font-size: 11px;
+}
+
+.equip-btn {
+  background: #27ae60 !important;
+  color: white !important;
+}
+
+.equip-btn:hover {
+  background: #219a52 !important;
+}
+
+/* Equip Mode */
+.equip-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.equip-section {
+  background: rgba(255,255,255,0.7);
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.section-title {
+  font-size: 11px;
+  margin: 0 0 8px 0;
+  color: #555;
+}
+
+.items-mini-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.item-mini-card {
+  width: 44px;
+  height: 44px;
+  background: white;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.item-mini-card:hover {
+  border-color: #4a90d9;
+}
+
+.item-mini-card.selected {
+  border-color: #e74c3c;
+  background: #fff5f5;
+}
+
+.item-mini-sprite {
+  width: 28px;
+  height: 28px;
+  image-rendering: pixelated;
+}
+
+.item-mini-qty {
+  position: absolute;
+  bottom: 1px;
+  right: 2px;
+  font-size: 8px;
+  color: #666;
+  background: rgba(255,255,255,0.9);
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.unequip-card {
+  background: #f5f5f5;
+}
+
+.unequip-icon {
+  font-size: 18px;
+  color: #999;
+}
+
+.item-mini-name {
+  font-size: 7px;
+  color: #666;
+}
+
+/* Pokemon Equip Grid */
+.pokemon-equip-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.pokemon-equip-card {
+  background: white;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.pokemon-equip-card:hover {
+  border-color: #4a90d9;
+}
+
+.pokemon-equip-card.selected {
+  border-color: #27ae60;
+  background: #f0fff4;
+}
+
+.pokemon-equip-sprite {
+  width: 36px;
+  height: 36px;
+  image-rendering: pixelated;
+}
+
+.pokemon-equip-name {
+  font-size: 8px;
+  color: #333;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pokemon-held-item {
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.held-item-icon {
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
+}
+
+.no-item {
+  font-size: 10px;
+  color: #ccc;
+}
+
+/* Equip Confirm */
+.equip-confirm {
+  padding: 8px;
+  background: rgba(39, 174, 96, 0.1);
+  border-radius: 6px;
+}
+
+.confirm-equip-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 11px;
+  background: #27ae60 !important;
+  color: white !important;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.confirm-equip-btn:hover {
+  background: #219a52 !important;
+}
+
+/* Empty State */
+.storage-screen .empty-state {
+  text-align: center;
+  padding: 30px 20px;
+}
+
+.storage-screen .empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.storage-screen .empty-title {
+  font-size: 14px;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.storage-screen .empty-text {
+  font-size: 11px;
+  color: #666;
+  margin: 0 0 16px 0;
+}
+
+.seed-items-btn {
+  background: #4a90d9 !important;
+  color: white !important;
+  padding: 10px 20px;
+  font-size: 11px;
+}

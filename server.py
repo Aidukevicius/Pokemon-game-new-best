@@ -198,6 +198,168 @@ class Companion(db.Model):
         }
 
 
+POKEMON_ITEMS = {
+    'leftovers': {
+        'name': 'Leftovers',
+        'description': 'Restores HP gradually during battle.',
+        'category': 'hold',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/leftovers.png'
+    },
+    'choice-band': {
+        'name': 'Choice Band',
+        'description': 'Boosts Attack but locks into one move.',
+        'category': 'hold',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/choice-band.png'
+    },
+    'choice-specs': {
+        'name': 'Choice Specs',
+        'description': 'Boosts Sp. Atk but locks into one move.',
+        'category': 'hold',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/choice-specs.png'
+    },
+    'choice-scarf': {
+        'name': 'Choice Scarf',
+        'description': 'Boosts Speed but locks into one move.',
+        'category': 'hold',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/choice-scarf.png'
+    },
+    'life-orb': {
+        'name': 'Life Orb',
+        'description': 'Boosts damage by 30% but costs HP.',
+        'category': 'hold',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/life-orb.png'
+    },
+    'focus-sash': {
+        'name': 'Focus Sash',
+        'description': 'Survives one-hit KO with 1 HP.',
+        'category': 'hold',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/focus-sash.png'
+    },
+    'rocky-helmet': {
+        'name': 'Rocky Helmet',
+        'description': 'Damages attacker on contact.',
+        'category': 'hold',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/rocky-helmet.png'
+    },
+    'assault-vest': {
+        'name': 'Assault Vest',
+        'description': 'Boosts Sp. Def but prevents status moves.',
+        'category': 'hold',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/assault-vest.png'
+    },
+    'eviolite': {
+        'name': 'Eviolite',
+        'description': 'Boosts Def and Sp. Def of unevolved Pokemon.',
+        'category': 'hold',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/eviolite.png'
+    },
+    'black-sludge': {
+        'name': 'Black Sludge',
+        'description': 'Restores HP for Poison types.',
+        'category': 'hold',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/black-sludge.png'
+    },
+    'sitrus-berry': {
+        'name': 'Sitrus Berry',
+        'description': 'Restores 25% HP when below 50%.',
+        'category': 'berry',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/sitrus-berry.png'
+    },
+    'lum-berry': {
+        'name': 'Lum Berry',
+        'description': 'Cures any status condition.',
+        'category': 'berry',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/lum-berry.png'
+    },
+    'oran-berry': {
+        'name': 'Oran Berry',
+        'description': 'Restores 10 HP when below 50%.',
+        'category': 'berry',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/oran-berry.png'
+    },
+    'exp-share': {
+        'name': 'Exp. Share',
+        'description': 'Shares experience with holder.',
+        'category': 'hold',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/exp-share.png'
+    },
+    'lucky-egg': {
+        'name': 'Lucky Egg',
+        'description': 'Boosts experience gained.',
+        'category': 'hold',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/lucky-egg.png'
+    },
+    'soothe-bell': {
+        'name': 'Soothe Bell',
+        'description': 'Increases happiness gained.',
+        'category': 'hold',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/soothe-bell.png'
+    },
+    'macho-brace': {
+        'name': 'Macho Brace',
+        'description': 'Doubles EVs gained but halves Speed.',
+        'category': 'training',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/macho-brace.png'
+    },
+    'power-bracer': {
+        'name': 'Power Bracer',
+        'description': '+8 Attack EVs per battle.',
+        'category': 'training',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-bracer.png'
+    },
+    'power-belt': {
+        'name': 'Power Belt',
+        'description': '+8 Defense EVs per battle.',
+        'category': 'training',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-belt.png'
+    },
+    'power-lens': {
+        'name': 'Power Lens',
+        'description': '+8 Sp. Atk EVs per battle.',
+        'category': 'training',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-lens.png'
+    },
+    'power-band': {
+        'name': 'Power Band',
+        'description': '+8 Sp. Def EVs per battle.',
+        'category': 'training',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-band.png'
+    },
+    'power-anklet': {
+        'name': 'Power Anklet',
+        'description': '+8 Speed EVs per battle.',
+        'category': 'training',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-anklet.png'
+    },
+    'power-weight': {
+        'name': 'Power Weight',
+        'description': '+8 HP EVs per battle.',
+        'category': 'training',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-weight.png'
+    }
+}
+
+
+class Item(db.Model):
+    __tablename__ = 'items'
+
+    id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.String(50), nullable=False)
+    quantity = db.Column(db.Integer, default=1)
+
+    def to_dict(self):
+        item_data = POKEMON_ITEMS.get(self.item_id, {})
+        return {
+            'id': self.id,
+            'itemId': self.item_id,
+            'name': item_data.get('name', self.item_id),
+            'description': item_data.get('description', ''),
+            'category': item_data.get('category', 'hold'),
+            'sprite': item_data.get('sprite', ''),
+            'quantity': self.quantity
+        }
+
+
 with app.app_context():
     db.create_all()
 
@@ -432,6 +594,142 @@ def get_natures():
         'natures': NATURES,
         'modifiers': NATURE_MODIFIERS
     })
+
+
+@app.route('/api/items', methods=['GET'])
+def get_items():
+    items = Item.query.all()
+    return jsonify([item.to_dict() for item in items])
+
+
+@app.route('/api/items/catalog', methods=['GET'])
+def get_item_catalog():
+    catalog = []
+    for item_id, item_data in POKEMON_ITEMS.items():
+        catalog.append({
+            'itemId': item_id,
+            'name': item_data['name'],
+            'description': item_data['description'],
+            'category': item_data['category'],
+            'sprite': item_data['sprite']
+        })
+    return jsonify(catalog)
+
+
+@app.route('/api/items', methods=['POST'])
+def add_item():
+    data = request.json
+    item_id = data.get('itemId')
+    quantity = data.get('quantity', 1)
+    
+    if item_id not in POKEMON_ITEMS:
+        return jsonify({'error': 'Invalid item'}), 400
+    
+    existing = Item.query.filter_by(item_id=item_id).first()
+    if existing:
+        existing.quantity += quantity
+    else:
+        new_item = Item(item_id=item_id, quantity=quantity)
+        db.session.add(new_item)
+    
+    db.session.commit()
+    return jsonify({'message': f'Added {quantity}x {POKEMON_ITEMS[item_id]["name"]}'})
+
+
+@app.route('/api/items/<item_id>', methods=['PUT'])
+def update_item_quantity(item_id):
+    data = request.json
+    item = Item.query.filter_by(item_id=item_id).first()
+    
+    if not item:
+        return jsonify({'error': 'Item not found'}), 404
+    
+    if 'quantity' in data:
+        item.quantity = max(0, data['quantity'])
+        if item.quantity == 0:
+            db.session.delete(item)
+    
+    db.session.commit()
+    return jsonify(item.to_dict() if item.quantity > 0 else {'deleted': True})
+
+
+@app.route('/api/pokemon/<int:db_id>/equip', methods=['POST'])
+def equip_item_to_pokemon(db_id):
+    pokemon = Pokemon.query.get_or_404(db_id)
+    data = request.json
+    item_id = data.get('itemId')
+    
+    if item_id:
+        if item_id not in POKEMON_ITEMS:
+            return jsonify({'error': 'Invalid item'}), 400
+        
+        inventory_item = Item.query.filter_by(item_id=item_id).first()
+        if not inventory_item or inventory_item.quantity < 1:
+            return jsonify({'error': 'Item not in inventory'}), 400
+        
+        if pokemon.item:
+            old_item_id = None
+            for key, val in POKEMON_ITEMS.items():
+                if val['name'] == pokemon.item:
+                    old_item_id = key
+                    break
+            if old_item_id:
+                old_inventory = Item.query.filter_by(item_id=old_item_id).first()
+                if old_inventory:
+                    old_inventory.quantity += 1
+                else:
+                    db.session.add(Item(item_id=old_item_id, quantity=1))
+        
+        inventory_item.quantity -= 1
+        if inventory_item.quantity <= 0:
+            db.session.delete(inventory_item)
+        
+        pokemon.item = POKEMON_ITEMS[item_id]['name']
+    else:
+        if pokemon.item:
+            old_item_id = None
+            for key, val in POKEMON_ITEMS.items():
+                if val['name'] == pokemon.item:
+                    old_item_id = key
+                    break
+            if old_item_id:
+                old_inventory = Item.query.filter_by(item_id=old_item_id).first()
+                if old_inventory:
+                    old_inventory.quantity += 1
+                else:
+                    db.session.add(Item(item_id=old_item_id, quantity=1))
+        pokemon.item = None
+    
+    db.session.commit()
+    return jsonify(pokemon.to_dict())
+
+
+@app.route('/api/items/seed', methods=['POST'])
+def seed_items():
+    Item.query.delete()
+    
+    starter_items = [
+        ('leftovers', 2),
+        ('choice-band', 1),
+        ('choice-specs', 1),
+        ('choice-scarf', 1),
+        ('life-orb', 2),
+        ('focus-sash', 3),
+        ('sitrus-berry', 5),
+        ('lum-berry', 3),
+        ('oran-berry', 8),
+        ('lucky-egg', 1),
+        ('soothe-bell', 1),
+        ('exp-share', 1),
+        ('power-bracer', 1),
+        ('power-lens', 1),
+    ]
+    
+    for item_id, qty in starter_items:
+        db.session.add(Item(item_id=item_id, quantity=qty))
+    
+    db.session.commit()
+    return jsonify({'message': 'Items seeded', 'count': len(starter_items)})
 
 
 if __name__ == '__main__':
