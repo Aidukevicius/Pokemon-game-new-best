@@ -243,7 +243,17 @@
   color: #666;
 }
 
-.stats-grid, .evs-grid, .ivs-grid {
+.stats-grid, .evs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #f5f5f5;
+  padding: 8px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+}
+
+.ivs-grid {
   display: flex;
   flex-direction: column;
   gap: 4px;
