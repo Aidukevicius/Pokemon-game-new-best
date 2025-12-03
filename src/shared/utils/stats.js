@@ -32,8 +32,8 @@ export const STAT_NAMES = {
   hp: 'HP',
   attack: 'Attack',
   defense: 'Defense',
-  spAttack: 'Sp. Atk',
-  spDefense: 'Sp. Def',
+  spAttack: 'Sp.Atk',
+  spDefense: 'Sp.Def',
   speed: 'Speed'
 };
 
