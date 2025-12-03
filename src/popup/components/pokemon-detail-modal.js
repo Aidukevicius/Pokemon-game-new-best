@@ -14,6 +14,15 @@ export class PokemonDetailModal {
     this.createModal();
   }
 
+  getNameScale(name) {
+    const length = name.length;
+    if (length <= 9) return '';
+    if (length <= 11) return 'data-scale="0.9"';
+    if (length <= 13) return 'data-scale="0.8"';
+    if (length <= 15) return 'data-scale="0.7"';
+    return 'data-scale="0.6"';
+  }
+
   createModal() {
     const pokemon = this.currentPokemon;
     const baseData = getPokemonById(pokemon.id);
@@ -46,7 +55,7 @@ export class PokemonDetailModal {
           </div>
           <div class="detail-info">
             <span class="pokemon-number">#${String(pokemon.id).padStart(3, '0')}</span>
-            <h2 class="detail-name" ${pokemon.name.length > 10 ? 'data-long="true"' : ''}>${pokemon.name}</h2>
+            <h2 class="detail-name" ${this.getNameScale(pokemon.name)}>${pokemon.name}</h2>
             <div class="detail-types">${typesBadges}</div>
             <span class="detail-level">Level ${pokemon.level}</span>
           </div>

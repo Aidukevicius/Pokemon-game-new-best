@@ -120,14 +120,23 @@
   max-width: 100%;
   line-height: 1.2;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   transform-origin: left center;
 }
 
-.detail-name[data-long="true"] {
-  font-size: clamp(8px, 11px, 13px);
-  letter-spacing: 0.1px;
+.detail-name[data-scale="0.9"] {
+  transform: scaleX(0.9);
+}
+
+.detail-name[data-scale="0.8"] {
+  transform: scaleX(0.8);
+}
+
+.detail-name[data-scale="0.7"] {
+  transform: scaleX(0.7);
+}
+
+.detail-name[data-scale="0.6"] {
+  transform: scaleX(0.6);
 }
 
 .detail-types {
