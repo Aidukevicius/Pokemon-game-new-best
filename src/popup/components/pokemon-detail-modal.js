@@ -79,7 +79,7 @@ export class PokemonDetailModal {
         <div class="detail-section evs-section">
           <div class="section-header">
             <span class="section-icon">↑</span>
-            <span class="section-title">Effort Values (EVs)</span>
+            <span class="section-title">EVs</span>
             <span class="ev-total">${totalEVs}/510</span>
           </div>
           <div class="evs-grid">
@@ -90,7 +90,7 @@ export class PokemonDetailModal {
         <div class="detail-section ivs-section">
           <div class="section-header">
             <span class="section-icon">★</span>
-            <span class="section-title">Individual Values (IVs)</span>
+            <span class="section-title">IVs</span>
             <span class="iv-rating" style="color: ${ivRating.color}">${ivRating.label}</span>
           </div>
           <div class="ivs-grid">

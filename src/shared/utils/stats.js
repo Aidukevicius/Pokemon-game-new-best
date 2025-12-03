@@ -65,10 +65,10 @@ export function getTotalIVs(ivs) {
 }
 
 export function getIVRating(totalIVs) {
-  if (totalIVs >= 151) return { label: 'Outstanding!', color: '#ffd700' };
-  if (totalIVs >= 121) return { label: 'Relatively Superior', color: '#9b59b6' };
-  if (totalIVs >= 91) return { label: 'Above Average', color: '#3498db' };
-  return { label: 'Decent', color: '#888888' };
+  if (totalIVs >= 151) return { label: 'Legendary', color: '#ffd700' };
+  if (totalIVs >= 121) return { label: 'Rare', color: '#9b59b6' };
+  if (totalIVs >= 91) return { label: 'Uncommon', color: '#3498db' };
+  return { label: 'Common', color: '#888888' };
 }
 
 export function getNatureModifier(nature, statKey) {
