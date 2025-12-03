@@ -14,14 +14,6 @@ export class PokemonDetailModal {
     this.createModal();
   }
 
-  getNameScale(name) {
-    const length = name.length;
-    if (length <= 9) return '';
-    if (length <= 11) return 'data-size="small"';
-    if (length <= 13) return 'data-size="smaller"';
-    return 'data-size="tiny"';
-  }
-
   createModal() {
     const pokemon = this.currentPokemon;
     const baseData = getPokemonById(pokemon.id);
@@ -54,7 +46,7 @@ export class PokemonDetailModal {
           </div>
           <div class="detail-info">
             <span class="pokemon-number">#${String(pokemon.id).padStart(3, '0')}</span>
-            <h2 class="detail-name" ${this.getNameScale(pokemon.name)}>${pokemon.name}</h2>
+            <h2 class="detail-name">${pokemon.name}</h2>
             <div class="detail-types">${typesBadges}</div>
             <span class="detail-level">Level ${pokemon.level}</span>
           </div>
@@ -116,7 +108,32 @@ export class PokemonDetailModal {
     `;
     
     document.body.appendChild(this.overlay);
+    this.fitTextToContainer();
     this.attachEventListeners();
+  }
+
+  fitTextToContainer() {
+    const nameElement = this.overlay.querySelector('.detail-name');
+    const container = this.overlay.querySelector('.detail-info');
+    
+    if (!nameElement || !container) return;
+    
+    const containerWidth = container.offsetWidth - 20; // padding
+    let fontSize = 13;
+    
+    nameElement.style.fontSize = fontSize + 'px';
+    
+    while (nameElement.scrollWidth > containerWidth && fontSize > 7) {
+      fontSize -= 0.5;
+      nameElement.style.fontSize = fontSize + 'px';
+    }
+    
+    // Adjust letter spacing for very long names
+    if (fontSize < 10) {
+      nameElement.style.letterSpacing = '0px';
+    } else if (fontSize < 12) {
+      nameElement.style.letterSpacing = '0.1px';
+    }
   }
 
   renderStatBars(stats, nature) {

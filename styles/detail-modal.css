@@ -120,21 +120,7 @@
   max-width: 100%;
   line-height: 1.2;
   white-space: nowrap;
-}
-
-.detail-name[data-size="small"] {
-  font-size: 11px;
-  letter-spacing: 0.2px;
-}
-
-.detail-name[data-size="smaller"] {
-  font-size: 9px;
-  letter-spacing: 0.1px;
-}
-
-.detail-name[data-size="tiny"] {
-  font-size: 8px;
-  letter-spacing: 0px;
+  display: inline-block;
 }
 
 .detail-types {
