@@ -3,16 +3,19 @@
 ## Project Overview
 A lofi SNES-style Pokemon catching game implemented as a Chrome extension. Users can encounter and catch Pokemon while browsing the web. Features a mobile-shaped popup (360x640px) with tab-based navigation for different screens.
 
-## Current State (December 2, 2025)
-**Phase**: Database Integration Complete
+## Current State (December 3, 2025)
+**Phase**: Pokemon Detail Cards Complete
 - PostgreSQL database connected via Flask backend
-- 6 test Pokemon seeded (Bulbasaur, Charmander, Squirtle, Pikachu, Jigglypuff, Eevee)
+- 10 test Pokemon seeded with full stats, natures, items, and EVs
+- Pokemon detail modal with comprehensive stat display
+- Canonical Pokemon stat formulas (HP, Attack, Defense, Sp. Atk, Sp. Def, Speed)
+- Nature system with +10%/-10% stat modifiers
+- EV (Effort Value) tracking per stat (510 total cap, 252 per stat)
+- Item slot display for held items
+- Click handlers on Pokemon slots to open detail cards
 - Tab navigation system with 6 screens
-- Each screen has dedicated component file
-- SNES-style aesthetic design
+- SNES-style aesthetic with retro detail-modal.css styling
 - Mobile-shaped popup (280x500px in preview mode)
-- Preview server configured for Replit testing
-- Storage displays Pokemon count and filled slots with emoji icons
 
 ## Architecture
 
@@ -99,12 +102,17 @@ The preview server runs on port 5000 displaying `preview.html`, which embeds pop
 3. Load unpacked extension from this directory
 
 ## Recent Changes
+- **2025-12-03**: Added Pokemon detail card modal with full stats display
+- **2025-12-03**: Implemented canonical Pokemon stat formulas (IV/EV/nature)
+- **2025-12-03**: Created stats.js utility with nature modifiers and stat calculations
+- **2025-12-03**: Added EV tracking (6 stats, 510 total cap) with visual bars
+- **2025-12-03**: Added item slot system for held items
+- **2025-12-03**: Created detail-modal.css with SNES-style retro design
+- **2025-12-03**: Extended database schema with nature, item, and 6 EV columns
+- **2025-12-03**: Seeded 10 Pokemon with full data (including Mewtwo, Dragonite, Gengar)
+- **2025-12-03**: Added click handlers to main-screen and collection-screen for modals
 - **2025-12-02**: Integrated PostgreSQL database with Flask backend
 - **2025-12-02**: Created server.py with Pokemon model and REST API endpoints
-- **2025-12-02**: Seeded 6 test Pokemon to database
-- **2025-12-02**: Updated StorageService.js to fetch from database API
-- **2025-12-02**: Fixed storage slot CSS grid (3 columns, proper sizing)
-- **2025-12-02**: Added emoji icons for Pokemon in storage slots
 - **2025-11-21**: Added tab-based navigation system
 - **2025-11-21**: Created 6 separate screen component files
 - **2025-11-21**: Added tabs-navigation.js for bottom tab menu
