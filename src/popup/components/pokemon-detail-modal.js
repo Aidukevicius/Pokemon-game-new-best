@@ -154,7 +154,7 @@ export class PokemonDetailModal {
           <div class="section-header">
             <span class="section-icon">★</span>
             <span class="section-title">IVs</span>
-            <span class="iv-rating" style="color: ${ivRating.color}">${ivRating.label} (${totalIVs}/186)</span>
+            <span class="iv-total">${totalIVs}/186</span>
           </div>
           <div class="ivs-grid">
             ${this.renderIVBars(pokemon.ivs)}
