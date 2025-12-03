@@ -207,7 +207,7 @@
 }
 
 .pokemon-storage {
-  background: #e0f2fe;
+  background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
   border: 3px solid #3b82f6;
   border-radius: 8px;
   padding: 12px;
