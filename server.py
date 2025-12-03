@@ -56,6 +56,30 @@ NATURE_MODIFIERS = {
     'Quirky': {'increase': None, 'decrease': None}
 }
 
+MAX_TOTAL_EVS = 510
+MAX_SINGLE_EV = 252
+
+def validate_and_clamp_evs(evs):
+    """Validate EVs: max 252 per stat, max 510 total"""
+    if not evs:
+        return {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}
+    
+    stat_keys = ['hp', 'attack', 'defense', 'spAttack', 'spDefense', 'speed']
+    clamped = {}
+    total_used = 0
+    
+    for key in stat_keys:
+        value = evs.get(key, 0)
+        value = max(0, min(MAX_SINGLE_EV, value))
+        
+        if total_used + value > MAX_TOTAL_EVS:
+            value = MAX_TOTAL_EVS - total_used
+        
+        clamped[key] = value
+        total_used += value
+    
+    return clamped
+
 
 class Pokemon(db.Model):
     __tablename__ = 'pokemon'
@@ -212,6 +236,11 @@ def add_pokemon():
     data = request.json
     nature = data.get('nature', random.choice(NATURES))
     
+    raw_evs = data.get('evs', {})
+    validated_evs = validate_and_clamp_evs(raw_evs)
+    
+    ivs = data.get('ivs', {})
+    
     new_pokemon = Pokemon(
         pokemon_id=data['id'],
         name=data['name'],
@@ -219,12 +248,18 @@ def add_pokemon():
         caught_at=datetime.fromisoformat(data['caughtAt'].replace('Z', '+00:00')) if 'caughtAt' in data else datetime.now(),
         nature=nature,
         item=data.get('item'),
-        hp_ev=data.get('evs', {}).get('hp', 0),
-        attack_ev=data.get('evs', {}).get('attack', 0),
-        defense_ev=data.get('evs', {}).get('defense', 0),
-        sp_attack_ev=data.get('evs', {}).get('spAttack', 0),
-        sp_defense_ev=data.get('evs', {}).get('spDefense', 0),
-        speed_ev=data.get('evs', {}).get('speed', 0)
+        hp_ev=validated_evs.get('hp', 0),
+        attack_ev=validated_evs.get('attack', 0),
+        defense_ev=validated_evs.get('defense', 0),
+        sp_attack_ev=validated_evs.get('spAttack', 0),
+        sp_defense_ev=validated_evs.get('spDefense', 0),
+        speed_ev=validated_evs.get('speed', 0),
+        hp_iv=ivs.get('hp', random.randint(0, 31)),
+        attack_iv=ivs.get('attack', random.randint(0, 31)),
+        defense_iv=ivs.get('defense', random.randint(0, 31)),
+        sp_attack_iv=ivs.get('spAttack', random.randint(0, 31)),
+        sp_defense_iv=ivs.get('spDefense', random.randint(0, 31)),
+        speed_iv=ivs.get('speed', random.randint(0, 31))
     )
     db.session.add(new_pokemon)
     db.session.commit()
@@ -241,19 +276,23 @@ def update_pokemon(db_id):
     if 'is_favorite' in data:
         pokemon.is_favorite = data['is_favorite']
     if 'evs' in data:
-        evs = data['evs']
-        if 'hp' in evs:
-            pokemon.hp_ev = evs['hp']
-        if 'attack' in evs:
-            pokemon.attack_ev = evs['attack']
-        if 'defense' in evs:
-            pokemon.defense_ev = evs['defense']
-        if 'spAttack' in evs:
-            pokemon.sp_attack_ev = evs['spAttack']
-        if 'spDefense' in evs:
-            pokemon.sp_defense_ev = evs['spDefense']
-        if 'speed' in evs:
-            pokemon.speed_ev = evs['speed']
+        current_evs = {
+            'hp': pokemon.hp_ev,
+            'attack': pokemon.attack_ev,
+            'defense': pokemon.defense_ev,
+            'spAttack': pokemon.sp_attack_ev,
+            'spDefense': pokemon.sp_defense_ev,
+            'speed': pokemon.speed_ev
+        }
+        current_evs.update(data['evs'])
+        validated_evs = validate_and_clamp_evs(current_evs)
+        
+        pokemon.hp_ev = validated_evs['hp']
+        pokemon.attack_ev = validated_evs['attack']
+        pokemon.defense_ev = validated_evs['defense']
+        pokemon.sp_attack_ev = validated_evs['spAttack']
+        pokemon.sp_defense_ev = validated_evs['spDefense']
+        pokemon.speed_ev = validated_evs['speed']
     
     db.session.commit()
     return jsonify(pokemon.to_dict())

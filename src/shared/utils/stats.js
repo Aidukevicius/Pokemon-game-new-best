@@ -163,3 +163,60 @@ export function getStatTotal(stats) {
   return stats.hp.calculated + stats.attack.calculated + stats.defense.calculated +
          stats.spAttack.calculated + stats.spDefense.calculated + stats.speed.calculated;
 }
+
+export const MAX_TOTAL_EVS = 510;
+export const MAX_SINGLE_EV = 252;
+
+export function validateAndClampEVs(evs) {
+  if (!evs) {
+    return { hp: 0, attack: 0, defense: 0, spAttack: 0, spDefense: 0, speed: 0 };
+  }
+  
+  const statKeys = ['hp', 'attack', 'defense', 'spAttack', 'spDefense', 'speed'];
+  const clamped = {};
+  let totalUsed = 0;
+  
+  for (const key of statKeys) {
+    let value = evs[key] || 0;
+    value = Math.max(0, Math.min(MAX_SINGLE_EV, value));
+    
+    if (totalUsed + value > MAX_TOTAL_EVS) {
+      value = MAX_TOTAL_EVS - totalUsed;
+    }
+    
+    clamped[key] = value;
+    totalUsed += value;
+  }
+  
+  return clamped;
+}
+
+export function canAddEVs(currentEvs, statKey, amount) {
+  const currentTotal = getTotalEVs(currentEvs);
+  const currentStat = currentEvs[statKey] || 0;
+  
+  if (currentStat + amount > MAX_SINGLE_EV) {
+    return { allowed: false, reason: `${STAT_NAMES[statKey]} is maxed at ${MAX_SINGLE_EV}` };
+  }
+  
+  if (currentTotal + amount > MAX_TOTAL_EVS) {
+    return { allowed: false, reason: `Total EVs cannot exceed ${MAX_TOTAL_EVS}` };
+  }
+  
+  return { allowed: true, remaining: MAX_TOTAL_EVS - currentTotal - amount };
+}
+
+export function generateRandomIVs() {
+  return {
+    hp: Math.floor(Math.random() * 32),
+    attack: Math.floor(Math.random() * 32),
+    defense: Math.floor(Math.random() * 32),
+    spAttack: Math.floor(Math.random() * 32),
+    spDefense: Math.floor(Math.random() * 32),
+    speed: Math.floor(Math.random() * 32)
+  };
+}
+
+export function getDefaultEVs() {
+  return { hp: 0, attack: 0, defense: 0, spAttack: 0, spDefense: 0, speed: 0 };
+}

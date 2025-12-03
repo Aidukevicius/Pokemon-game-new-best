@@ -1,6 +1,7 @@
 // Encounter Service - Handles Pokemon encounter generation
 import { POKEMON_DATABASE, RARITY_WEIGHTS, getPokemonByRarity } from '../data/pokemon-database.js';
 import { getRandomInt, weightedRandomChoice } from '../utils/random.js';
+import { calculateHP, calculateStat, generateRandomIVs, getDefaultEVs, getNatureModifier } from '../utils/stats.js';
 
 export class EncounterService {
   constructor() {
@@ -50,14 +51,10 @@ export class EncounterService {
     const level = getRandomInt(minLevel, maxLevel);
     
     // Generate random IVs (Individual Values - 0-31 for each stat)
-    const ivs = {
-      hp: getRandomInt(0, 31),
-      attack: getRandomInt(0, 31),
-      defense: getRandomInt(0, 31),
-      spAttack: getRandomInt(0, 31),
-      spDefense: getRandomInt(0, 31),
-      speed: getRandomInt(0, 31)
-    };
+    const ivs = generateRandomIVs();
+    
+    // Wild Pokemon start with 0 EVs
+    const evs = getDefaultEVs();
     
     // Generate random nature
     const natures = [
@@ -69,8 +66,8 @@ export class EncounterService {
     ];
     const nature = natures[getRandomInt(0, natures.length - 1)];
     
-    // Calculate actual stats based on base stats, IVs, and level
-    const stats = this.calculateStats(pokemon.baseStats, ivs, level);
+    // Calculate actual stats using official Pokemon formula (Base Stats + IVs + EVs + Nature)
+    const stats = this.calculateStatsOfficial(pokemon.baseStats, ivs, evs, level, nature);
     
     const encounter = {
       pokemon: {
@@ -83,6 +80,7 @@ export class EncounterService {
       },
       level,
       ivs,
+      evs,
       nature,
       stats,
       currentHp: stats.hp,
@@ -95,27 +93,18 @@ export class EncounterService {
   }
 
   /**
-   * Calculate actual stats from base stats, IVs, and level
-   * Using Gen 1 stat calculation formula
+   * Calculate actual stats using official Pokemon formula (Gen 3+)
+   * HP: floor(((2 * Base + IV + floor(EV/4)) * Level) / 100) + Level + 10
+   * Other: floor((floor(((2 * Base + IV + floor(EV/4)) * Level) / 100) + 5) * Nature)
    */
-  calculateStats(baseStats, ivs, level) {
-    const calculateStat = (base, iv, level, isHp = false) => {
-      if (isHp) {
-        // HP formula: ((Base + IV) * 2 * Level / 100) + Level + 10
-        return Math.floor(((base + iv) * 2 * level / 100) + level + 10);
-      } else {
-        // Other stats: ((Base + IV) * 2 * Level / 100) + 5
-        return Math.floor(((base + iv) * 2 * level / 100) + 5);
-      }
-    };
-
+  calculateStatsOfficial(baseStats, ivs, evs, level, nature) {
     return {
-      hp: calculateStat(baseStats.hp, ivs.hp, level, true),
-      attack: calculateStat(baseStats.attack, ivs.attack, level),
-      defense: calculateStat(baseStats.defense, ivs.defense, level),
-      spAttack: calculateStat(baseStats.spAttack, ivs.spAttack, level),
-      spDefense: calculateStat(baseStats.spDefense, ivs.spDefense, level),
-      speed: calculateStat(baseStats.speed, ivs.speed, level)
+      hp: calculateHP(baseStats.hp, level, evs.hp, ivs.hp),
+      attack: calculateStat(baseStats.attack, level, evs.attack, ivs.attack, getNatureModifier(nature, 'attack')),
+      defense: calculateStat(baseStats.defense, level, evs.defense, ivs.defense, getNatureModifier(nature, 'defense')),
+      spAttack: calculateStat(baseStats.spAttack, level, evs.spAttack, ivs.spAttack, getNatureModifier(nature, 'spAttack')),
+      spDefense: calculateStat(baseStats.spDefense, level, evs.spDefense, ivs.spDefense, getNatureModifier(nature, 'spDefense')),
+      speed: calculateStat(baseStats.speed, level, evs.speed, ivs.speed, getNatureModifier(nature, 'speed'))
     };
   }
 
