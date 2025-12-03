@@ -58,6 +58,8 @@ export const POKEMON_DATABASE = [
   { id: 88, name: 'Grimer', types: ['Poison'], baseStats: { hp: 80, attack: 80, defense: 50, spAttack: 40, spDefense: 50, speed: 25 }, catchRate: 190, encounterRate: 10, rarity: 'common' },
   { id: 90, name: 'Shellder', types: ['Water'], baseStats: { hp: 30, attack: 65, defense: 100, spAttack: 45, spDefense: 25, speed: 40 }, catchRate: 190, encounterRate: 10, rarity: 'common' },
   { id: 92, name: 'Gastly', types: ['Ghost', 'Poison'], baseStats: { hp: 30, attack: 35, defense: 30, spAttack: 100, spDefense: 35, speed: 80 }, catchRate: 190, encounterRate: 8, rarity: 'uncommon' },
+  { id: 93, name: 'Haunter', types: ['Ghost', 'Poison'], baseStats: { hp: 45, attack: 50, defense: 45, spAttack: 115, spDefense: 55, speed: 95 }, catchRate: 90, encounterRate: 4, rarity: 'uncommon' },
+  { id: 94, name: 'Gengar', types: ['Ghost', 'Poison'], baseStats: { hp: 60, attack: 65, defense: 60, spAttack: 130, spDefense: 75, speed: 110 }, catchRate: 45, encounterRate: 2, rarity: 'rare' },
   { id: 95, name: 'Onix', types: ['Rock', 'Ground'], baseStats: { hp: 35, attack: 45, defense: 160, spAttack: 30, spDefense: 45, speed: 70 }, catchRate: 45, encounterRate: 3, rarity: 'rare' },
   { id: 96, name: 'Drowzee', types: ['Psychic'], baseStats: { hp: 60, attack: 48, defense: 45, spAttack: 43, spDefense: 90, speed: 42 }, catchRate: 190, encounterRate: 10, rarity: 'common' },
   { id: 98, name: 'Krabby', types: ['Water'], baseStats: { hp: 30, attack: 105, defense: 90, spAttack: 25, spDefense: 25, speed: 50 }, catchRate: 225, encounterRate: 12, rarity: 'common' },
@@ -83,6 +85,7 @@ export const POKEMON_DATABASE = [
   { id: 142, name: 'Aerodactyl', types: ['Rock', 'Flying'], baseStats: { hp: 80, attack: 105, defense: 65, spAttack: 60, spDefense: 75, speed: 130 }, catchRate: 45, encounterRate: 1, rarity: 'rare' },
   { id: 147, name: 'Dratini', types: ['Dragon'], baseStats: { hp: 41, attack: 64, defense: 45, spAttack: 50, spDefense: 50, speed: 50 }, catchRate: 45, encounterRate: 2, rarity: 'rare' },
   { id: 148, name: 'Dragonair', types: ['Dragon'], baseStats: { hp: 61, attack: 84, defense: 65, spAttack: 70, spDefense: 70, speed: 70 }, catchRate: 45, encounterRate: 1, rarity: 'rare' },
+  { id: 149, name: 'Dragonite', types: ['Dragon', 'Flying'], baseStats: { hp: 91, attack: 134, defense: 95, spAttack: 100, spDefense: 100, speed: 80 }, catchRate: 45, encounterRate: 0.5, rarity: 'rare' },
   
   // Legendary Pokemon - Very Rare
   { id: 144, name: 'Articuno', types: ['Ice', 'Flying'], baseStats: { hp: 90, attack: 85, defense: 100, spAttack: 95, spDefense: 125, speed: 85 }, catchRate: 3, encounterRate: 0.1, rarity: 'legendary' },
