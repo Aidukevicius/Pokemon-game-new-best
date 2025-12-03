@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import random
 from datetime import datetime
 from flask import Flask, jsonify, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
@@ -19,6 +20,42 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 }
 db.init_app(app)
 
+NATURES = [
+    'Hardy', 'Lonely', 'Brave', 'Adamant', 'Naughty',
+    'Bold', 'Docile', 'Relaxed', 'Impish', 'Lax',
+    'Timid', 'Hasty', 'Serious', 'Jolly', 'Naive',
+    'Modest', 'Mild', 'Quiet', 'Bashful', 'Rash',
+    'Calm', 'Gentle', 'Sassy', 'Careful', 'Quirky'
+]
+
+NATURE_MODIFIERS = {
+    'Hardy': {'increase': None, 'decrease': None},
+    'Lonely': {'increase': 'attack', 'decrease': 'defense'},
+    'Brave': {'increase': 'attack', 'decrease': 'speed'},
+    'Adamant': {'increase': 'attack', 'decrease': 'spAttack'},
+    'Naughty': {'increase': 'attack', 'decrease': 'spDefense'},
+    'Bold': {'increase': 'defense', 'decrease': 'attack'},
+    'Docile': {'increase': None, 'decrease': None},
+    'Relaxed': {'increase': 'defense', 'decrease': 'speed'},
+    'Impish': {'increase': 'defense', 'decrease': 'spAttack'},
+    'Lax': {'increase': 'defense', 'decrease': 'spDefense'},
+    'Timid': {'increase': 'speed', 'decrease': 'attack'},
+    'Hasty': {'increase': 'speed', 'decrease': 'defense'},
+    'Serious': {'increase': None, 'decrease': None},
+    'Jolly': {'increase': 'speed', 'decrease': 'spAttack'},
+    'Naive': {'increase': 'speed', 'decrease': 'spDefense'},
+    'Modest': {'increase': 'spAttack', 'decrease': 'attack'},
+    'Mild': {'increase': 'spAttack', 'decrease': 'defense'},
+    'Quiet': {'increase': 'spAttack', 'decrease': 'speed'},
+    'Bashful': {'increase': None, 'decrease': None},
+    'Rash': {'increase': 'spAttack', 'decrease': 'spDefense'},
+    'Calm': {'increase': 'spDefense', 'decrease': 'attack'},
+    'Gentle': {'increase': 'spDefense', 'decrease': 'defense'},
+    'Sassy': {'increase': 'spDefense', 'decrease': 'speed'},
+    'Careful': {'increase': 'spDefense', 'decrease': 'spAttack'},
+    'Quirky': {'increase': None, 'decrease': None}
+}
+
 
 class Pokemon(db.Model):
     __tablename__ = 'pokemon'
@@ -29,6 +66,14 @@ class Pokemon(db.Model):
     level = db.Column(db.Integer, default=1)
     caught_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_favorite = db.Column(db.Boolean, default=False)
+    nature = db.Column(db.String(20), default='Hardy')
+    item = db.Column(db.String(100), nullable=True)
+    hp_ev = db.Column(db.Integer, default=0)
+    attack_ev = db.Column(db.Integer, default=0)
+    defense_ev = db.Column(db.Integer, default=0)
+    sp_attack_ev = db.Column(db.Integer, default=0)
+    sp_defense_ev = db.Column(db.Integer, default=0)
+    speed_ev = db.Column(db.Integer, default=0)
 
     def to_dict(self):
         return {
@@ -36,8 +81,20 @@ class Pokemon(db.Model):
             'name': self.name,
             'level': self.level,
             'caught_at': self.caught_at.isoformat() if self.caught_at else None,
+            'caughtAt': int(self.caught_at.timestamp() * 1000) if self.caught_at else None,
             'is_favorite': self.is_favorite,
-            'db_id': self.id
+            'db_id': self.id,
+            'catchId': self.id,
+            'nature': self.nature,
+            'item': self.item,
+            'evs': {
+                'hp': self.hp_ev,
+                'attack': self.attack_ev,
+                'defense': self.defense_ev,
+                'spAttack': self.sp_attack_ev,
+                'spDefense': self.sp_defense_ev,
+                'speed': self.speed_ev
+            }
         }
 
 
@@ -55,6 +112,14 @@ class Companion(db.Model):
     happiness = db.Column(db.Integer, default=100)
     last_fed = db.Column(db.DateTime, default=datetime.utcnow)
     last_interaction = db.Column(db.DateTime, default=datetime.utcnow)
+    nature = db.Column(db.String(20), default='Hardy')
+    item = db.Column(db.String(100), nullable=True)
+    hp_ev = db.Column(db.Integer, default=0)
+    attack_ev = db.Column(db.Integer, default=0)
+    defense_ev = db.Column(db.Integer, default=0)
+    sp_attack_ev = db.Column(db.Integer, default=0)
+    sp_defense_ev = db.Column(db.Integer, default=0)
+    speed_ev = db.Column(db.Integer, default=0)
 
     def to_dict(self):
         return {
@@ -67,7 +132,17 @@ class Companion(db.Model):
             'experienceToNext': self.experience_to_next,
             'happiness': self.happiness,
             'lastFed': int(self.last_fed.timestamp() * 1000) if self.last_fed else None,
-            'lastInteraction': int(self.last_interaction.timestamp() * 1000) if self.last_interaction else None
+            'lastInteraction': int(self.last_interaction.timestamp() * 1000) if self.last_interaction else None,
+            'nature': self.nature,
+            'item': self.item,
+            'evs': {
+                'hp': self.hp_ev,
+                'attack': self.attack_ev,
+                'defense': self.defense_ev,
+                'spAttack': self.sp_attack_ev,
+                'spDefense': self.sp_defense_ev,
+                'speed': self.speed_ev
+            }
         }
 
 
@@ -94,23 +169,66 @@ def get_pokemon_collection():
     return jsonify([p.to_dict() for p in pokemon_list])
 
 
+@app.route('/api/pokemon/<int:db_id>', methods=['GET'])
+def get_pokemon_detail(db_id):
+    pokemon = Pokemon.query.get_or_404(db_id)
+    return jsonify(pokemon.to_dict())
+
+
 @app.route('/api/pokemon', methods=['POST'])
 def add_pokemon():
-    # Check if storage limit reached (100 Pokemon max)
     current_count = Pokemon.query.count()
     if current_count >= 100:
         return jsonify({'error': 'Storage limit reached. Maximum 100 Pokemon allowed.'}), 400
 
     data = request.json
+    nature = data.get('nature', random.choice(NATURES))
+    
     new_pokemon = Pokemon(
         pokemon_id=data['id'],
         name=data['name'],
         level=data.get('level', 1),
-        caught_at=datetime.fromisoformat(data['caughtAt'].replace('Z', '+00:00')) if 'caughtAt' in data else datetime.now()
+        caught_at=datetime.fromisoformat(data['caughtAt'].replace('Z', '+00:00')) if 'caughtAt' in data else datetime.now(),
+        nature=nature,
+        item=data.get('item'),
+        hp_ev=data.get('evs', {}).get('hp', 0),
+        attack_ev=data.get('evs', {}).get('attack', 0),
+        defense_ev=data.get('evs', {}).get('defense', 0),
+        sp_attack_ev=data.get('evs', {}).get('spAttack', 0),
+        sp_defense_ev=data.get('evs', {}).get('spDefense', 0),
+        speed_ev=data.get('evs', {}).get('speed', 0)
     )
     db.session.add(new_pokemon)
     db.session.commit()
     return jsonify(new_pokemon.to_dict()), 201
+
+
+@app.route('/api/pokemon/<int:db_id>', methods=['PUT'])
+def update_pokemon(db_id):
+    pokemon = Pokemon.query.get_or_404(db_id)
+    data = request.json
+    
+    if 'item' in data:
+        pokemon.item = data['item']
+    if 'is_favorite' in data:
+        pokemon.is_favorite = data['is_favorite']
+    if 'evs' in data:
+        evs = data['evs']
+        if 'hp' in evs:
+            pokemon.hp_ev = evs['hp']
+        if 'attack' in evs:
+            pokemon.attack_ev = evs['attack']
+        if 'defense' in evs:
+            pokemon.defense_ev = evs['defense']
+        if 'spAttack' in evs:
+            pokemon.sp_attack_ev = evs['spAttack']
+        if 'spDefense' in evs:
+            pokemon.sp_defense_ev = evs['spDefense']
+        if 'speed' in evs:
+            pokemon.speed_ev = evs['speed']
+    
+    db.session.commit()
+    return jsonify(pokemon.to_dict())
 
 
 @app.route('/api/pokemon/<int:db_id>', methods=['DELETE'])
@@ -133,7 +251,8 @@ def get_companion():
             max_health=100,
             experience=0,
             experience_to_next=100,
-            happiness=100
+            happiness=100,
+            nature=random.choice(NATURES)
         )
         db.session.add(companion)
         db.session.commit()
@@ -145,7 +264,7 @@ def update_companion():
     data = request.json
     companion = Companion.query.first()
     if not companion:
-        companion = Companion(pokemon_id=25, name='Pikachu')
+        companion = Companion(pokemon_id=25, name='Pikachu', nature=random.choice(NATURES))
         db.session.add(companion)
 
     if 'level' in data:
@@ -164,6 +283,22 @@ def update_companion():
         companion.last_fed = datetime.fromtimestamp(data['lastFed'] / 1000)
     if 'lastInteraction' in data:
         companion.last_interaction = datetime.fromtimestamp(data['lastInteraction'] / 1000)
+    if 'item' in data:
+        companion.item = data['item']
+    if 'evs' in data:
+        evs = data['evs']
+        if 'hp' in evs:
+            companion.hp_ev = evs['hp']
+        if 'attack' in evs:
+            companion.attack_ev = evs['attack']
+        if 'defense' in evs:
+            companion.defense_ev = evs['defense']
+        if 'spAttack' in evs:
+            companion.sp_attack_ev = evs['spAttack']
+        if 'spDefense' in evs:
+            companion.sp_defense_ev = evs['spDefense']
+        if 'speed' in evs:
+            companion.speed_ev = evs['speed']
 
     db.session.commit()
     return jsonify(companion.to_dict())
@@ -172,26 +307,47 @@ def update_companion():
 @app.route('/api/seed', methods=['POST'])
 def seed_pokemon():
     test_pokemon = [
-        {'id': 1, 'name': 'Bulbasaur', 'level': 5},
-        {'id': 4, 'name': 'Charmander', 'level': 7},
-        {'id': 7, 'name': 'Squirtle', 'level': 6},
-        {'id': 25, 'name': 'Pikachu', 'level': 10},
-        {'id': 39, 'name': 'Jigglypuff', 'level': 8},
-        {'id': 133, 'name': 'Eevee', 'level': 12},
+        {'id': 1, 'name': 'Bulbasaur', 'level': 15, 'nature': 'Modest', 'item': 'Miracle Seed', 'evs': {'hp': 20, 'spAttack': 45, 'spDefense': 30}},
+        {'id': 4, 'name': 'Charmander', 'level': 18, 'nature': 'Adamant', 'item': 'Charcoal', 'evs': {'attack': 50, 'speed': 35}},
+        {'id': 7, 'name': 'Squirtle', 'level': 16, 'nature': 'Bold', 'item': 'Mystic Water', 'evs': {'defense': 40, 'hp': 25}},
+        {'id': 25, 'name': 'Pikachu', 'level': 22, 'nature': 'Jolly', 'item': 'Light Ball', 'evs': {'speed': 60, 'attack': 30}},
+        {'id': 39, 'name': 'Jigglypuff', 'level': 14, 'nature': 'Calm', 'item': None, 'evs': {'hp': 55, 'spDefense': 20}},
+        {'id': 133, 'name': 'Eevee', 'level': 20, 'nature': 'Timid', 'item': 'Everstone', 'evs': {'speed': 40, 'spAttack': 25}},
+        {'id': 6, 'name': 'Charizard', 'level': 45, 'nature': 'Naive', 'item': 'Dragon Fang', 'evs': {'spAttack': 80, 'speed': 70, 'attack': 40}},
+        {'id': 94, 'name': 'Gengar', 'level': 42, 'nature': 'Timid', 'item': 'Spell Tag', 'evs': {'spAttack': 90, 'speed': 65}},
+        {'id': 149, 'name': 'Dragonite', 'level': 55, 'nature': 'Adamant', 'item': 'Dragon Scale', 'evs': {'attack': 100, 'hp': 50, 'speed': 30}},
+        {'id': 150, 'name': 'Mewtwo', 'level': 70, 'nature': 'Modest', 'item': 'Twisted Spoon', 'evs': {'spAttack': 120, 'speed': 80, 'hp': 40}},
     ]
 
+    Pokemon.query.delete()
+    
     for p in test_pokemon:
-        existing = Pokemon.query.filter_by(pokemon_id=p['id']).first()
-        if not existing:
-            pokemon = Pokemon(
-                pokemon_id=p['id'],
-                name=p['name'],
-                level=p['level']
-            )
-            db.session.add(pokemon)
+        evs = p.get('evs', {})
+        pokemon = Pokemon(
+            pokemon_id=p['id'],
+            name=p['name'],
+            level=p['level'],
+            nature=p.get('nature', random.choice(NATURES)),
+            item=p.get('item'),
+            hp_ev=evs.get('hp', 0),
+            attack_ev=evs.get('attack', 0),
+            defense_ev=evs.get('defense', 0),
+            sp_attack_ev=evs.get('spAttack', 0),
+            sp_defense_ev=evs.get('spDefense', 0),
+            speed_ev=evs.get('speed', 0)
+        )
+        db.session.add(pokemon)
 
     db.session.commit()
     return jsonify({'message': 'Test Pokemon added', 'count': len(test_pokemon)})
+
+
+@app.route('/api/natures', methods=['GET'])
+def get_natures():
+    return jsonify({
+        'natures': NATURES,
+        'modifiers': NATURE_MODIFIERS
+    })
 
 
 if __name__ == '__main__':

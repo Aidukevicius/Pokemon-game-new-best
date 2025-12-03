@@ -1,9 +1,7 @@
 
-// COLLECTION SCREEN - Display caught Pokemon
-// Separate from Pokedex which shows encountered Pokemon
-
 import { StorageService } from '../../shared/services/StorageService.js';
 import { SpriteService } from '../../shared/services/SpriteService.js';
+import { showPokemonDetail } from '../components/pokemon-detail-modal.js';
 
 export class CollectionScreen {
   constructor(containerElement) {
@@ -11,7 +9,7 @@ export class CollectionScreen {
     this.storageService = new StorageService();
     this.spriteService = new SpriteService();
     this.caughtPokemon = [];
-    this.sortBy = 'date'; // 'date', 'number', 'name', 'level'
+    this.sortBy = 'date';
   }
 
   async initialize() {
@@ -31,7 +29,6 @@ export class CollectionScreen {
     
     this.container.innerHTML = `
       <div class="collection-screen">
-        <!-- Header -->
         <div class="snes-container collection-header">
           <h2 class="collection-title">My Collection</h2>
           <div class="collection-stats">
@@ -40,7 +37,6 @@ export class CollectionScreen {
           </div>
         </div>
 
-        <!-- Sort Controls -->
         <div class="collection-controls">
           <select class="snes-select sort-select" id="sortSelect">
             <option value="date">Sort by Date</option>
@@ -50,7 +46,6 @@ export class CollectionScreen {
           </select>
         </div>
 
-        <!-- Pokemon Grid -->
         <div class="collection-grid" id="collectionGrid">
           ${this.caughtPokemon.length > 0 ? this.renderPokemonGrid() : this.renderEmptyState()}
         </div>
@@ -65,17 +60,20 @@ export class CollectionScreen {
     
     return sorted.map(pokemon => {
       const spriteUrl = this.spriteService.getDefaultSpriteUrl(pokemon.id);
+      const itemIndicator = pokemon.item ? '<span class="item-indicator" title="Holding item">◆</span>' : '';
       
       return `
-        <div class="collection-card snes-container" data-catch-id="${pokemon.catchId}">
+        <div class="collection-card snes-container" data-catch-id="${pokemon.catchId || pokemon.db_id}">
           <div class="card-sprite">
             <img src="${spriteUrl}" alt="${pokemon.name}" class="pokemon-img">
+            ${itemIndicator}
           </div>
           <div class="card-info">
             <span class="card-number">#${String(pokemon.id).padStart(3, '0')}</span>
             <h4 class="card-name">${pokemon.name}</h4>
             <div class="card-details">
               <span class="detail-badge">Lv.${pokemon.level}</span>
+              ${pokemon.nature ? `<span class="nature-mini">${pokemon.nature}</span>` : ''}
             </div>
           </div>
         </div>
@@ -103,7 +101,7 @@ export class CollectionScreen {
         return collection.sort((a, b) => b.level - a.level);
       case 'date':
       default:
-        return collection.sort((a, b) => b.caughtAt - a.caughtAt);
+        return collection.sort((a, b) => (b.caughtAt || 0) - (a.caughtAt || 0));
     }
   }
 
@@ -125,9 +123,9 @@ export class CollectionScreen {
       });
     }
 
-    // Click on Pokemon card to view details (future feature)
     const cards = this.container.querySelectorAll('.collection-card');
     cards.forEach(card => {
+      card.style.cursor = 'pointer';
       card.addEventListener('click', () => {
         const catchId = card.dataset.catchId;
         this.showPokemonDetail(catchId);
@@ -144,8 +142,16 @@ export class CollectionScreen {
   }
 
   showPokemonDetail(catchId) {
-    // Future: Show detailed view of caught Pokemon
-    console.log('[CollectionScreen] Show details for catch ID:', catchId);
+    const pokemon = this.caughtPokemon.find(p => 
+      String(p.catchId) === String(catchId) || String(p.db_id) === String(catchId)
+    );
+    
+    if (pokemon) {
+      console.log('[CollectionScreen] Opening detail for:', pokemon.name);
+      showPokemonDetail(pokemon);
+    } else {
+      console.warn('[CollectionScreen] Pokemon not found for catchId:', catchId);
+    }
   }
 
   async refresh() {

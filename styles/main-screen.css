@@ -367,4 +367,31 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+}
+
+.pokemon-slot.filled:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+  border-color: #2563eb;
+}
+
+.slot-item-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 8px;
+  color: #d4a017;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+}
+
+.pokemon-display.clickable {
+  cursor: pointer;
+}
+
+.pokemon-display.clickable:hover .pokemon-sprite {
+  transform: scale(1.15);
+  filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.5));
 }

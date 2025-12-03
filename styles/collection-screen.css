@@ -170,3 +170,25 @@
   width: 0;
   height: 0;
 }
+
+.card-sprite {
+  position: relative;
+}
+
+.item-indicator {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  font-size: 10px;
+  color: #d4a017;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.nature-mini {
+  font-size: 6px;
+  color: #666;
+  background: #f0f0f0;
+  padding: 1px 4px;
+  border-radius: 2px;
+  border: 1px solid #ddd;
+}
