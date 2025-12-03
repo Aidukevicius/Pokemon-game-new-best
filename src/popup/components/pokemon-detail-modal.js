@@ -132,17 +132,32 @@ export class PokemonDetailModal {
           <div class="section-header">
             <span class="section-icon">⚔</span>
             <span class="section-title">Stats</span>
+            <span class="stat-total">Total: ${getStatTotal(stats)}</span>
           </div>
-          <div class="stats-grid compact">
-            ${this.renderStatBarsCompact(stats, pokemon.nature)}
+          <div class="stats-grid">
+            ${this.renderStatBars(stats, pokemon.nature)}
           </div>
         </div>
         
-        <div class="detail-section ivs-section compact">
+        <div class="detail-section evs-section">
+          <div class="section-header">
+            <span class="section-icon">◆</span>
+            <span class="section-title">EVs</span>
+            <span class="ev-total">${getTotalEVs(pokemon.evs)}/510</span>
+          </div>
+          <div class="evs-grid">
+            ${this.renderEVBars(pokemon.evs)}
+          </div>
+        </div>
+        
+        <div class="detail-section ivs-section">
           <div class="section-header">
             <span class="section-icon">★</span>
             <span class="section-title">IVs</span>
             <span class="iv-rating" style="color: ${ivRating.color}">${ivRating.label} (${totalIVs}/186)</span>
+          </div>
+          <div class="ivs-grid">
+            ${this.renderIVBars(pokemon.ivs)}
           </div>
         </div>
         
@@ -213,6 +228,81 @@ export class PokemonDetailModal {
         </div>
       </div>
     `;
+  }
+
+  renderStatBars(stats, nature) {
+    const statOrder = ['hp', 'attack', 'defense', 'spAttack', 'spDefense', 'speed'];
+    const maxStat = 300;
+    
+    return statOrder.map(key => {
+      const stat = stats[key];
+      const percentage = Math.min((stat.calculated / maxStat) * 100, 100);
+      const color = STAT_COLORS[key];
+      const modClass = stat.modifier > 1 ? 'stat-boosted' : stat.modifier < 1 ? 'stat-lowered' : '';
+      const modSymbol = stat.modifier > 1 ? '↑' : stat.modifier < 1 ? '↓' : '';
+      
+      return `
+        <div class="stat-row-detail ${modClass}">
+          <span class="stat-name">${STAT_NAMES[key]}</span>
+          <div class="stat-bar-container">
+            <div class="stat-bar-bg">
+              <div class="stat-bar-fill" style="width: ${percentage}%; background: ${color}"></div>
+            </div>
+          </div>
+          <span class="stat-value-num">${stat.calculated}</span>
+          <span class="stat-mod">${modSymbol}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  renderEVBars(evs) {
+    const statOrder = ['hp', 'attack', 'defense', 'spAttack', 'spDefense', 'speed'];
+    const maxEV = 252;
+    
+    return statOrder.map(key => {
+      const ev = evs[key] || 0;
+      const percentage = (ev / maxEV) * 100;
+      const color = STAT_COLORS[key];
+      
+      return `
+        <div class="ev-row">
+          <span class="ev-name">${STAT_NAMES[key]}</span>
+          <div class="ev-bar-container">
+            <div class="ev-bar-bg">
+              <div class="ev-bar-fill" style="width: ${percentage}%; background: ${color}"></div>
+            </div>
+          </div>
+          <span class="ev-value">${ev}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  renderIVBars(ivs) {
+    const statOrder = ['hp', 'attack', 'defense', 'spAttack', 'spDefense', 'speed'];
+    const maxIV = 31;
+    
+    return statOrder.map(key => {
+      const iv = ivs[key] || 15;
+      const percentage = (iv / maxIV) * 100;
+      const color = STAT_COLORS[key];
+      const isPerfect = iv === 31;
+      const isZero = iv === 0;
+      const rowClass = isPerfect ? 'iv-perfect' : isZero ? 'iv-zero' : '';
+      
+      return `
+        <div class="iv-row ${rowClass}">
+          <span class="iv-name">${STAT_NAMES[key]}</span>
+          <div class="iv-bar-container">
+            <div class="iv-bar-bg">
+              <div class="iv-bar-fill" style="width: ${percentage}%; background: ${color}"></div>
+            </div>
+          </div>
+          <span class="iv-value">${iv}</span>
+        </div>
+      `;
+    }).join('');
   }
 
   renderStatBarsCompact(stats, nature) {
