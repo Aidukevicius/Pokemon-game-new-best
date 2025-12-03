@@ -4,15 +4,16 @@
 A lofi SNES-style Pokemon catching game implemented as a Chrome extension. Users can encounter and catch Pokemon while browsing the web. Features a mobile-shaped popup (360x640px) with tab-based navigation for different screens.
 
 ## Current State (December 3, 2025)
-**Phase**: Individual Values (IVs) Complete
+**Phase**: Item Equipping UX Complete
 - PostgreSQL database connected via Flask backend
 - 10 test Pokemon seeded with full stats, natures, items, EVs, and random IVs
 - Pokemon detail modal with comprehensive stat display including IVs
+- Item equipping via Pokemon detail modal (equip/change/remove items)
+- Items tab shows overview-only with compact badge display
 - Canonical Pokemon stat formulas using individual IVs (0-31 range)
 - IV rating system (Outstanding, Relatively Superior, Above Average, Decent)
 - Nature system with +10%/-10% stat modifiers
 - EV (Effort Value) tracking per stat (510 total cap, 252 per stat)
-- Item slot display for held items
 - Fixed click handlers on Pokemon slots to open detail cards
 - Tab navigation system with 6 screens
 - SNES-style aesthetic with retro detail-modal.css styling
@@ -103,6 +104,10 @@ The preview server runs on port 5000 displaying `preview.html`, which embeds pop
 3. Load unpacked extension from this directory
 
 ## Recent Changes
+- **2025-12-03**: Redesigned item equipping UX - moved from Items tab to Pokemon detail modal
+- **2025-12-03**: Simplified Items tab to overview-only with compact badge display
+- **2025-12-03**: Added item selector in detail modal with equip/change/remove functionality
+- **2025-12-03**: Collection screen now loads from API and refreshes on item changes
 - **2025-12-03**: Added Individual Values (IVs) system with random 0-31 values per stat
 - **2025-12-03**: Created IV rating system (Outstanding, Relatively Superior, Above Average, Decent)
 - **2025-12-03**: Fixed Pokemon slot click handlers by using in-memory collection

@@ -46,11 +46,27 @@ export class PokemonDetailModal {
     this.spriteService = new SpriteService();
     this.overlay = null;
     this.currentPokemon = null;
+    this.availableItems = [];
+    this.showItemSelector = false;
+    this.onEquipCallback = null;
   }
 
-  show(pokemon) {
+  async show(pokemon, onEquipCallback = null) {
     this.currentPokemon = pokemon;
+    this.onEquipCallback = onEquipCallback;
+    this.showItemSelector = false;
+    await this.loadItems();
     this.createModal();
+  }
+
+  async loadItems() {
+    try {
+      const res = await fetch('/api/items');
+      this.availableItems = await res.json();
+    } catch (error) {
+      console.error('[DetailModal] Error loading items:', error);
+      this.availableItems = [];
+    }
   }
 
   createModal() {
@@ -72,10 +88,8 @@ export class PokemonDetailModal {
     
     const spriteUrl = this.spriteService.getDefaultSpriteUrl(pokemon.id);
     const natureDesc = getNatureDescription(pokemon.nature);
-    const totalEVs = getTotalEVs(pokemon.evs);
     const totalIVs = getTotalIVs(pokemon.ivs);
     const ivRating = getIVRating(totalIVs);
-    const statTotal = getStatTotal(stats);
     
     this.overlay.innerHTML = `
       <div class="detail-modal snes-container">
@@ -93,6 +107,16 @@ export class PokemonDetailModal {
           </div>
         </div>
         
+        <div class="detail-section item-section">
+          <div class="section-header">
+            <span class="section-icon">◆</span>
+            <span class="section-title">Held Item</span>
+          </div>
+          <div class="item-equip-area" id="itemEquipArea">
+            ${this.renderItemArea()}
+          </div>
+        </div>
+        
         <div class="detail-section nature-section">
           <div class="section-header">
             <span class="section-icon">★</span>
@@ -107,54 +131,18 @@ export class PokemonDetailModal {
         <div class="detail-section stats-section">
           <div class="section-header">
             <span class="section-icon">⚔</span>
-            <span class="section-title">Actual Stats (Base+IV+EV)</span>
+            <span class="section-title">Stats</span>
           </div>
-          <div class="stats-grid">
-            ${this.renderStatBars(stats, pokemon.nature)}
-          </div>
-        </div>
-        
-        <div class="detail-section evs-section">
-          <div class="section-header">
-            <span class="section-icon">↑</span>
-            <span class="section-title">EVs</span>
-            <span class="ev-total">${totalEVs}/510</span>
-          </div>
-          <div class="evs-grid">
-            ${this.renderEVBars(pokemon.evs)}
+          <div class="stats-grid compact">
+            ${this.renderStatBarsCompact(stats, pokemon.nature)}
           </div>
         </div>
         
-        <div class="detail-section ivs-section">
+        <div class="detail-section ivs-section compact">
           <div class="section-header">
             <span class="section-icon">★</span>
             <span class="section-title">IVs</span>
-            <span class="iv-rating" style="color: ${ivRating.color}">${ivRating.label}</span>
-          </div>
-          <div class="ivs-grid">
-            ${this.renderIVBars(pokemon.ivs)}
-          </div>
-          <div class="iv-total-display">
-            <span class="iv-total-label">Total IVs:</span>
-            <span class="iv-total-value">${totalIVs}/186</span>
-          </div>
-        </div>
-        
-        <div class="detail-section item-section">
-          <div class="section-header">
-            <span class="section-icon">◆</span>
-            <span class="section-title">Held Item</span>
-          </div>
-          <div class="item-slot ${pokemon.item ? 'has-item' : 'empty'}">
-            ${pokemon.item ? `
-              ${getItemSprite(pokemon.item) ? 
-                `<img src="${getItemSprite(pokemon.item)}" alt="${pokemon.item}" class="held-item-sprite">` :
-                `<span class="item-icon">⬟</span>`
-              }
-              <span class="item-name">${pokemon.item}</span>
-            ` : `
-              <span class="empty-slot-text">No item equipped</span>
-            `}
+            <span class="iv-rating" style="color: ${ivRating.color}">${ivRating.label} (${totalIVs}/186)</span>
           </div>
         </div>
         
@@ -166,35 +154,68 @@ export class PokemonDetailModal {
     `;
     
     document.body.appendChild(this.overlay);
-    this.fitTextToContainer();
     this.attachEventListeners();
   }
 
-  fitTextToContainer() {
-    const nameElement = this.overlay.querySelector('.detail-name');
-    const container = this.overlay.querySelector('.detail-info');
+  renderItemArea() {
+    const pokemon = this.currentPokemon;
     
-    if (!nameElement || !container) return;
-    
-    const containerWidth = container.offsetWidth - 20; // padding
-    let fontSize = 13;
-    
-    nameElement.style.fontSize = fontSize + 'px';
-    
-    while (nameElement.scrollWidth > containerWidth && fontSize > 7) {
-      fontSize -= 0.5;
-      nameElement.style.fontSize = fontSize + 'px';
+    if (this.showItemSelector) {
+      return this.renderItemSelector();
     }
     
-    // Adjust letter spacing for very long names
-    if (fontSize < 10) {
-      nameElement.style.letterSpacing = '0px';
-    } else if (fontSize < 12) {
-      nameElement.style.letterSpacing = '0.1px';
-    }
+    return `
+      <div class="current-item-display">
+        ${pokemon.item ? `
+          <div class="equipped-item">
+            ${getItemSprite(pokemon.item) ? 
+              `<img src="${getItemSprite(pokemon.item)}" alt="${pokemon.item}" class="equipped-item-sprite">` :
+              `<span class="item-icon">⬟</span>`
+            }
+            <span class="equipped-item-name">${pokemon.item}</span>
+            <button class="change-item-btn" data-action="show-items">Change</button>
+          </div>
+        ` : `
+          <div class="no-item">
+            <span class="no-item-text">No item equipped</span>
+            <button class="equip-item-btn" data-action="show-items">Equip Item</button>
+          </div>
+        `}
+      </div>
+    `;
   }
 
-  renderStatBars(stats, nature) {
+  renderItemSelector() {
+    const pokemon = this.currentPokemon;
+    const itemsWithQty = this.availableItems.filter(i => i.quantity > 0);
+    
+    return `
+      <div class="item-selector">
+        <div class="item-selector-header">
+          <span class="selector-title">Select Item:</span>
+          <button class="cancel-select-btn" data-action="cancel-select">Cancel</button>
+        </div>
+        <div class="item-selector-grid">
+          ${pokemon.item ? `
+            <div class="item-option unequip-option" data-action="unequip">
+              <span class="unequip-x">✕</span>
+              <span class="item-option-name">Remove</span>
+            </div>
+          ` : ''}
+          ${itemsWithQty.length > 0 ? itemsWithQty.map(item => `
+            <div class="item-option" data-action="equip" data-item-id="${item.itemId}">
+              <img src="${item.sprite}" alt="${item.name}" class="item-option-sprite"
+                   onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><text y=%2218%22 font-size=%2214%22>📦</text></svg>'">
+              <span class="item-option-name">${item.name}</span>
+              <span class="item-option-qty">×${item.quantity}</span>
+            </div>
+          `).join('') : '<div class="no-items-msg">No items in bag</div>'}
+        </div>
+      </div>
+    `;
+  }
+
+  renderStatBarsCompact(stats, nature) {
     const statOrder = ['hp', 'attack', 'defense', 'spAttack', 'spDefense', 'speed'];
     const maxStat = 300;
     
@@ -205,75 +226,23 @@ export class PokemonDetailModal {
       const modClass = stat.modifier > 1 ? 'stat-boosted' : stat.modifier < 1 ? 'stat-lowered' : '';
       
       return `
-        <div class="stat-row-detail ${modClass}">
-          <span class="stat-name">${STAT_NAMES[key]}</span>
-          <div class="stat-bar-container">
-            <div class="stat-bar-bg">
-              <div class="stat-bar-fill" style="width: ${percentage}%; background: ${color}"></div>
-            </div>
+        <div class="stat-row-compact ${modClass}">
+          <span class="stat-name-short">${STAT_NAMES[key].substring(0, 3)}</span>
+          <div class="stat-bar-mini">
+            <div class="stat-bar-fill" style="width: ${percentage}%; background: ${color}"></div>
           </div>
-          <span class="stat-value-num">${stat.calculated}</span>
-          ${stat.modifier !== 1 ? `<span class="stat-mod">${stat.modifier > 1 ? '+' : '-'}</span>` : '<span class="stat-mod"></span>'}
+          <span class="stat-value-mini">${stat.calculated}</span>
         </div>
       `;
     }).join('');
   }
 
-  renderEVBars(evs) {
-    const statOrder = ['hp', 'attack', 'defense', 'spAttack', 'spDefense', 'speed'];
-    const maxEV = 252;
-    
-    if (!evs) {
-      evs = { hp: 0, attack: 0, defense: 0, spAttack: 0, spDefense: 0, speed: 0 };
+  updateItemArea() {
+    const itemArea = this.overlay.querySelector('#itemEquipArea');
+    if (itemArea) {
+      itemArea.innerHTML = this.renderItemArea();
+      this.attachItemListeners();
     }
-    
-    return statOrder.map(key => {
-      const ev = evs[key] || 0;
-      const percentage = Math.min((ev / maxEV) * 100, 100);
-      const color = STAT_COLORS[key];
-      
-      return `
-        <div class="ev-row">
-          <span class="ev-name">${STAT_NAMES[key]}</span>
-          <div class="ev-bar-container">
-            <div class="ev-bar-bg">
-              <div class="ev-bar-fill" style="width: ${percentage}%; background: ${color}"></div>
-            </div>
-          </div>
-          <span class="ev-value">${ev}</span>
-        </div>
-      `;
-    }).join('');
-  }
-
-  renderIVBars(ivs) {
-    const statOrder = ['hp', 'attack', 'defense', 'spAttack', 'spDefense', 'speed'];
-    const maxIV = 31;
-    const defaultIV = 15;
-    
-    if (!ivs) {
-      ivs = { hp: defaultIV, attack: defaultIV, defense: defaultIV, spAttack: defaultIV, spDefense: defaultIV, speed: defaultIV };
-    }
-    
-    return statOrder.map(key => {
-      const iv = ivs[key] !== undefined ? ivs[key] : defaultIV;
-      const percentage = Math.min((iv / maxIV) * 100, 100);
-      const color = STAT_COLORS[key];
-      const isPerfect = iv === 31;
-      const isZero = iv === 0;
-      
-      return `
-        <div class="iv-row ${isPerfect ? 'iv-perfect' : ''} ${isZero ? 'iv-zero' : ''}">
-          <span class="iv-name">${STAT_NAMES[key]}</span>
-          <div class="iv-bar-container">
-            <div class="iv-bar-bg">
-              <div class="iv-bar-fill" style="width: ${percentage}%; background: ${color}"></div>
-            </div>
-          </div>
-          <span class="iv-value">${iv}</span>
-        </div>
-      `;
-    }).join('');
   }
 
   attachEventListeners() {
@@ -286,12 +255,79 @@ export class PokemonDetailModal {
       }
     });
 
+    this.attachItemListeners();
     document.addEventListener('keydown', this.handleKeyDown.bind(this));
+  }
+
+  attachItemListeners() {
+    const showItemsBtn = this.overlay.querySelector('[data-action="show-items"]');
+    if (showItemsBtn) {
+      showItemsBtn.addEventListener('click', () => {
+        this.showItemSelector = true;
+        this.updateItemArea();
+      });
+    }
+
+    const cancelBtn = this.overlay.querySelector('[data-action="cancel-select"]');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', () => {
+        this.showItemSelector = false;
+        this.updateItemArea();
+      });
+    }
+
+    const unequipBtn = this.overlay.querySelector('[data-action="unequip"]');
+    if (unequipBtn) {
+      unequipBtn.addEventListener('click', () => this.equipItem(null));
+    }
+
+    const equipBtns = this.overlay.querySelectorAll('[data-action="equip"]');
+    equipBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const itemId = btn.dataset.itemId;
+        this.equipItem(itemId);
+      });
+    });
+  }
+
+  async equipItem(itemId) {
+    const pokemon = this.currentPokemon;
+    
+    try {
+      const res = await fetch(`/api/pokemon/${pokemon.db_id}/equip`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemId })
+      });
+
+      if (res.ok) {
+        const updated = await res.json();
+        this.currentPokemon.item = updated.item;
+        this.showItemSelector = false;
+        await this.loadItems();
+        this.updateItemArea();
+        
+        if (this.onEquipCallback) {
+          this.onEquipCallback(updated);
+        }
+      } else {
+        const error = await res.json();
+        console.error('[DetailModal] Equip error:', error);
+        alert(error.error || 'Failed to equip item');
+      }
+    } catch (error) {
+      console.error('[DetailModal] Error equipping item:', error);
+    }
   }
 
   handleKeyDown(e) {
     if (e.key === 'Escape') {
-      this.close();
+      if (this.showItemSelector) {
+        this.showItemSelector = false;
+        this.updateItemArea();
+      } else {
+        this.close();
+      }
     }
   }
 
@@ -302,16 +338,17 @@ export class PokemonDetailModal {
       this.overlay = null;
     }
     this.currentPokemon = null;
+    this.showItemSelector = false;
   }
 }
 
 let modalInstance = null;
 
-export function showPokemonDetail(pokemon) {
+export function showPokemonDetail(pokemon, onEquipCallback = null) {
   if (!modalInstance) {
     modalInstance = new PokemonDetailModal();
   }
-  modalInstance.show(pokemon);
+  modalInstance.show(pokemon, onEquipCallback);
 }
 
 export function closePokemonDetail() {

@@ -1,12 +1,9 @@
-
-import { StorageService } from '../../shared/services/StorageService.js';
 import { SpriteService } from '../../shared/services/SpriteService.js';
 import { showPokemonDetail } from '../components/pokemon-detail-modal.js';
 
 export class CollectionScreen {
   constructor(containerElement) {
     this.container = containerElement;
-    this.storageService = new StorageService();
     this.spriteService = new SpriteService();
     this.caughtPokemon = [];
     this.sortBy = 'date';
@@ -19,9 +16,14 @@ export class CollectionScreen {
   }
 
   async loadCollection() {
-    const collection = await this.storageService.get('pokemon_collection');
-    this.caughtPokemon = collection || [];
-    console.log('[CollectionScreen] Loaded collection:', this.caughtPokemon.length, 'Pokemon');
+    try {
+      const res = await fetch('/api/pokemon');
+      this.caughtPokemon = await res.json();
+      console.log('[CollectionScreen] Loaded collection:', this.caughtPokemon.length, 'Pokemon');
+    } catch (error) {
+      console.error('[CollectionScreen] Error loading collection:', error);
+      this.caughtPokemon = [];
+    }
   }
 
   async render() {
@@ -30,10 +32,9 @@ export class CollectionScreen {
     this.container.innerHTML = `
       <div class="collection-screen">
         <div class="snes-container collection-header">
-          <h2 class="collection-title">My Collection</h2>
+          <h2 class="collection-title">My Pokemon</h2>
           <div class="collection-stats">
-            <span class="stat-badge">Caught: ${stats.total}</span>
-            <span class="stat-badge">Unique: ${stats.unique}</span>
+            <span class="stat-badge">${stats.total} caught</span>
           </div>
         </div>
 
@@ -63,7 +64,7 @@ export class CollectionScreen {
       const itemIndicator = pokemon.item ? '<span class="item-indicator" title="Holding item">◆</span>' : '';
       
       return `
-        <div class="collection-card snes-container" data-catch-id="${pokemon.catchId || pokemon.db_id}">
+        <div class="collection-card snes-container" data-db-id="${pokemon.db_id}">
           <div class="card-sprite">
             <img src="${spriteUrl}" alt="${pokemon.name}" class="pokemon-img">
             ${itemIndicator}
@@ -73,7 +74,6 @@ export class CollectionScreen {
             <h4 class="card-name">${pokemon.name}</h4>
             <div class="card-details">
               <span class="detail-badge">Lv.${pokemon.level}</span>
-              ${pokemon.nature ? `<span class="nature-mini">${pokemon.nature}</span>` : ''}
             </div>
           </div>
         </div>
@@ -86,7 +86,8 @@ export class CollectionScreen {
       <div class="empty-state">
         <div class="empty-icon">📦</div>
         <h3 class="empty-title">No Pokemon Caught Yet</h3>
-        <p class="empty-text">Go catch some Pokemon to build your collection!</p>
+        <p class="empty-text">Go catch some Pokemon!</p>
+        <button class="snes-btn seed-btn" id="seedPokemonBtn">Add Test Pokemon</button>
       </div>
     `;
   }
@@ -123,14 +124,33 @@ export class CollectionScreen {
       });
     }
 
+    const seedBtn = this.container.querySelector('#seedPokemonBtn');
+    if (seedBtn) {
+      seedBtn.addEventListener('click', async () => {
+        await this.seedPokemon();
+      });
+    }
+
     const cards = this.container.querySelectorAll('.collection-card');
     cards.forEach(card => {
       card.style.cursor = 'pointer';
       card.addEventListener('click', () => {
-        const catchId = card.dataset.catchId;
-        this.showPokemonDetail(catchId);
+        const dbId = parseInt(card.dataset.dbId);
+        this.showPokemonDetail(dbId);
       });
     });
+  }
+
+  async seedPokemon() {
+    try {
+      const res = await fetch('/api/seed', { method: 'POST' });
+      if (res.ok) {
+        await this.loadCollection();
+        this.render();
+      }
+    } catch (error) {
+      console.error('[CollectionScreen] Error seeding Pokemon:', error);
+    }
   }
 
   updateGrid() {
@@ -141,16 +161,20 @@ export class CollectionScreen {
     }
   }
 
-  showPokemonDetail(catchId) {
-    const pokemon = this.caughtPokemon.find(p => 
-      String(p.catchId) === String(catchId) || String(p.db_id) === String(catchId)
-    );
+  showPokemonDetail(dbId) {
+    const pokemon = this.caughtPokemon.find(p => p.db_id === dbId);
     
     if (pokemon) {
       console.log('[CollectionScreen] Opening detail for:', pokemon.name);
-      showPokemonDetail(pokemon);
+      showPokemonDetail(pokemon, (updatedPokemon) => {
+        const index = this.caughtPokemon.findIndex(p => p.db_id === updatedPokemon.db_id);
+        if (index !== -1) {
+          this.caughtPokemon[index] = updatedPokemon;
+          this.updateGrid();
+        }
+      });
     } else {
-      console.warn('[CollectionScreen] Pokemon not found for catchId:', catchId);
+      console.warn('[CollectionScreen] Pokemon not found for dbId:', dbId);
     }
   }
 
