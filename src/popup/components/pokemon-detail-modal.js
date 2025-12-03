@@ -17,10 +17,9 @@ export class PokemonDetailModal {
   getNameScale(name) {
     const length = name.length;
     if (length <= 9) return '';
-    if (length <= 11) return 'data-scale="0.9"';
-    if (length <= 13) return 'data-scale="0.8"';
-    if (length <= 15) return 'data-scale="0.7"';
-    return 'data-scale="0.6"';
+    if (length <= 11) return 'data-size="small"';
+    if (length <= 13) return 'data-size="smaller"';
+    return 'data-size="tiny"';
   }
 
   createModal() {
