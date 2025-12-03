@@ -207,8 +207,11 @@
 }
 
 .pokemon-storage {
-  background: #fff;
+  background: #e0f2fe;
+  border: 3px solid #3b82f6;
+  border-radius: 8px;
   padding: 12px;
+  box-shadow: 4px 4px 0 rgba(59, 130, 246, 0.3);
 }
 
 .storage-header {
