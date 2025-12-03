@@ -22,15 +22,18 @@ async function initializeApp() {
     // Create screen containers
     const mainContainer = document.createElement('div');
     mainContainer.id = 'main-screen-container';
+    mainContainer.className = 'screen-container';
     screensContainer.appendChild(mainContainer);
 
     const storageContainer = document.createElement('div');
     storageContainer.id = 'storage-screen-container';
+    storageContainer.className = 'screen-container';
     storageContainer.style.display = 'none';
     screensContainer.appendChild(storageContainer);
 
     const collectionContainer = document.createElement('div');
     collectionContainer.id = 'collection-screen-container';
+    collectionContainer.className = 'screen-container';
     collectionContainer.style.display = 'none';
     screensContainer.appendChild(collectionContainer);
 

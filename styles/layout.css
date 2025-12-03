@@ -50,6 +50,14 @@
   display: block;
 }
 
+.screen-container {
+  width: 100%;
+  min-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #e4e4e4;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
