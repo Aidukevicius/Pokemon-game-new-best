@@ -238,11 +238,14 @@ export class PokemonDetailModal {
       const stat = stats[key];
       const percentage = Math.min((stat.calculated / maxStat) * 100, 100);
       const color = STAT_COLORS[key];
+      const hasItemBonus = stat.itemBonus && stat.itemBonus > 1;
       const modClass = stat.modifier > 1 ? 'stat-boosted' : stat.modifier < 1 ? 'stat-lowered' : '';
+      const itemClass = hasItemBonus ? 'stat-item-boosted' : '';
       const modSymbol = stat.modifier > 1 ? '↑' : stat.modifier < 1 ? '↓' : '';
+      const itemSymbol = hasItemBonus ? '◆' : '';
       
       return `
-        <div class="stat-row-detail ${modClass}">
+        <div class="stat-row-detail ${modClass} ${itemClass}">
           <span class="stat-name">${STAT_NAMES[key]}</span>
           <div class="stat-bar-container">
             <div class="stat-bar-bg">
@@ -251,6 +254,7 @@ export class PokemonDetailModal {
           </div>
           <span class="stat-value-num">${stat.calculated}</span>
           <span class="stat-mod">${modSymbol}</span>
+          <span class="stat-item-mod">${itemSymbol}</span>
         </div>
       `;
     }).join('');

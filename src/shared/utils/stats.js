@@ -46,6 +46,20 @@ export const STAT_COLORS = {
   speed: '#fa92b2'
 };
 
+export const ITEM_STAT_BONUSES = {
+  'Choice Band': { attack: 1.5 },
+  'Choice Specs': { spAttack: 1.5 },
+  'Choice Scarf': { speed: 1.5 },
+  'Assault Vest': { spDefense: 1.5 },
+  'Eviolite': { defense: 1.5, spDefense: 1.5 },
+  'Light Ball': { attack: 2.0, spAttack: 2.0 }, // Pikachu only, but applying generally
+  'Deep Sea Scale': { spDefense: 2.0 }, // Clamperl only
+  'Deep Sea Tooth': { spAttack: 2.0 }, // Clamperl only
+  'Thick Club': { attack: 2.0 }, // Cubone/Marowak only
+  'Metal Powder': { defense: 2.0 }, // Ditto only
+  'Quick Powder': { speed: 2.0 } // Ditto only
+};
+
 const DEFAULT_IV = 15;
 const MAX_IV = 31;
 
@@ -103,53 +117,73 @@ export function calculateAllStats(pokemon) {
   const nature = pokemon.nature || 'Hardy';
   const evs = pokemon.evs || { hp: 0, attack: 0, defense: 0, spAttack: 0, spDefense: 0, speed: 0 };
   const ivs = pokemon.ivs || { hp: DEFAULT_IV, attack: DEFAULT_IV, defense: DEFAULT_IV, spAttack: DEFAULT_IV, spDefense: DEFAULT_IV, speed: DEFAULT_IV };
+  const item = pokemon.item || null;
   
   const baseStats = baseData.baseStats;
+  const itemBonuses = item && ITEM_STAT_BONUSES[item] ? ITEM_STAT_BONUSES[item] : {};
   
-  return {
+  // Calculate base stats first
+  const stats = {
     hp: {
       base: baseStats.hp,
       ev: evs.hp,
       iv: ivs.hp,
       calculated: calculateHP(baseStats.hp, level, evs.hp, ivs.hp),
-      modifier: 1.0
+      modifier: 1.0,
+      itemBonus: 1.0
     },
     attack: {
       base: baseStats.attack,
       ev: evs.attack,
       iv: ivs.attack,
       calculated: calculateStat(baseStats.attack, level, evs.attack, ivs.attack, getNatureModifier(nature, 'attack')),
-      modifier: getNatureModifier(nature, 'attack')
+      modifier: getNatureModifier(nature, 'attack'),
+      itemBonus: itemBonuses.attack || 1.0
     },
     defense: {
       base: baseStats.defense,
       ev: evs.defense,
       iv: ivs.defense,
       calculated: calculateStat(baseStats.defense, level, evs.defense, ivs.defense, getNatureModifier(nature, 'defense')),
-      modifier: getNatureModifier(nature, 'defense')
+      modifier: getNatureModifier(nature, 'defense'),
+      itemBonus: itemBonuses.defense || 1.0
     },
     spAttack: {
       base: baseStats.spAttack,
       ev: evs.spAttack,
       iv: ivs.spAttack,
       calculated: calculateStat(baseStats.spAttack, level, evs.spAttack, ivs.spAttack, getNatureModifier(nature, 'spAttack')),
-      modifier: getNatureModifier(nature, 'spAttack')
+      modifier: getNatureModifier(nature, 'spAttack'),
+      itemBonus: itemBonuses.spAttack || 1.0
     },
     spDefense: {
       base: baseStats.spDefense,
       ev: evs.spDefense,
       iv: ivs.spDefense,
       calculated: calculateStat(baseStats.spDefense, level, evs.spDefense, ivs.spDefense, getNatureModifier(nature, 'spDefense')),
-      modifier: getNatureModifier(nature, 'spDefense')
+      modifier: getNatureModifier(nature, 'spDefense'),
+      itemBonus: itemBonuses.spDefense || 1.0
     },
     speed: {
       base: baseStats.speed,
       ev: evs.speed,
       iv: ivs.speed,
       calculated: calculateStat(baseStats.speed, level, evs.speed, ivs.speed, getNatureModifier(nature, 'speed')),
-      modifier: getNatureModifier(nature, 'speed')
+      modifier: getNatureModifier(nature, 'speed'),
+      itemBonus: itemBonuses.speed || 1.0
     }
   };
+  
+  // Apply item bonuses to calculated stats (except HP)
+  if (item && itemBonuses) {
+    ['attack', 'defense', 'spAttack', 'spDefense', 'speed'].forEach(statKey => {
+      if (itemBonuses[statKey]) {
+        stats[statKey].calculated = Math.floor(stats[statKey].calculated * itemBonuses[statKey]);
+      }
+    });
+  }
+  
+  return stats;
 }
 
 export function getTotalEVs(evs) {
