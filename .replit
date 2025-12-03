@@ -1,4 +1,4 @@
-modules = ["nodejs-20", "web", "python-3.12"]
+modules = ["nodejs-20", "web", "python-3.11"]
 [agent]
 expertMode = true
 
@@ -12,27 +12,32 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Preview Server"
+args = "Start application"
 
 [[workflows.workflow]]
-name = "Preview Server"
+name = "Start application"
 author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python server.py"
 waitForPort = 5000
 
+[workflows.workflow.metadata]
+outputType = "webview"
+
 [[ports]]
 localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 41229
+localPort = 40019
 externalPort = 3000
 
 [nix]
 channel = "stable-25_05"
+packages = ["openssl", "postgresql"]
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]

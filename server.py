@@ -11,8 +11,8 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 
 app = Flask(__name__, static_folder='.', static_url_path='')
-app.secret_key = os.environ.get("FLASK_SECRET_KEY") or "pokebrowse-secret-key"
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+app.secret_key = os.environ.get("SESSION_SECRET") or "pokebrowse-secret-key"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL") or "sqlite:///pokebrowse.db"
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
