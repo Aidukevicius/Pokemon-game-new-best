@@ -68,7 +68,7 @@ export class PokemonDetailModal {
         <div class="detail-section stats-section">
           <div class="section-header">
             <span class="section-icon">⚔</span>
-            <span class="section-title">Stats</span>
+            <span class="section-title">Actual Stats (Base+IV+EV)</span>
             <span class="stat-total">Total: ${statTotal}</span>
           </div>
           <div class="stats-grid">
