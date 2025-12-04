@@ -256,11 +256,11 @@
 .battle-field-large {
   position: relative;
   flex: 1;
-  min-height: 280px;
+  min-height: 260px;
   background: linear-gradient(180deg, #87ceeb 0%, #98d1a8 50%, #5a9a5a 80%, #3d7a3d 100%);
   border: 4px solid #2d4a2d;
   border-radius: 4px;
-  margin-bottom: 6px;
+  margin-bottom: 2px;
   overflow: hidden;
   box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
 }
@@ -341,16 +341,17 @@
 /* Large Pokemon Sprite Area */
 .pokemon-sprite-large {
   text-align: center;
-  padding: 8px;
+  padding: 4px;
 }
 
 .ally-sprite-lg {
   text-align: center;
+  padding: 4px;
 }
 
 .battle-sprite-lg {
-  width: 96px;
-  height: 96px;
+  width: 88px;
+  height: 88px;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
@@ -358,15 +359,27 @@
   transition: transform 0.15s ease;
 }
 
+.battle-sprite-lg.ally {
+  width: 88px;
+  height: 88px;
+  transform: scaleX(-1);
+}
+
 .battle-sprite-lg.attacking {
-  transform: translateX(12px) scale(1.15);
+  transform: scaleX(-1) translateX(-12px) scale(1.15);
 }
 
 .battle-sprite-lg.enemy.attacking {
   transform: translateX(-12px) scale(1.15);
 }
 
-.battle-sprite-lg.damaged {
+.battle-sprite-lg.ally.damaged {
+  filter: brightness(2) drop-shadow(3px 3px 4px rgba(0,0,0,0.5));
+  animation: damage-shake-lg 0.25s ease-in-out;
+  transform: scaleX(-1);
+}
+
+.battle-sprite-lg.enemy.damaged {
   filter: brightness(2) drop-shadow(3px 3px 4px rgba(0,0,0,0.5));
   animation: damage-shake-lg 0.25s ease-in-out;
 }
@@ -459,29 +472,30 @@
   background: linear-gradient(180deg, #1e3a5f 0%, #0f172a 100%);
   border: 3px solid #3b5998;
   border-radius: 4px;
-  padding: 8px;
+  padding: 6px;
   box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
 }
 
 .moves-grid-compact {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
-  margin-bottom: 6px;
+  gap: 3px;
+  margin-bottom: 4px;
 }
 
 .move-btn-compact {
   background: linear-gradient(180deg, #475569 0%, #334155 100%);
   border: 2px solid #64748b;
   border-radius: 4px;
-  padding: 6px 3px;
+  padding: 8px 4px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   transition: all 0.1s ease;
   box-shadow: 2px 2px 0 #1e293b;
+  position: relative;
 }
 
 .move-btn-compact:hover:not(:disabled) {
@@ -501,21 +515,40 @@
 }
 
 .move-btn-compact .move-name {
-  font-size: 6px;
+  font-size: 8px;
   font-weight: bold;
   color: white;
   text-transform: uppercase;
   text-align: center;
-  line-height: 1.1;
+  line-height: 1.2;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
 }
 
-.move-btn-compact .move-type {
-  font-size: 5px;
+.move-btn-compact .move-power {
+  font-size: 6px;
   padding: 1px 4px;
   border-radius: 2px;
-  color: white;
+  color: #fbbf24;
   text-transform: uppercase;
-  border: 1px solid rgba(255,255,255,0.3);
+  font-weight: bold;
+}
+
+/* Tooltip on hover */
+.move-btn-compact[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.9);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 7px;
+  white-space: nowrap;
+  z-index: 100;
+  margin-bottom: 4px;
+  border: 1px solid #475569;
 }
 
 /* Type colors */
@@ -538,64 +571,210 @@
 .type-dark { background: #1f2937; }
 .type-steel { background: #9ca3af; }
 
-/* Action buttons at bottom */
-.actions-compact {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 6px;
+/* Small Action buttons row */
+.actions-row {
+  display: flex;
+  gap: 4px;
 }
 
-.action-btn {
+.action-btn-sm {
+  flex: 1;
   background: linear-gradient(180deg, #475569 0%, #334155 100%);
-  border: 3px solid #64748b;
+  border: 2px solid #64748b;
   border-radius: 4px;
-  padding: 10px 8px;
+  padding: 6px 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
   color: white;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: bold;
   transition: all 0.1s ease;
   box-shadow: 2px 2px 0 #1e293b;
   text-transform: uppercase;
 }
 
-.action-btn:hover:not(:disabled) {
+.action-btn-sm:hover:not(:disabled) {
   transform: translate(-1px, -1px);
   box-shadow: 3px 3px 0 #1e293b;
 }
 
-.action-btn:active:not(:disabled) {
+.action-btn-sm:active:not(:disabled) {
   transform: translate(1px, 1px);
   box-shadow: 1px 1px 0 #1e293b;
 }
 
-.action-btn:disabled {
+.action-btn-sm:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.catch-btn-lg {
+.catch-btn-sm {
   background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%) !important;
   border-color: #ef4444 !important;
 }
 
-.catch-btn-lg:hover:not(:disabled) {
+.catch-btn-sm:hover:not(:disabled) {
   background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%) !important;
 }
 
-.run-btn-lg {
+.run-btn-sm {
   background: linear-gradient(180deg, #64748b 0%, #475569 100%) !important;
   border-color: #94a3b8 !important;
 }
 
-.run-btn-lg:hover:not(:disabled) {
+.run-btn-sm:hover:not(:disabled) {
   background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%) !important;
 }
 
-.btn-icon {
-  font-size: 12px;
+.action-btn-sm .btn-icon {
+  font-size: 10px;
+}
+
+/* ========================================
+   ATTACK ANIMATION LAYER
+   ======================================== */
+
+.attack-animation-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.move-effect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+}
+
+/* Electric Effect - Thunder bolts */
+.electric-effect {
+  background: 
+    linear-gradient(135deg, transparent 40%, #fbbf24 41%, #fbbf24 43%, transparent 44%),
+    linear-gradient(225deg, transparent 40%, #fbbf24 41%, #fbbf24 43%, transparent 44%),
+    linear-gradient(315deg, transparent 40%, #fbbf24 41%, #fbbf24 43%, transparent 44%);
+  animation: electric-flash 0.1s ease-in-out 6;
+}
+
+@keyframes electric-flash {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+/* Fire Effect - Flames */
+.fire-effect {
+  background: radial-gradient(ellipse at center, #ef4444 0%, #f97316 40%, transparent 70%);
+  animation: fire-burst 0.6s ease-out;
+}
+
+@keyframes fire-burst {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+}
+
+/* Water Effect - Wave */
+.water-effect {
+  background: radial-gradient(ellipse at center, #3b82f6 0%, #60a5fa 40%, transparent 70%);
+  animation: water-splash 0.6s ease-out;
+}
+
+@keyframes water-splash {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5) rotate(0deg); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(180deg); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3) rotate(360deg); }
+}
+
+/* Grass Effect - Leaves */
+.grass-effect {
+  background: radial-gradient(ellipse at center, #22c55e 0%, #4ade80 40%, transparent 70%);
+  animation: grass-rustle 0.6s ease-out;
+}
+
+@keyframes grass-rustle {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  40% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+}
+
+/* Normal Effect - Impact */
+.normal-effect {
+  background: radial-gradient(ellipse at center, white 0%, #e5e5e5 30%, transparent 60%);
+  animation: normal-hit 0.4s ease-out;
+}
+
+@keyframes normal-hit {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+}
+
+/* Psychic Effect - Purple swirl */
+.psychic-effect {
+  background: radial-gradient(ellipse at center, #ec4899 0%, #a855f7 40%, transparent 70%);
+  animation: psychic-pulse 0.6s ease-out;
+}
+
+@keyframes psychic-pulse {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(0deg); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2) rotate(180deg); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5) rotate(360deg); }
+}
+
+/* Ice Effect - Freeze */
+.ice-effect {
+  background: radial-gradient(ellipse at center, #67e8f9 0%, #06b6d4 40%, transparent 70%);
+  animation: ice-freeze 0.6s ease-out;
+}
+
+@keyframes ice-freeze {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(0.9); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Dragon Effect - Purple burst */
+.dragon-effect {
+  background: radial-gradient(ellipse at center, #8b5cf6 0%, #6366f1 40%, transparent 70%);
+  animation: dragon-blast 0.6s ease-out;
+}
+
+@keyframes dragon-blast {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+  40% { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.6); }
+}
+
+/* Ghost Effect - Dark fade */
+.ghost-effect {
+  background: radial-gradient(ellipse at center, #6b21a8 0%, #581c87 40%, transparent 70%);
+  animation: ghost-fade 0.6s ease-out;
+}
+
+@keyframes ghost-fade {
+  0% { opacity: 0; }
+  30% { opacity: 0.8; }
+  60% { opacity: 0.3; }
+  100% { opacity: 0; }
+}
+
+/* Fighting Effect - Impact */
+.fighting-effect {
+  background: radial-gradient(ellipse at center, #dc2626 0%, #b91c1c 40%, transparent 70%);
+  animation: fighting-hit 0.5s ease-out;
+}
+
+@keyframes fighting-hit {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.4); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
 }

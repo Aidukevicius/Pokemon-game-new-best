@@ -163,24 +163,26 @@ export class SearchScreen {
         <div class="battle-menu-compact">
           <div class="moves-grid-compact">
             ${moves.map((move, i) => `
-              <button class="move-btn-compact" data-move="${i}" data-power="${move.power}" data-type="${move.type}">
+              <button class="move-btn-compact" data-move="${i}" data-power="${move.power}" data-type="${move.type}" title="${move.desc}">
                 <span class="move-name">${move.name}</span>
-                <span class="move-type type-${move.type.toLowerCase()}">${move.type}</span>
+                <span class="move-power">PWR ${move.power}</span>
               </button>
             `).join('')}
           </div>
           
-          <div class="actions-compact">
-            <button class="action-btn catch-btn-lg" data-action="catch">
+          <div class="actions-row">
+            <button class="action-btn-sm catch-btn-sm" data-action="catch">
               <span class="btn-icon">⚾</span>
               <span>CATCH</span>
             </button>
-            <button class="action-btn run-btn-lg" data-action="run">
+            <button class="action-btn-sm run-btn-sm" data-action="run">
               <span class="btn-icon">🏃</span>
               <span>RUN</span>
             </button>
           </div>
         </div>
+
+        <div class="attack-animation-layer" id="attackAnimationLayer"></div>
       </div>
     `;
 
@@ -192,34 +194,34 @@ export class SearchScreen {
     
     const movesByType = {
       'Electric': [
-        { name: 'Thunderbolt', type: 'Electric', power: 90 },
-        { name: 'Quick Attack', type: 'Normal', power: 40 },
-        { name: 'Thunder Wave', type: 'Electric', power: 30 },
-        { name: 'Slam', type: 'Normal', power: 80 }
+        { name: 'Thunderbolt', type: 'Electric', power: 90, desc: 'A strong electric bolt. May paralyze.' },
+        { name: 'Quick Attack', type: 'Normal', power: 40, desc: 'Always strikes first.' },
+        { name: 'Thunder Wave', type: 'Electric', power: 30, desc: 'Paralyzes the target.' },
+        { name: 'Slam', type: 'Normal', power: 80, desc: 'Slams with full body force.' }
       ],
       'Fire': [
-        { name: 'Flamethrower', type: 'Fire', power: 90 },
-        { name: 'Ember', type: 'Fire', power: 40 },
-        { name: 'Scratch', type: 'Normal', power: 40 },
-        { name: 'Fire Spin', type: 'Fire', power: 35 }
+        { name: 'Flamethrower', type: 'Fire', power: 90, desc: 'Scorching flames. May burn.' },
+        { name: 'Ember', type: 'Fire', power: 40, desc: 'Small flames. May burn.' },
+        { name: 'Scratch', type: 'Normal', power: 40, desc: 'Scratches with sharp claws.' },
+        { name: 'Fire Spin', type: 'Fire', power: 35, desc: 'Traps foe in a fire vortex.' }
       ],
       'Water': [
-        { name: 'Water Gun', type: 'Water', power: 40 },
-        { name: 'Bubble', type: 'Water', power: 40 },
-        { name: 'Tackle', type: 'Normal', power: 40 },
-        { name: 'Hydro Pump', type: 'Water', power: 110 }
+        { name: 'Water Gun', type: 'Water', power: 40, desc: 'Squirts water at the foe.' },
+        { name: 'Bubble', type: 'Water', power: 40, desc: 'Bubbles may lower Speed.' },
+        { name: 'Tackle', type: 'Normal', power: 40, desc: 'Charges and tackles.' },
+        { name: 'Hydro Pump', type: 'Water', power: 110, desc: 'Powerful water blast!' }
       ],
       'Grass': [
-        { name: 'Vine Whip', type: 'Grass', power: 45 },
-        { name: 'Razor Leaf', type: 'Grass', power: 55 },
-        { name: 'Tackle', type: 'Normal', power: 40 },
-        { name: 'Solar Beam', type: 'Grass', power: 120 }
+        { name: 'Vine Whip', type: 'Grass', power: 45, desc: 'Whips with vines.' },
+        { name: 'Razor Leaf', type: 'Grass', power: 55, desc: 'Sharp leaves. High crit.' },
+        { name: 'Tackle', type: 'Normal', power: 40, desc: 'Charges and tackles.' },
+        { name: 'Solar Beam', type: 'Grass', power: 120, desc: 'Absorbs light, then attacks!' }
       ],
       'Normal': [
-        { name: 'Tackle', type: 'Normal', power: 40 },
-        { name: 'Quick Attack', type: 'Normal', power: 40 },
-        { name: 'Slam', type: 'Normal', power: 80 },
-        { name: 'Hyper Beam', type: 'Normal', power: 150 }
+        { name: 'Tackle', type: 'Normal', power: 40, desc: 'Charges and tackles.' },
+        { name: 'Quick Attack', type: 'Normal', power: 40, desc: 'Always strikes first.' },
+        { name: 'Slam', type: 'Normal', power: 80, desc: 'Slams with full body force.' },
+        { name: 'Hyper Beam', type: 'Normal', power: 150, desc: 'Devastating beam! Must recharge.' }
       ]
     };
 
@@ -279,17 +281,11 @@ export class SearchScreen {
 
     const damage = this.calculateDamage(power, this.companion?.level || 10, type);
     
-    this.battleLog.push(`${this.companion?.name || 'Pikachu'} used ${move.name}!`);
-    this.updateBattleLog();
-    
     await this.animateAttack('ally');
+    await this.playMoveAnimation(move.type, 'enemy');
     await this.animateDamage('enemy');
     
     this.currentEncounter.currentHp = Math.max(0, this.currentEncounter.currentHp - damage);
-    
-    await this.delay(300);
-    this.battleLog.push(`It dealt ${damage} damage!`);
-    this.updateBattleLog();
     
     if (this.currentEncounter.currentHp <= 0) {
       await this.delay(500);
@@ -378,6 +374,33 @@ export class SearchScreen {
     }
   }
 
+  async playMoveAnimation(moveType, target) {
+    const animationLayer = this.container.querySelector('#attackAnimationLayer');
+    if (!animationLayer) return;
+
+    const animationClass = this.getAnimationClass(moveType);
+    animationLayer.innerHTML = `<div class="move-effect ${animationClass}"></div>`;
+    
+    await this.delay(600);
+    animationLayer.innerHTML = '';
+  }
+
+  getAnimationClass(moveType) {
+    const animations = {
+      'Electric': 'electric-effect',
+      'Fire': 'fire-effect',
+      'Water': 'water-effect',
+      'Grass': 'grass-effect',
+      'Normal': 'normal-effect',
+      'Psychic': 'psychic-effect',
+      'Ice': 'ice-effect',
+      'Dragon': 'dragon-effect',
+      'Ghost': 'ghost-effect',
+      'Fighting': 'fighting-effect'
+    };
+    return animations[moveType] || 'normal-effect';
+  }
+
   updateBattleLog() {
     const logBox = this.container.querySelector('#battleLog');
     if (logBox) {
@@ -387,7 +410,7 @@ export class SearchScreen {
   }
 
   disableButtons(disabled) {
-    const buttons = this.container.querySelectorAll('.move-btn-compact, .action-btn');
+    const buttons = this.container.querySelectorAll('.move-btn-compact, .action-btn-sm');
     buttons.forEach(btn => btn.disabled = disabled);
   }
 
