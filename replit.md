@@ -109,9 +109,13 @@ The preview server runs on port 5000 displaying `preview.html`, which embeds pop
 3. Load unpacked extension from this directory
 
 ## Recent Changes
+- **2025-12-04**: Redesigned battle screen - larger battle field (280px), bigger Pokemon sprites (96px)
+- **2025-12-04**: Removed "Wild Pokemon appeared" message and catch rate indicator from battle UI
+- **2025-12-04**: Added Pokemon type badges displayed below wild Pokemon
+- **2025-12-04**: Reorganized battle menu with 4-column move grid and larger action buttons
+- **2025-12-04**: Dark theme battle frame with enhanced SNES aesthetic
 - **2025-12-04**: Implemented Search screen with encounter testing buttons (Common/Uncommon/Rare/Legendary)
 - **2025-12-04**: Added EncounterService for Pokemon encounter generation with rarity weights
-- **2025-12-04**: Created full encounter UI with Pokemon sprite, stats, HP bar, catch rate
 - **2025-12-04**: Integrated CatchService with Gen 1 catch rate formula
 - **2025-12-04**: Added Settings screen with "Add Test Pokemon" button
 - **2025-12-04**: Created search-screen.css with styling for search mode and encounters

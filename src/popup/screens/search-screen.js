@@ -101,93 +101,81 @@ export class SearchScreen {
 
   renderBattleEncounter(encounter) {
     const spriteUrl = this.spriteService.getSpriteUrl(encounter.pokemon.id);
-    const catchRate = this.catchService.getCatchRatePercentage(encounter, 'pokeball');
     const hpPercent = (encounter.currentHp / encounter.maxHp) * 100;
     const companionHpPercent = this.companion ? (this.companion.health / 100) * 100 : 100;
     
     const moves = this.getCompanionMoves();
+    const enemyTypes = encounter.pokemon.types || ['Normal'];
     
     this.container.innerHTML = `
       <div class="search-screen battle-mode">
-        <div class="battle-header">
-          <span class="battle-title">⚔️ Wild Battle!</span>
-        </div>
-
-        <div class="battle-field">
-          <div class="enemy-pokemon">
-            <div class="pokemon-name-plate">
-              <span class="poke-name">${encounter.pokemon.name}</span>
-              <span class="poke-level">Lv.${encounter.level}</span>
-            </div>
-            <div class="hp-bar-container">
-              <div class="hp-label">HP</div>
-              <div class="hp-bar">
-                <div class="hp-fill ${hpPercent < 20 ? 'critical' : hpPercent < 50 ? 'warning' : ''}" 
-                     style="width: ${hpPercent}%"></div>
+        <div class="battle-field-large">
+          <div class="enemy-pokemon-large">
+            <div class="pokemon-info-plate">
+              <div class="name-level">
+                <span class="poke-name">${encounter.pokemon.name}</span>
+                <span class="poke-level">Lv.${encounter.level}</span>
               </div>
-              <span class="hp-text">${encounter.currentHp}/${encounter.maxHp}</span>
+              <div class="hp-bar-container">
+                <div class="hp-label">HP</div>
+                <div class="hp-bar">
+                  <div class="hp-fill ${hpPercent < 20 ? 'critical' : hpPercent < 50 ? 'warning' : ''}" 
+                       style="width: ${hpPercent}%"></div>
+                </div>
+                <span class="hp-text">${encounter.currentHp}/${encounter.maxHp}</span>
+              </div>
             </div>
-            <div class="pokemon-sprite-area">
+            <div class="pokemon-sprite-large">
               <img src="${spriteUrl}" 
                    alt="${encounter.pokemon.name}" 
-                   class="battle-sprite enemy"
+                   class="battle-sprite-lg enemy"
                    id="enemySprite"
                    onerror="this.src='${this.spriteService.getDefaultSpriteUrl(encounter.pokemon.id)}';">
             </div>
+            <div class="pokemon-types">
+              ${enemyTypes.map(type => `<span class="type-badge type-${type.toLowerCase()}">${type}</span>`).join('')}
+            </div>
           </div>
 
-          <div class="ally-pokemon">
-            <div class="pokemon-sprite-area ally-sprite-area">
+          <div class="ally-pokemon-large">
+            <div class="pokemon-sprite-large ally-sprite-lg">
               <img src="${this.spriteService.getDefaultSpriteUrl(this.companion?.id || 25)}" 
                    alt="${this.companion?.name || 'Pikachu'}" 
-                   class="battle-sprite ally"
+                   class="battle-sprite-lg ally"
                    id="allySprite">
             </div>
-            <div class="pokemon-name-plate ally-plate">
-              <span class="poke-name">${this.companion?.name || 'Pikachu'}</span>
-              <span class="poke-level">Lv.${this.companion?.level || 1}</span>
-            </div>
-            <div class="hp-bar-container ally-hp">
-              <div class="hp-label">HP</div>
-              <div class="hp-bar">
-                <div class="hp-fill ${companionHpPercent < 20 ? 'critical' : companionHpPercent < 50 ? 'warning' : ''}" 
-                     style="width: ${companionHpPercent}%"></div>
+            <div class="pokemon-info-plate ally-plate">
+              <div class="name-level">
+                <span class="poke-name">${this.companion?.name || 'Pikachu'}</span>
+                <span class="poke-level">Lv.${this.companion?.level || 1}</span>
+              </div>
+              <div class="hp-bar-container ally-hp">
+                <div class="hp-label">HP</div>
+                <div class="hp-bar">
+                  <div class="hp-fill ${companionHpPercent < 20 ? 'critical' : companionHpPercent < 50 ? 'warning' : ''}" 
+                       style="width: ${companionHpPercent}%"></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="battle-log-box" id="battleLog">
-          <p class="log-text">${this.battleLog.length > 0 ? this.battleLog[this.battleLog.length - 1] : `A wild ${encounter.pokemon.name} appeared!`}</p>
-        </div>
-
-        <div class="catch-indicator">
-          <span class="catch-label">Catch Rate:</span>
-          <div class="catch-bar">
-            <div class="catch-fill" style="width: ${catchRate}%"></div>
-          </div>
-          <span class="catch-percent">${catchRate}%</span>
-        </div>
-
-        <div class="battle-menu">
-          <div class="menu-section moves-section">
-            <h4>FIGHT</h4>
-            <div class="moves-grid">
-              ${moves.map((move, i) => `
-                <button class="move-btn" data-move="${i}" data-power="${move.power}" data-type="${move.type}">
-                  <span class="move-name">${move.name}</span>
-                  <span class="move-type type-${move.type.toLowerCase()}">${move.type}</span>
-                </button>
-              `).join('')}
-            </div>
+        <div class="battle-menu-compact">
+          <div class="moves-grid-compact">
+            ${moves.map((move, i) => `
+              <button class="move-btn-compact" data-move="${i}" data-power="${move.power}" data-type="${move.type}">
+                <span class="move-name">${move.name}</span>
+                <span class="move-type type-${move.type.toLowerCase()}">${move.type}</span>
+              </button>
+            `).join('')}
           </div>
           
-          <div class="menu-section actions-section">
-            <button class="action-btn catch-btn" data-action="catch" ${encounter.currentHp === encounter.maxHp ? 'disabled' : ''}>
+          <div class="actions-compact">
+            <button class="action-btn catch-btn-lg" data-action="catch">
               <span class="btn-icon">⚾</span>
               <span>CATCH</span>
             </button>
-            <button class="action-btn run-btn" data-action="run">
+            <button class="action-btn run-btn-lg" data-action="run">
               <span class="btn-icon">🏃</span>
               <span>RUN</span>
             </button>
@@ -264,7 +252,7 @@ export class SearchScreen {
   }
 
   attachBattleListeners() {
-    const moveBtns = this.container.querySelectorAll('.move-btn');
+    const moveBtns = this.container.querySelectorAll('.move-btn-compact');
     moveBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const moveIndex = parseInt(btn.dataset.move);
@@ -371,7 +359,8 @@ export class SearchScreen {
   }
 
   async animateAttack(who) {
-    const sprite = this.container.querySelector(`#${who}Sprite`);
+    const spriteId = who === 'ally' ? 'allySprite' : 'enemySprite';
+    const sprite = this.container.querySelector(`#${spriteId}`);
     if (sprite) {
       sprite.classList.add('attacking');
       await this.delay(200);
@@ -380,7 +369,8 @@ export class SearchScreen {
   }
 
   async animateDamage(who) {
-    const sprite = this.container.querySelector(`#${who}Sprite`);
+    const spriteId = who === 'ally' ? 'allySprite' : 'enemySprite';
+    const sprite = this.container.querySelector(`#${spriteId}`);
     if (sprite) {
       sprite.classList.add('damaged');
       await this.delay(300);
@@ -397,7 +387,7 @@ export class SearchScreen {
   }
 
   disableButtons(disabled) {
-    const buttons = this.container.querySelectorAll('.move-btn, .action-btn');
+    const buttons = this.container.querySelectorAll('.move-btn-compact, .action-btn');
     buttons.forEach(btn => btn.disabled = disabled);
   }
 
