@@ -160,23 +160,21 @@ export class SearchScreen {
           </div>
         </div>
 
-        <div class="battle-menu-compact">
-          <div class="moves-grid-compact">
+        <div class="battle-menu-pokemon">
+          <div class="moves-grid-2x2">
             ${moves.map((move, i) => `
-              <button class="move-btn-compact" data-move="${i}" data-power="${move.power}" data-type="${move.type}" title="${move.desc}">
-                <span class="move-name">${move.name}</span>
-                <span class="move-power">PWR ${move.power}</span>
+              <button class="move-btn-pokemon type-bg-${move.type.toLowerCase()}" data-move="${i}" data-power="${move.power}" data-type="${move.type}" title="${move.desc}">
+                <span class="move-name-pokemon">${move.name}</span>
+                <span class="move-pp">PP 15/15</span>
               </button>
             `).join('')}
           </div>
           
-          <div class="actions-row">
-            <button class="action-btn-sm catch-btn-sm" data-action="catch">
-              <span class="btn-icon">⚾</span>
+          <div class="actions-row-pokemon">
+            <button class="action-btn-pokemon catch-pokemon" data-action="catch">
               <span>CATCH</span>
             </button>
-            <button class="action-btn-sm run-btn-sm" data-action="run">
-              <span class="btn-icon">🏃</span>
+            <button class="action-btn-pokemon run-pokemon" data-action="run">
               <span>RUN</span>
             </button>
           </div>
@@ -254,7 +252,7 @@ export class SearchScreen {
   }
 
   attachBattleListeners() {
-    const moveBtns = this.container.querySelectorAll('.move-btn-compact');
+    const moveBtns = this.container.querySelectorAll('.move-btn-pokemon');
     moveBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const moveIndex = parseInt(btn.dataset.move);
@@ -410,7 +408,7 @@ export class SearchScreen {
   }
 
   disableButtons(disabled) {
-    const buttons = this.container.querySelectorAll('.move-btn-compact, .action-btn-sm');
+    const buttons = this.container.querySelectorAll('.move-btn-pokemon, .action-btn-pokemon');
     buttons.forEach(btn => btn.disabled = disabled);
   }
 
