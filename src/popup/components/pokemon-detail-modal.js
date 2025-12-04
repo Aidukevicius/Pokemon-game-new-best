@@ -163,7 +163,6 @@ export class PokemonDetailModal {
         
         <div class="detail-footer">
           <span class="rarity-badge rarity-${baseData.rarity}">${baseData.rarity}</span>
-          ${pokemon.caught_at ? `<span class="caught-date">Caught: ${new Date(pokemon.caught_at).toLocaleDateString()}</span>` : ''}
         </div>
       </div>
     `;
