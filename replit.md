@@ -3,8 +3,14 @@
 ## Project Overview
 A lofi SNES-style Pokemon catching game implemented as a Chrome extension. Users can encounter and catch Pokemon while browsing the web. Features a mobile-shaped popup (360x640px) with tab-based navigation for different screens.
 
-## Current State (December 3, 2025)
-**Phase**: Item Equipping UX Complete
+## Current State (December 4, 2025)
+**Phase**: Search & Encounter System Implementation
+- Search screen with Pokemon encounter testing buttons
+- Encounter system with rarity-based Pokemon spawning (Common, Uncommon, Rare, Legendary)
+- Gen 1 catch rate formula implementation
+- Full encounter UI with Pokemon stats, HP bar, catch rate indicator
+- Test encounter buttons for each rarity tier
+- Settings screen with test Pokemon seed button
 - PostgreSQL database connected via Flask backend
 - 10 test Pokemon seeded with full stats, natures, items, EVs, and random IVs
 - Pokemon detail modal with comprehensive stat display including IVs
@@ -14,7 +20,6 @@ A lofi SNES-style Pokemon catching game implemented as a Chrome extension. Users
 - IV rating system (Outstanding, Relatively Superior, Above Average, Decent)
 - Nature system with +10%/-10% stat modifiers
 - EV (Effort Value) tracking per stat (510 total cap, 252 per stat)
-- Fixed click handlers on Pokemon slots to open detail cards
 - Tab navigation system with 6 screens
 - SNES-style aesthetic with retro detail-modal.css styling
 - Mobile-shaped popup (280x500px in preview mode)
@@ -104,6 +109,12 @@ The preview server runs on port 5000 displaying `preview.html`, which embeds pop
 3. Load unpacked extension from this directory
 
 ## Recent Changes
+- **2025-12-04**: Implemented Search screen with encounter testing buttons (Common/Uncommon/Rare/Legendary)
+- **2025-12-04**: Added EncounterService for Pokemon encounter generation with rarity weights
+- **2025-12-04**: Created full encounter UI with Pokemon sprite, stats, HP bar, catch rate
+- **2025-12-04**: Integrated CatchService with Gen 1 catch rate formula
+- **2025-12-04**: Added Settings screen with "Add Test Pokemon" button
+- **2025-12-04**: Created search-screen.css with styling for search mode and encounters
 - **2025-12-03**: Redesigned item equipping UX - moved from Items tab to Pokemon detail modal
 - **2025-12-03**: Simplified Items tab to overview-only with compact badge display
 - **2025-12-03**: Added item selector in detail modal with equip/change/remove functionality
