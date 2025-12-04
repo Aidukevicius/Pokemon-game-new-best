@@ -12,12 +12,24 @@ export class SearchScreen {
     this.encounterService = new EncounterService();
     this.currentEncounter = null;
     this.isSearching = false;
+    this.companion = null;
+    this.battleLog = [];
   }
 
   async initialize() {
     console.log('[SearchScreen] Initializing...');
+    await this.loadCompanion();
     await this.loadEncounterQueue();
     this.render();
+  }
+
+  async loadCompanion() {
+    try {
+      this.companion = await this.storage.get('companion');
+      console.log('[SearchScreen] Companion loaded:', this.companion?.name);
+    } catch (error) {
+      console.error('[SearchScreen] Error loading companion:', error);
+    }
   }
 
   async loadEncounterQueue() {
@@ -26,10 +38,10 @@ export class SearchScreen {
 
   render() {
     if (this.currentEncounter) {
-      this.renderEncounter(this.currentEncounter);
+      this.renderBattleEncounter(this.currentEncounter);
     } else if (this.encounterQueue && this.encounterQueue.length > 0) {
       this.currentEncounter = this.encounterQueue[0];
-      this.renderEncounter(this.currentEncounter);
+      this.renderBattleEncounter(this.currentEncounter);
     } else {
       this.renderSearchMode();
     }
@@ -63,16 +75,16 @@ export class SearchScreen {
           <div class="encounter-tips-section">
             <h3>How it works:</h3>
             <ul class="tips-list">
-              <li><span class="tip-icon">🌐</span> Browse different websites to find Pokemon</li>
-              <li><span class="tip-icon">⚡</span> Website types affect which Pokemon appear</li>
-              <li><span class="tip-icon">✨</span> Rare Pokemon are harder to find!</li>
-              <li><span class="tip-icon">⚾</span> Use Pokeballs from the Shop to catch them</li>
+              <li><span class="tip-icon">⚔️</span> Battle wild Pokemon to weaken them</li>
+              <li><span class="tip-icon">❤️</span> Lower HP = Higher catch rate!</li>
+              <li><span class="tip-icon">⚡</span> Your companion fights for you</li>
+              <li><span class="tip-icon">⚾</span> Throw Pokeballs when HP is low</li>
             </ul>
           </div>
 
           <div class="test-encounter-section">
             <h3>Testing Mode</h3>
-            <p class="test-desc">Trigger a test encounter to try the catching system:</p>
+            <p class="test-desc">Trigger a test encounter to battle and catch:</p>
             <div class="test-buttons">
               <button class="snes-btn test-btn" id="testCommonBtn" data-rarity="common">Common</button>
               <button class="snes-btn test-btn" id="testUncommonBtn" data-rarity="uncommon">Uncommon</button>
@@ -87,108 +99,153 @@ export class SearchScreen {
     this.attachSearchListeners();
   }
 
-  renderEncounter(encounter) {
+  renderBattleEncounter(encounter) {
     const spriteUrl = this.spriteService.getSpriteUrl(encounter.pokemon.id);
     const catchRate = this.catchService.getCatchRatePercentage(encounter, 'pokeball');
+    const hpPercent = (encounter.currentHp / encounter.maxHp) * 100;
+    const companionHpPercent = this.companion ? (this.companion.health / 100) * 100 : 100;
+    
+    const moves = this.getCompanionMoves();
     
     this.container.innerHTML = `
-      <div class="search-screen encounter-active">
-        <div class="encounter-header">
-          <h2>⚡ Wild ${encounter.pokemon.name} appeared!</h2>
-          <span class="encounter-level">Lv. ${encounter.level}</span>
+      <div class="search-screen battle-mode">
+        <div class="battle-header">
+          <span class="battle-title">⚔️ Wild Battle!</span>
         </div>
 
-        <div class="snes-container encounter-display">
-          <div class="pokemon-sprite-container">
-            <img src="${spriteUrl}" 
-                 alt="${encounter.pokemon.name}" 
-                 class="encounter-sprite"
-                 onerror="this.src='${this.spriteService.getDefaultSpriteUrl(encounter.pokemon.id)}';">
+        <div class="battle-field">
+          <div class="enemy-pokemon">
+            <div class="pokemon-name-plate">
+              <span class="poke-name">${encounter.pokemon.name}</span>
+              <span class="poke-level">Lv.${encounter.level}</span>
+            </div>
+            <div class="hp-bar-container">
+              <div class="hp-label">HP</div>
+              <div class="hp-bar">
+                <div class="hp-fill ${hpPercent < 20 ? 'critical' : hpPercent < 50 ? 'warning' : ''}" 
+                     style="width: ${hpPercent}%"></div>
+              </div>
+              <span class="hp-text">${encounter.currentHp}/${encounter.maxHp}</span>
+            </div>
+            <div class="pokemon-sprite-area">
+              <img src="${spriteUrl}" 
+                   alt="${encounter.pokemon.name}" 
+                   class="battle-sprite enemy"
+                   id="enemySprite"
+                   onerror="this.src='${this.spriteService.getDefaultSpriteUrl(encounter.pokemon.id)}';">
+            </div>
           </div>
-          
-          <div class="encounter-info">
-            <div class="info-row">
-              <span class="label">Type:</span>
-              <div class="types">
-                ${encounter.pokemon.types.map(type => 
-                  `<span class="type-badge type-${type.toLowerCase()}">${type}</span>`
-                ).join('')}
+
+          <div class="ally-pokemon">
+            <div class="pokemon-sprite-area ally-sprite-area">
+              <img src="${this.spriteService.getDefaultSpriteUrl(this.companion?.id || 25)}" 
+                   alt="${this.companion?.name || 'Pikachu'}" 
+                   class="battle-sprite ally"
+                   id="allySprite">
+            </div>
+            <div class="pokemon-name-plate ally-plate">
+              <span class="poke-name">${this.companion?.name || 'Pikachu'}</span>
+              <span class="poke-level">Lv.${this.companion?.level || 1}</span>
+            </div>
+            <div class="hp-bar-container ally-hp">
+              <div class="hp-label">HP</div>
+              <div class="hp-bar">
+                <div class="hp-fill ${companionHpPercent < 20 ? 'critical' : companionHpPercent < 50 ? 'warning' : ''}" 
+                     style="width: ${companionHpPercent}%"></div>
               </div>
             </div>
-            
-            <div class="info-row">
-              <span class="label">Nature:</span>
-              <span class="value">${encounter.nature}</span>
-            </div>
-            
-            <div class="info-row">
-              <span class="label">Rarity:</span>
-              <span class="rarity-badge rarity-${encounter.pokemon.rarity}">${encounter.pokemon.rarity}</span>
-            </div>
-          </div>
-
-          <div class="hp-container">
-            <div class="hp-bar">
-              <div class="hp-fill" style="width: ${(encounter.currentHp / encounter.maxHp) * 100}%">
-                <span class="hp-text">${encounter.currentHp} / ${encounter.maxHp} HP</span>
-              </div>
-            </div>
           </div>
         </div>
 
-        <div class="snes-container stats-preview">
-          <div class="stat-grid">
-            <div class="stat-item">
-              <span class="stat-name">HP</span>
-              <span class="stat-value">${encounter.stats.hp}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-name">ATK</span>
-              <span class="stat-value">${encounter.stats.attack}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-name">DEF</span>
-              <span class="stat-value">${encounter.stats.defense}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-name">SP.A</span>
-              <span class="stat-value">${encounter.stats.spAttack}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-name">SP.D</span>
-              <span class="stat-value">${encounter.stats.spDefense}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-name">SPD</span>
-              <span class="stat-value">${encounter.stats.speed}</span>
-            </div>
-          </div>
+        <div class="battle-log-box" id="battleLog">
+          <p class="log-text">${this.battleLog.length > 0 ? this.battleLog[this.battleLog.length - 1] : `A wild ${encounter.pokemon.name} appeared!`}</p>
         </div>
 
-        <div class="catch-rate-indicator">
+        <div class="catch-indicator">
           <span class="catch-label">Catch Rate:</span>
           <div class="catch-bar">
             <div class="catch-fill" style="width: ${catchRate}%"></div>
           </div>
-          <span class="catch-percentage">${catchRate}%</span>
+          <span class="catch-percent">${catchRate}%</span>
         </div>
 
-        <div class="encounter-actions">
-          <button class="snes-btn catch-button" data-action="catch">
-            <span class="button-icon">⚾</span>
-            <span class="button-text">Throw Pokeball</span>
-          </button>
-          <button class="snes-btn run-button" data-action="run">
-            <span class="button-icon">🏃</span>
-            <span class="button-text">Run Away</span>
-          </button>
+        <div class="battle-menu">
+          <div class="menu-section moves-section">
+            <h4>FIGHT</h4>
+            <div class="moves-grid">
+              ${moves.map((move, i) => `
+                <button class="move-btn" data-move="${i}" data-power="${move.power}" data-type="${move.type}">
+                  <span class="move-name">${move.name}</span>
+                  <span class="move-type type-${move.type.toLowerCase()}">${move.type}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+          
+          <div class="menu-section actions-section">
+            <button class="action-btn catch-btn" data-action="catch" ${encounter.currentHp === encounter.maxHp ? 'disabled' : ''}>
+              <span class="btn-icon">⚾</span>
+              <span>CATCH</span>
+            </button>
+            <button class="action-btn run-btn" data-action="run">
+              <span class="btn-icon">🏃</span>
+              <span>RUN</span>
+            </button>
+          </div>
         </div>
-
-        <div class="encounter-status" id="encounterStatus"></div>
       </div>
     `;
 
-    this.attachEncounterListeners();
+    this.attachBattleListeners();
+  }
+
+  getCompanionMoves() {
+    const companionType = this.getCompanionType();
+    
+    const movesByType = {
+      'Electric': [
+        { name: 'Thunderbolt', type: 'Electric', power: 90 },
+        { name: 'Quick Attack', type: 'Normal', power: 40 },
+        { name: 'Thunder Wave', type: 'Electric', power: 30 },
+        { name: 'Slam', type: 'Normal', power: 80 }
+      ],
+      'Fire': [
+        { name: 'Flamethrower', type: 'Fire', power: 90 },
+        { name: 'Ember', type: 'Fire', power: 40 },
+        { name: 'Scratch', type: 'Normal', power: 40 },
+        { name: 'Fire Spin', type: 'Fire', power: 35 }
+      ],
+      'Water': [
+        { name: 'Water Gun', type: 'Water', power: 40 },
+        { name: 'Bubble', type: 'Water', power: 40 },
+        { name: 'Tackle', type: 'Normal', power: 40 },
+        { name: 'Hydro Pump', type: 'Water', power: 110 }
+      ],
+      'Grass': [
+        { name: 'Vine Whip', type: 'Grass', power: 45 },
+        { name: 'Razor Leaf', type: 'Grass', power: 55 },
+        { name: 'Tackle', type: 'Normal', power: 40 },
+        { name: 'Solar Beam', type: 'Grass', power: 120 }
+      ],
+      'Normal': [
+        { name: 'Tackle', type: 'Normal', power: 40 },
+        { name: 'Quick Attack', type: 'Normal', power: 40 },
+        { name: 'Slam', type: 'Normal', power: 80 },
+        { name: 'Hyper Beam', type: 'Normal', power: 150 }
+      ]
+    };
+
+    return movesByType[companionType] || movesByType['Normal'];
+  }
+
+  getCompanionType() {
+    const pokemonTypes = {
+      25: 'Electric', 26: 'Electric',
+      1: 'Grass', 2: 'Grass', 3: 'Grass',
+      4: 'Fire', 5: 'Fire', 6: 'Fire',
+      7: 'Water', 8: 'Water', 9: 'Water'
+    };
+    return pokemonTypes[this.companion?.id] || 'Normal';
   }
 
   attachSearchListeners() {
@@ -206,12 +263,146 @@ export class SearchScreen {
     });
   }
 
-  attachEncounterListeners() {
+  attachBattleListeners() {
+    const moveBtns = this.container.querySelectorAll('.move-btn');
+    moveBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const moveIndex = parseInt(btn.dataset.move);
+        const power = parseInt(btn.dataset.power);
+        const type = btn.dataset.type;
+        this.executeMove(moveIndex, power, type);
+      });
+    });
+
     const catchBtn = this.container.querySelector('[data-action="catch"]');
     const runBtn = this.container.querySelector('[data-action="run"]');
 
     catchBtn?.addEventListener('click', () => this.attemptCatch());
     runBtn?.addEventListener('click', () => this.runAway());
+  }
+
+  async executeMove(moveIndex, power, type) {
+    if (!this.currentEncounter) return;
+
+    const moves = this.getCompanionMoves();
+    const move = moves[moveIndex];
+    
+    this.disableButtons(true);
+
+    const damage = this.calculateDamage(power, this.companion?.level || 10, type);
+    
+    this.battleLog.push(`${this.companion?.name || 'Pikachu'} used ${move.name}!`);
+    this.updateBattleLog();
+    
+    await this.animateAttack('ally');
+    await this.animateDamage('enemy');
+    
+    this.currentEncounter.currentHp = Math.max(0, this.currentEncounter.currentHp - damage);
+    
+    await this.delay(300);
+    this.battleLog.push(`It dealt ${damage} damage!`);
+    this.updateBattleLog();
+    
+    if (this.currentEncounter.currentHp <= 0) {
+      await this.delay(500);
+      this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} fainted!`);
+      this.updateBattleLog();
+      await this.delay(1500);
+      this.currentEncounter = null;
+      this.battleLog = [];
+      this.render();
+      return;
+    }
+
+    await this.delay(800);
+    await this.enemyTurn();
+    
+    this.render();
+  }
+
+  async enemyTurn() {
+    if (!this.currentEncounter || !this.companion) return;
+
+    const enemyMoves = ['Tackle', 'Quick Attack', 'Scratch', 'Bite'];
+    const enemyMove = enemyMoves[Math.floor(Math.random() * enemyMoves.length)];
+    const enemyPower = 30 + Math.floor(Math.random() * 30);
+    
+    this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} used ${enemyMove}!`);
+    this.updateBattleLog();
+    
+    await this.animateAttack('enemy');
+    await this.animateDamage('ally');
+    
+    const damage = this.calculateDamage(enemyPower, this.currentEncounter.level, 'Normal');
+    const newHealth = Math.max(0, (this.companion.health || 100) - Math.floor(damage / 3));
+    
+    this.companion.health = newHealth;
+    await this.storage.set('companion', this.companion);
+    
+    await this.delay(300);
+    this.battleLog.push(`Your ${this.companion.name} took ${Math.floor(damage / 3)} damage!`);
+    this.updateBattleLog();
+    
+    if (newHealth <= 0) {
+      await this.delay(500);
+      this.battleLog.push(`${this.companion.name} fainted! The wild Pokemon fled.`);
+      this.updateBattleLog();
+      await this.delay(1500);
+      this.companion.health = 100;
+      await this.storage.set('companion', this.companion);
+      this.currentEncounter = null;
+      this.battleLog = [];
+      this.render();
+    }
+    
+    this.disableButtons(false);
+  }
+
+  calculateDamage(power, level, type) {
+    const baseDamage = Math.floor((((2 * level / 5 + 2) * power * 50) / 50) / 50) + 2;
+    const randomFactor = 0.85 + Math.random() * 0.15;
+    const stab = this.getTypeBonus(type) ? 1.5 : 1;
+    return Math.floor(baseDamage * randomFactor * stab);
+  }
+
+  getTypeBonus(moveType) {
+    const companionType = this.getCompanionType();
+    return moveType === companionType;
+  }
+
+  async animateAttack(who) {
+    const sprite = this.container.querySelector(`#${who}Sprite`);
+    if (sprite) {
+      sprite.classList.add('attacking');
+      await this.delay(200);
+      sprite.classList.remove('attacking');
+    }
+  }
+
+  async animateDamage(who) {
+    const sprite = this.container.querySelector(`#${who}Sprite`);
+    if (sprite) {
+      sprite.classList.add('damaged');
+      await this.delay(300);
+      sprite.classList.remove('damaged');
+    }
+  }
+
+  updateBattleLog() {
+    const logBox = this.container.querySelector('#battleLog');
+    if (logBox) {
+      const lastMsg = this.battleLog[this.battleLog.length - 1] || '';
+      logBox.innerHTML = `<p class="log-text">${lastMsg}</p>`;
+    }
+  }
+
+  disableButtons(disabled) {
+    const buttons = this.container.querySelectorAll('.move-btn, .action-btn');
+    buttons.forEach(btn => btn.disabled = disabled);
+  }
+
+  delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   toggleSearch() {
@@ -223,6 +414,8 @@ export class SearchScreen {
 
   async triggerTestEncounter(rarity = 'common') {
     console.log('[SearchScreen] Triggering test encounter:', rarity);
+    
+    await this.loadCompanion();
     
     const encounter = this.encounterService.generateEncounter('normal');
     
@@ -244,6 +437,7 @@ export class SearchScreen {
       }
     }
     
+    this.battleLog = [`A wild ${encounter.pokemon.name} appeared!`];
     this.currentEncounter = encounter;
     this.render();
   }
@@ -292,38 +486,37 @@ export class SearchScreen {
   }
 
   async attemptCatch() {
-    const statusEl = this.container.querySelector('#encounterStatus');
-    const catchBtn = this.container.querySelector('[data-action="catch"]');
+    const statusEl = this.container.querySelector('#battleLog');
     
     if (!this.currentEncounter) return;
     
-    catchBtn.disabled = true;
-    statusEl.textContent = 'Throwing Pokeball...';
-    statusEl.className = 'encounter-status throwing';
+    this.disableButtons(true);
     
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    this.battleLog.push('You threw a Pokeball!');
+    this.updateBattleLog();
+    
+    await this.delay(1000);
     
     const result = await this.catchService.attemptCatch(this.currentEncounter);
     
     if (result.success) {
-      statusEl.innerHTML = `<span class="success-icon">✨</span> ${result.message} <span class="coin-reward">+${result.coinReward} coins!</span>`;
-      statusEl.className = 'encounter-status success';
+      this.battleLog.push(`Gotcha! ${this.currentEncounter.pokemon.name} was caught!`);
+      this.updateBattleLog();
       
       await this.saveCaughtPokemonToServer(this.currentEncounter);
       
-      setTimeout(() => {
-        this.currentEncounter = null;
-        this.render();
-      }, 2500);
+      await this.delay(2000);
+      this.currentEncounter = null;
+      this.battleLog = [];
+      this.render();
     } else {
       if (result.reason === 'no_pokeballs') {
-        statusEl.innerHTML = `<span class="error-icon">❌</span> ${result.message}`;
-        statusEl.className = 'encounter-status error';
+        this.battleLog.push(`You don't have any Pokeballs!`);
       } else {
-        statusEl.innerHTML = `<span class="escape-icon">💨</span> ${result.message}`;
-        statusEl.className = 'encounter-status escaped';
-        catchBtn.disabled = false;
+        this.battleLog.push(`Oh no! ${this.currentEncounter.pokemon.name} broke free!`);
       }
+      this.updateBattleLog();
+      this.disableButtons(false);
     }
   }
 
@@ -347,19 +540,20 @@ export class SearchScreen {
   }
 
   async runAway() {
-    const statusEl = this.container.querySelector('#encounterStatus');
-    statusEl.textContent = '🏃 You ran away safely!';
-    statusEl.className = 'encounter-status escaped';
+    this.battleLog.push('Got away safely!');
+    this.updateBattleLog();
     
-    setTimeout(() => {
-      this.currentEncounter = null;
-      this.render();
-    }, 1000);
+    await this.delay(1000);
+    this.currentEncounter = null;
+    this.battleLog = [];
+    this.render();
   }
 
   show() {
     this.container.style.display = 'block';
-    this.loadEncounterQueue().then(() => this.render());
+    this.loadCompanion().then(() => {
+      this.loadEncounterQueue().then(() => this.render());
+    });
   }
 
   hide() {
