@@ -1,5 +1,5 @@
 .search-screen {
-  padding: 8px;
+  padding: 10px;
   min-height: 100%;
 }
 
@@ -12,22 +12,26 @@
 }
 
 .search-title {
-  font-size: 14px;
+  font-size: 10px;
   margin: 0;
-  color: #333;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .search-status {
-  font-size: 10px;
+  font-size: 7px;
   padding: 4px 8px;
-  border-radius: 10px;
+  border-radius: 4px;
   background: #e8e8e8;
   color: #666;
+  border: 2px solid #cbd5e1;
 }
 
 .search-status.active {
   background: #dcfce7;
   color: #166534;
+  border-color: #22c55e;
   animation: pulse 2s ease-in-out infinite;
 }
 
@@ -39,62 +43,75 @@
 .search-content {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .search-toggle-section {
-  background: rgba(255,255,255,0.8);
+  background: #f8fafc;
+  border: 3px solid #475569;
   border-radius: 8px;
   padding: 14px;
   text-align: center;
+  box-shadow: 4px 4px 0 rgba(71, 85, 105, 0.3);
 }
 
 .toggle-info h3 {
-  font-size: 13px;
-  color: #333;
+  font-size: 9px;
+  color: #1e293b;
   margin: 0 0 6px 0;
+  text-transform: uppercase;
 }
 
 .toggle-desc {
-  font-size: 10px;
-  color: #666;
+  font-size: 7px;
+  color: #64748b;
   margin: 0 0 12px 0;
 }
 
 .toggle-search-btn {
   background: #3b82f6 !important;
   color: white !important;
-  padding: 10px 20px;
-  font-size: 11px;
-  border: none;
+  padding: 10px 16px;
+  font-size: 8px;
+  border: 3px solid #2563eb !important;
   border-radius: 6px;
   cursor: pointer;
   width: 100%;
-  transition: all 0.2s ease;
+  box-shadow: 3px 3px 0 #1e40af;
+  transition: all 0.1s ease;
+  text-transform: uppercase;
 }
 
 .toggle-search-btn:hover {
   background: #2563eb !important;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #1e40af;
+}
+
+.toggle-search-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #1e40af;
 }
 
 .toggle-search-btn.active {
   background: #ef4444 !important;
-}
-
-.toggle-search-btn.active:hover {
-  background: #dc2626 !important;
+  border-color: #dc2626 !important;
+  box-shadow: 3px 3px 0 #991b1b;
 }
 
 .encounter-tips-section {
-  background: rgba(255,255,255,0.7);
+  background: #f8fafc;
+  border: 3px solid #475569;
   border-radius: 8px;
   padding: 12px;
+  box-shadow: 4px 4px 0 rgba(71, 85, 105, 0.3);
 }
 
 .encounter-tips-section h3 {
-  font-size: 11px;
-  color: #333;
+  font-size: 8px;
+  color: #1e293b;
   margin: 0 0 10px 0;
+  text-transform: uppercase;
 }
 
 .tips-list {
@@ -107,10 +124,10 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 9px;
-  color: #555;
-  padding: 6px 0;
-  border-bottom: 1px solid #eee;
+  font-size: 7px;
+  color: #475569;
+  padding: 5px 0;
+  border-bottom: 2px solid #e2e8f0;
 }
 
 .tips-list li:last-child {
@@ -118,24 +135,26 @@
 }
 
 .tip-icon {
-  font-size: 12px;
+  font-size: 10px;
 }
 
 .test-encounter-section {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%);
+  border: 3px solid #f59e0b;
   border-radius: 8px;
   padding: 12px;
-  border: 2px dashed #f59e0b;
+  box-shadow: 4px 4px 0 rgba(245, 158, 11, 0.4);
 }
 
 .test-encounter-section h3 {
-  font-size: 11px;
+  font-size: 8px;
   color: #92400e;
   margin: 0 0 4px 0;
+  text-transform: uppercase;
 }
 
 .test-desc {
-  font-size: 9px;
+  font-size: 7px;
   color: #a16207;
   margin: 0 0 10px 0;
 }
@@ -147,89 +166,159 @@
 }
 
 .test-btn {
-  padding: 8px 10px;
-  font-size: 9px;
-  border: none;
-  border-radius: 4px;
+  padding: 8px 6px;
+  font-size: 7px;
+  border: 3px solid;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.1s ease;
+  text-transform: uppercase;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+}
+
+.test-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+}
+
+.test-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 rgba(0,0,0,0.2);
 }
 
 .test-btn[data-rarity="common"] {
   background: #94a3b8 !important;
+  border-color: #64748b !important;
   color: white !important;
 }
 
 .test-btn[data-rarity="uncommon"] {
   background: #3b82f6 !important;
+  border-color: #2563eb !important;
   color: white !important;
 }
 
 .test-btn[data-rarity="rare"] {
   background: #f59e0b !important;
+  border-color: #d97706 !important;
   color: white !important;
 }
 
 .test-btn.legendary {
   background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%) !important;
+  border-color: #7c3aed !important;
   color: white !important;
 }
 
-.test-btn:hover {
-  transform: scale(1.02);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+/* ========================================
+   BATTLE MODE STYLES - SNES Aesthetic
+   ======================================== */
+
+.battle-mode {
+  background: #f8fafc;
+  border: 4px solid #475569;
+  border-radius: 0;
+  padding: 8px;
+  min-height: 100%;
+  position: relative;
 }
 
-/* Battle Mode Styles */
-.battle-mode {
-  background: linear-gradient(180deg, #87ceeb 0%, #98d8aa 60%, #90EE90 100%);
-  border-radius: 8px;
-  padding: 6px;
-  min-height: 100%;
+/* Power LED for battle mode */
+.battle-mode::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  border: 2px solid #1e293b;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.8), inset 0 -2px 4px rgba(0,0,0,0.3);
+  animation: battle-led 1s infinite;
+  z-index: 10;
+}
+
+@keyframes battle-led {
+  0%, 100% { 
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+  }
+  50% { 
+    opacity: 0.6;
+    box-shadow: 0 0 4px rgba(34, 197, 94, 0.4);
+  }
 }
 
 .battle-header {
   text-align: center;
-  padding: 4px;
-  margin-bottom: 4px;
+  padding: 2px 0 6px 0;
+  border-bottom: 3px solid #cbd5e1;
+  margin-bottom: 6px;
 }
 
 .battle-title {
-  font-size: 11px;
+  font-size: 9px;
   font-weight: bold;
-  color: #1e3a5f;
-  text-shadow: 1px 1px 0 white;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .battle-field {
   position: relative;
-  height: 160px;
-  margin-bottom: 4px;
+  height: 150px;
+  background: linear-gradient(180deg, #87ceeb 0%, #90EE90 70%, #228B22 100%);
+  border: 3px solid #475569;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  overflow: hidden;
+}
+
+/* Grass pattern overlay */
+.battle-field::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 8px,
+    rgba(0,100,0,0.1) 8px,
+    rgba(0,100,0,0.1) 16px
+  );
+  pointer-events: none;
 }
 
 .enemy-pokemon {
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 55%;
+  top: 4px;
+  right: 4px;
+  width: 52%;
+  z-index: 2;
 }
 
 .ally-pokemon {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 55%;
+  bottom: 4px;
+  left: 4px;
+  width: 52%;
+  z-index: 2;
 }
 
 .pokemon-name-plate {
-  background: linear-gradient(180deg, #f8f8f8 0%, #e0e0e0 100%);
-  border: 2px solid #333;
-  border-radius: 4px;
+  background: #f8fafc;
+  border: 3px solid #475569;
+  border-radius: 0;
   padding: 3px 6px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2px;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
 }
 
 .ally-plate {
@@ -238,24 +327,28 @@
 }
 
 .poke-name {
-  font-size: 9px;
+  font-size: 7px;
   font-weight: bold;
-  color: #333;
+  color: #1e293b;
+  text-transform: uppercase;
 }
 
 .poke-level {
-  font-size: 8px;
-  color: #666;
+  font-size: 7px;
+  color: #64748b;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 600;
 }
 
 .hp-bar-container {
-  background: linear-gradient(180deg, #f8f8f8 0%, #d0d0d0 100%);
-  border: 2px solid #333;
-  border-radius: 4px;
+  background: #f8fafc;
+  border: 3px solid #475569;
+  border-radius: 0;
   padding: 2px 4px;
   display: flex;
   align-items: center;
   gap: 4px;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
 }
 
 .ally-hp {
@@ -263,16 +356,16 @@
 }
 
 .hp-label {
-  font-size: 7px;
+  font-size: 6px;
   font-weight: bold;
   color: #f59e0b;
 }
 
 .hp-bar {
   flex: 1;
-  height: 6px;
-  background: #333;
-  border-radius: 2px;
+  height: 8px;
+  background: #1e293b;
+  border: 2px solid #475569;
   overflow: hidden;
 }
 
@@ -288,24 +381,26 @@
 
 .hp-fill.critical {
   background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
-  animation: blink 0.5s ease-in-out infinite;
+  animation: hp-blink 0.5s ease-in-out infinite;
 }
 
-@keyframes blink {
+@keyframes hp-blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
 
 .hp-text {
-  font-size: 7px;
-  color: #333;
-  min-width: 35px;
+  font-size: 6px;
+  color: #1e293b;
+  min-width: 32px;
   text-align: right;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 600;
 }
 
 .pokemon-sprite-area {
   text-align: right;
-  padding: 4px;
+  padding: 2px;
 }
 
 .ally-sprite-area {
@@ -313,71 +408,74 @@
 }
 
 .battle-sprite {
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   image-rendering: pixelated;
-  filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4));
   transition: transform 0.1s ease;
 }
 
 .battle-sprite.attacking {
-  transform: translateX(10px) scale(1.1);
+  transform: translateX(8px) scale(1.1);
 }
 
 .battle-sprite.enemy.attacking {
-  transform: translateX(-10px) scale(1.1);
+  transform: translateX(-8px) scale(1.1);
 }
 
 .battle-sprite.damaged {
-  filter: brightness(2) drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
-  animation: shake 0.2s ease-in-out;
+  filter: brightness(2) drop-shadow(2px 2px 2px rgba(0,0,0,0.4));
+  animation: damage-shake 0.2s ease-in-out;
 }
 
-@keyframes shake {
+@keyframes damage-shake {
   0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
 }
 
 .battle-log-box {
-  background: linear-gradient(180deg, #f8f8f8 0%, #e8e8e8 100%);
-  border: 3px solid #333;
-  border-radius: 6px;
+  background: #f8fafc;
+  border: 3px solid #475569;
+  border-radius: 0;
   padding: 8px 10px;
   margin-bottom: 4px;
   min-height: 28px;
+  box-shadow: 3px 3px 0 rgba(71, 85, 105, 0.3);
 }
 
 .log-text {
-  font-size: 9px;
-  color: #333;
+  font-size: 7px;
+  color: #1e293b;
   margin: 0;
-  line-height: 1.3;
+  line-height: 1.4;
 }
 
 .catch-indicator {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255,255,255,0.8);
+  background: #f8fafc;
+  border: 2px solid #cbd5e1;
   padding: 4px 8px;
-  border-radius: 4px;
   margin-bottom: 4px;
 }
 
 .catch-label {
-  font-size: 8px;
+  font-size: 6px;
   font-weight: bold;
-  color: #333;
+  color: #475569;
+  text-transform: uppercase;
 }
 
 .catch-bar {
   flex: 1;
-  height: 8px;
-  background: #ddd;
-  border-radius: 4px;
+  height: 10px;
+  background: #1e293b;
+  border: 2px solid #475569;
   overflow: hidden;
-  border: 1px solid #999;
 }
 
 .catch-fill {
@@ -387,22 +485,23 @@
 }
 
 .catch-percent {
-  font-size: 9px;
+  font-size: 7px;
   font-weight: bold;
-  color: #333;
+  color: #1e293b;
   min-width: 28px;
   text-align: right;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .battle-menu {
   background: linear-gradient(180deg, #1e3a5f 0%, #0f172a 100%);
-  border: 3px solid #333;
-  border-radius: 6px;
+  border: 3px solid #475569;
   padding: 6px;
+  box-shadow: 4px 4px 0 rgba(71, 85, 105, 0.5);
 }
 
 .menu-section h4 {
-  font-size: 8px;
+  font-size: 6px;
   color: #94a3b8;
   margin: 0 0 4px 0;
   text-transform: uppercase;
@@ -420,9 +519,9 @@
 }
 
 .move-btn {
-  background: linear-gradient(180deg, #374151 0%, #1f2937 100%);
-  border: 2px solid #4b5563;
-  border-radius: 4px;
+  background: linear-gradient(180deg, #475569 0%, #334155 100%);
+  border: 3px solid #64748b;
+  border-radius: 0;
   padding: 6px 4px;
   cursor: pointer;
   display: flex;
@@ -430,15 +529,18 @@
   align-items: center;
   gap: 2px;
   transition: all 0.1s ease;
+  box-shadow: 2px 2px 0 #1e293b;
 }
 
 .move-btn:hover:not(:disabled) {
-  background: linear-gradient(180deg, #4b5563 0%, #374151 100%);
-  border-color: #6b7280;
+  background: linear-gradient(180deg, #64748b 0%, #475569 100%);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #1e293b;
 }
 
 .move-btn:active:not(:disabled) {
-  transform: scale(0.95);
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #1e293b;
 }
 
 .move-btn:disabled {
@@ -447,18 +549,32 @@
 }
 
 .move-name {
-  font-size: 8px;
+  font-size: 6px;
   font-weight: bold;
   color: white;
+  text-transform: uppercase;
 }
 
 .move-type {
-  font-size: 6px;
+  font-size: 5px;
   padding: 1px 4px;
   border-radius: 2px;
   color: white;
   text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,0.3);
 }
+
+/* Type colors */
+.type-electric { background: #eab308; }
+.type-fire { background: #ef4444; }
+.type-water { background: #3b82f6; }
+.type-grass { background: #22c55e; }
+.type-normal { background: #94a3b8; }
+.type-psychic { background: #ec4899; }
+.type-ice { background: #06b6d4; }
+.type-dragon { background: #7c3aed; }
+.type-ghost { background: #6b21a8; }
+.type-fighting { background: #dc2626; }
 
 .actions-section {
   display: grid;
@@ -467,9 +583,9 @@
 }
 
 .action-btn {
-  background: linear-gradient(180deg, #374151 0%, #1f2937 100%);
-  border: 2px solid #4b5563;
-  border-radius: 4px;
+  background: linear-gradient(180deg, #475569 0%, #334155 100%);
+  border: 3px solid #64748b;
+  border-radius: 0;
   padding: 8px 6px;
   cursor: pointer;
   display: flex;
@@ -477,13 +593,21 @@
   justify-content: center;
   gap: 4px;
   color: white;
-  font-size: 9px;
+  font-size: 7px;
   font-weight: bold;
   transition: all 0.1s ease;
+  box-shadow: 2px 2px 0 #1e293b;
+  text-transform: uppercase;
 }
 
 .action-btn:hover:not(:disabled) {
-  background: linear-gradient(180deg, #4b5563 0%, #374151 100%);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #1e293b;
+}
+
+.action-btn:active:not(:disabled) {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #1e293b;
 }
 
 .action-btn:disabled {
@@ -501,9 +625,9 @@
 }
 
 .run-btn {
-  background: linear-gradient(180deg, #6b7280 0%, #4b5563 100%) !important;
+  background: linear-gradient(180deg, #64748b 0%, #475569 100%) !important;
 }
 
 .btn-icon {
-  font-size: 11px;
+  font-size: 10px;
 }
