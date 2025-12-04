@@ -4,6 +4,7 @@
 import { MainScreen } from './screens/main-screen.js';
 import { StorageScreen } from './screens/storage-screen.js';
 import { CollectionScreen } from './screens/collection-screen.js';
+import { SettingsScreen } from './screens/settings-screen.js';
 
 console.log('[Main] Script loaded');
 console.log('[Main] Screens imported');
@@ -37,22 +38,31 @@ async function initializeApp() {
     collectionContainer.style.display = 'none';
     screensContainer.appendChild(collectionContainer);
 
+    const settingsContainer = document.createElement('div');
+    settingsContainer.id = 'settings-screen-container';
+    settingsContainer.className = 'screen-container';
+    settingsContainer.style.display = 'none';
+    screensContainer.appendChild(settingsContainer);
+
     // Initialize screens
     console.log('[Main] Creating screens...');
     const mainScreen = new MainScreen(mainContainer);
     const storageScreen = new StorageScreen(storageContainer);
     const collectionScreen = new CollectionScreen(collectionContainer);
+    const settingsScreen = new SettingsScreen(settingsContainer);
 
     const screens = {
       main: mainScreen,
       storage: storageScreen,
-      pokedex: collectionScreen
+      pokedex: collectionScreen,
+      settings: settingsScreen
     };
 
     console.log('[Main] Initializing MainScreen...');
     await mainScreen.initialize();
     await storageScreen.initialize();
     await collectionScreen.initialize();
+    await settingsScreen.initialize();
 
     console.log('[Main] Showing MainScreen...');
     mainScreen.show();
