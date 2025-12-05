@@ -3,25 +3,24 @@
 ## Project Overview
 A lofi SNES-style Pokemon catching game implemented as a Chrome extension. Users can encounter and catch Pokemon while browsing the web. Features a mobile-shaped popup (360x640px) with tab-based navigation for different screens.
 
-## Current State (December 4, 2025)
-**Phase**: Search & Encounter System Implementation
+## Current State (December 5, 2025)
+**Phase**: Battle System Complete - Authentic Gen 3+ Mechanics
+- Authentic Gen 3+ damage formula with STAB, critical hits (2.0x), and type effectiveness
+- Complete 18-type effectiveness chart with immunities, resistances, and super effective matchups
+- Physical/special move split based on PokeAPI damageClass
+- Rarity-based level scaling (Common 5-15, Uncommon 15-25, Rare 25-40, Legendary 50-70)
+- Wild Pokemon use type-appropriate moves with proper damage calculation
+- Type effectiveness messages in battle log ("Super effective!", "Not very effective...")
+- All 151 Gen 1 Pokemon with base stats and proper type lookups
 - Search screen with Pokemon encounter testing buttons
 - Encounter system with rarity-based Pokemon spawning (Common, Uncommon, Rare, Legendary)
 - Gen 1 catch rate formula implementation
-- Full encounter UI with Pokemon stats, HP bar, catch rate indicator
-- Test encounter buttons for each rarity tier
-- Settings screen with test Pokemon seed button
+- Full encounter UI with Pokemon stats, HP bar, type badges
 - PostgreSQL database connected via Flask backend
-- 10 test Pokemon seeded with full stats, natures, items, EVs, and random IVs
-- Pokemon detail modal with comprehensive stat display including IVs
-- Item equipping via Pokemon detail modal (equip/change/remove items)
-- Items tab shows overview-only with compact badge display
 - Canonical Pokemon stat formulas using individual IVs (0-31 range)
-- IV rating system (Outstanding, Relatively Superior, Above Average, Decent)
 - Nature system with +10%/-10% stat modifiers
-- EV (Effort Value) tracking per stat (510 total cap, 252 per stat)
 - Tab navigation system with 6 screens
-- SNES-style aesthetic with retro detail-modal.css styling
+- SNES-style aesthetic with retro styling
 - Mobile-shaped popup (280x500px in preview mode)
 
 ## Architecture
@@ -109,6 +108,14 @@ The preview server runs on port 5000 displaying `preview.html`, which embeds pop
 3. Load unpacked extension from this directory
 
 ## Recent Changes
+- **2025-12-05**: Implemented authentic Gen 3+ damage formula with complete 18-type effectiveness chart
+- **2025-12-05**: Added BattleService with STAB, critical hits (2.0x Gen3 multiplier), type immunities
+- **2025-12-05**: Implemented physical/special move split using damageClass from PokeAPI
+- **2025-12-05**: Added rarity-based level scaling (Common 5-15, Uncommon 15-25, Rare 25-40, Legendary 50-70)
+- **2025-12-05**: Wild Pokemon now use type-appropriate move pools with proper damage calculation
+- **2025-12-05**: Type effectiveness messages displayed in battle log (Super effective!, Not very effective...)
+- **2025-12-05**: Extended base stats map to cover all Gen 1 Pokemon for accurate stat calculation
+- **2025-12-05**: Companion types now pulled from Pokemon database for all 151 Pokemon
 - **2025-12-05**: Integrated PokeAPI for real Pokemon move data (power, accuracy, PP, effects)
 - **2025-12-05**: Created MoveService.js for fetching and caching move data from PokeAPI
 - **2025-12-05**: Implemented 15+ type-specific CSS animations for move effects (Electric, Fire, Water, Grass, Psychic, Ice, Ghost, Dragon, Fighting, Rock, Ground, Poison, Bug, Flying, Normal)
