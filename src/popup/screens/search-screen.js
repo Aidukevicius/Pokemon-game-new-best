@@ -327,8 +327,6 @@ export class SearchScreen {
       return;
     }
     
-    await this.animateDamage('enemy');
-
     const attacker = {
       level: this.companion?.level || 10,
       stats: this.companionStats || { attack: 50, spAttack: 50 },
@@ -363,9 +361,12 @@ export class SearchScreen {
       this.battleLog.push(result.effectivenessMessage.text);
     }
     this.updateBattleLog();
+    this.render();
+    
+    await this.animateDamage('enemy');
+    await this.delay(500);
     
     if (this.currentEncounter.currentHp <= 0) {
-      await this.delay(500);
       this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} fainted!`);
       this.updateBattleLog();
       await this.delay(1500);
@@ -375,7 +376,7 @@ export class SearchScreen {
       return;
     }
 
-    await this.delay(800);
+    await this.delay(300);
     await this.enemyTurn();
     
     this.render();
