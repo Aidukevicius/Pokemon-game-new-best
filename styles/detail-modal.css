@@ -727,22 +727,25 @@
 
 .set-companion-btn {
   padding: 6px 12px;
-  background: #10b981;
+  background: #3b82f6;
   color: white;
-  border: 2px solid #059669;
+  border: 2px solid #2563eb;
   font-size: 8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   cursor: pointer;
   font-weight: bold;
   transition: all 0.2s;
+  box-shadow: 2px 2px 0 #1e40af;
 }
 
 .set-companion-btn:hover {
-  background: #059669;
-  transform: translateY(-1px);
+  background: #2563eb;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #1e40af;
 }
 
 .set-companion-btn:active {
-  transform: translateY(0);
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #1e40af;
 }
