@@ -206,12 +206,26 @@ export class SearchScreen {
 
         <div class="battle-menu-pokemon">
           <div class="moves-grid-2x2">
-            ${moves.map((move, i) => `
-              <button class="move-btn-pokemon type-bg-${move.type.toLowerCase()}" data-move="${i}" data-power="${move.power ?? 0}" data-type="${move.type}" data-accuracy="${move.accuracy ?? 100}" data-status="${move.isStatus ? 'true' : 'false'}" data-damage-class="${move.damageClass}" title="${move.desc || move.effect || 'Attacks the target.'}">
+            ${moves.map((move, i) => {
+              const power = move.power ?? 0;
+              const acc = move.accuracy ?? 100;
+              const isStatusMove = move.damageClass === 'status' || move.isStatus;
+              let powerText;
+              if (isStatusMove) {
+                powerText = 'Status Move';
+              } else if (power === 0) {
+                powerText = 'Fixed Damage';
+              } else {
+                powerText = `Power: ${power}`;
+              }
+              const accText = `Acc: ${acc}%`;
+              const tooltip = `${powerText} | ${accText}`;
+              return `
+              <button class="move-btn-pokemon type-bg-${move.type.toLowerCase()}" data-move="${i}" data-power="${power}" data-type="${move.type}" data-accuracy="${acc}" data-status="${isStatusMove ? 'true' : 'false'}" data-damage-class="${move.damageClass}" title="${tooltip}">
                 <span class="move-name-pokemon">${move.name}</span>
                 <span class="move-pp">PP ${move.pp ?? 15}/${move.pp ?? 15}</span>
               </button>
-            `).join('')}
+            `;}).join('')}
           </div>
           
           <div class="actions-row-pokemon">
@@ -641,11 +655,15 @@ export class SearchScreen {
 
   async showEffectivenessOverlay(result, moveName) {
     const overlay = this.container.querySelector('#effectivenessOverlay');
-    if (!overlay) return;
+    if (!overlay) {
+      console.log('[SearchScreen] Overlay not found!');
+      return;
+    }
 
     const messages = [];
     
     if (result.missed) {
+      console.log('[SearchScreen] Move missed! Showing overlay');
       messages.push({ text: 'It missed!', class: 'missed-msg' });
     }
     
