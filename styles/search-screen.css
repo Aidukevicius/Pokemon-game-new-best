@@ -1494,6 +1494,20 @@
   font-size: 11px;
 }
 
+/* Missed - Purple/Gray */
+.missed-msg {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  border-color: #4338ca;
+  color: #ffffff;
+  animation: message-pop 0.3s ease-out, miss-fade 0.3s ease-in-out;
+}
+
+@keyframes miss-fade {
+  0% { opacity: 0.5; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
 /* Normal effectiveness - No special styling needed, won't show */
 .normal-effectiveness {
   display: none;

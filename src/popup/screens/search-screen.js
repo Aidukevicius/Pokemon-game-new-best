@@ -353,6 +353,17 @@ export class SearchScreen {
 
     const result = this.battleService.calculateDamage(attacker, defender, moveData);
     
+    await this.showEffectivenessOverlay(result, move.name);
+    
+    if (result.missed) {
+      this.battleLog.push(`${this.companion.name}'s attack missed!`);
+      this.updateBattleLog();
+      await this.delay(300);
+      await this.enemyTurn();
+      this.disableButtons(false);
+      return;
+    }
+    
     const newHp = Math.max(0, this.currentEncounter.currentHp - result.damage);
     const enemyFainted = newHp <= 0;
     this.currentEncounter.currentHp = newHp;
@@ -361,16 +372,10 @@ export class SearchScreen {
     
     await this.animateDamage('enemy');
     
-    await this.showEffectivenessOverlay(result, move.name);
-    
     let damageMsg = `It dealt ${result.damage} damage!`;
     if (result.critical) damageMsg = `Critical hit! ${damageMsg}`;
     if (result.stab) damageMsg += ' (STAB!)';
     this.battleLog.push(damageMsg);
-    
-    if (result.effectivenessMessage.text) {
-      this.battleLog.push(result.effectivenessMessage.text);
-    }
     this.updateBattleLog();
     
     if (enemyFainted) {
@@ -402,7 +407,6 @@ export class SearchScreen {
     
     await this.animateAttack('enemy');
     await this.playMoveAnimation(enemyMove.type, 'ally');
-    await this.animateDamage('ally');
     
     const attacker = {
       level: this.currentEncounter.level,
@@ -420,6 +424,16 @@ export class SearchScreen {
 
     const result = this.battleService.calculateDamage(attacker, defender, enemyMove);
     
+    await this.showEffectivenessOverlay(result, enemyMove.name);
+    
+    if (result.missed) {
+      this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name}'s attack missed!`);
+      this.updateBattleLog();
+      return;
+    }
+    
+    await this.animateDamage('ally');
+    
     const maxHealth = this.companionStats?.hp || 100;
     const scaledDamage = Math.floor(result.damage * (100 / maxHealth));
     const cappedDamage = Math.min(scaledDamage, 40);
@@ -431,15 +445,9 @@ export class SearchScreen {
     
     this.updateHpDisplay('ally', newHealth, maxHealth);
     
-    await this.showEffectivenessOverlay(result, enemyMove.name);
-    
     let damageMsg = `Your ${this.companion.name} took ${actualDamage} damage!`;
     if (result.critical) damageMsg = `Critical hit! ${damageMsg}`;
     this.battleLog.push(damageMsg);
-    
-    if (result.effectivenessMessage.text) {
-      this.battleLog.push(result.effectivenessMessage.text);
-    }
     this.updateBattleLog();
     
     if (newHealth <= 0) {
@@ -637,32 +645,43 @@ export class SearchScreen {
 
     const messages = [];
     
+    if (result.missed) {
+      messages.push({ text: 'It missed!', class: 'missed-msg' });
+    }
+    
     if (result.critical) {
       messages.push({ text: 'Critical hit!', class: 'critical-msg' });
     }
     
-    if (result.effectivenessMessage && result.effectivenessMessage.text) {
+    if (result.effectiveness !== undefined && result.effectiveness !== 1) {
       let overlayClass = 'normal-effectiveness';
+      let text = '';
       if (result.effectiveness === 0) {
         overlayClass = 'immune-effectiveness';
+        text = "It doesn't affect...";
+      } else if (result.effectiveness >= 2) {
+        overlayClass = 'super-effectiveness';
+        text = "It's super effective!";
       } else if (result.effectiveness > 1) {
         overlayClass = 'super-effectiveness';
+        text = "It's super effective!";
       } else if (result.effectiveness < 1) {
         overlayClass = 'weak-effectiveness';
+        text = "It's not very effective...";
       }
-      messages.push({ text: result.effectivenessMessage.text, class: overlayClass });
+      if (text) {
+        messages.push({ text, class: overlayClass });
+      }
     }
-    
-    if (result.stab) {
-      messages.push({ text: 'Same type attack bonus!', class: 'stab-msg' });
-    }
+
+    if (messages.length === 0) return;
 
     for (const msg of messages) {
       overlay.innerHTML = `<div class="effectiveness-message ${msg.class}">${msg.text}</div>`;
       overlay.classList.add('active');
-      await this.delay(1000);
+      await this.delay(500);
       overlay.classList.remove('active');
-      await this.delay(200);
+      await this.delay(100);
     }
     
     overlay.innerHTML = '';

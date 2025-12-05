@@ -58,6 +58,20 @@ export class BattleService {
   }
 
   calculateDamage(attacker, defender, move) {
+    const accuracy = move.accuracy ?? 100;
+    const hitRoll = Math.random() * 100;
+    
+    if (hitRoll > accuracy) {
+      return {
+        damage: 0,
+        effectiveness: 1,
+        critical: false,
+        stab: false,
+        missed: true,
+        effectivenessMessage: { text: '', level: 'normal' }
+      };
+    }
+
     if (move.power === 0 || move.power === null || !move.power) {
       return this.handleFixedDamageMove(move, attacker.level, defender.currentHp);
     }
@@ -101,6 +115,7 @@ export class BattleService {
       effectiveness: typeEffectiveness,
       critical: critical > 1,
       stab: stab > 1,
+      missed: false,
       effectivenessMessage: this.getEffectivenessMessage(typeEffectiveness)
     };
   }
