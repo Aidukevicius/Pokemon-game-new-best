@@ -221,7 +221,7 @@ export class SearchScreen {
               const accText = `Acc: ${acc}%`;
               const tooltip = `${powerText} | ${accText}`;
               return `
-              <button class="move-btn-pokemon type-bg-${move.type.toLowerCase()}" data-move="${i}" data-power="${power}" data-type="${type}" data-accuracy="${acc}" data-status="${isStatusMove ? 'true' : 'false'}" data-damage-class="${move.damageClass}" title="${tooltip}">
+              <button class="move-btn-pokemon type-bg-${move.type.toLowerCase()}" data-move="${i}" data-power="${power}" data-type="${move.type}" data-accuracy="${acc}" data-status="${isStatusMove ? 'true' : 'false'}" data-damage-class="${move.damageClass}" title="${tooltip}">
                 <span class="move-name-pokemon">${move.name}</span>
                 <span class="move-pp">PP ${move.pp ?? 15}/${move.pp ?? 15}</span>
               </button>
