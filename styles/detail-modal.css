@@ -737,15 +737,18 @@
   font-weight: bold;
   transition: all 0.2s;
   box-shadow: 1px 1px 0 #0f172a;
+  filter: none;
 }
 
 .set-companion-btn:hover {
   background: #1e40af;
   transform: translate(-1px, -1px);
   box-shadow: 2px 2px 0 #0f172a;
+  filter: none;
 }
 
 .set-companion-btn:active {
   transform: translate(1px, 1px);
   box-shadow: 0px 0px 0 #0f172a;
+  filter: none;
 }
