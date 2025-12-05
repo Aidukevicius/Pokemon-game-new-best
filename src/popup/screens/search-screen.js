@@ -382,11 +382,23 @@ export class SearchScreen {
       return;
     }
 
-    const newHp = Math.max(0, this.currentEncounter.currentHp - result.damage);
-    const enemyFainted = newHp <= 0;
-    this.currentEncounter.currentHp = newHp;
+    this.currentEncounter.currentHp = Math.max(0, this.currentEncounter.currentHp - result.damage);
 
-    this.updateHpDisplay('enemy', newHp, this.currentEncounter.maxHp);
+    this.updateBattleLog();
+    this.render();
+
+    if (this.currentEncounter.currentHp === 0) {
+      this.disableButtons(true);
+      await this.delay(1500);
+      this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} fainted!`);
+      this.battleLog.push('You won the battle!');
+      this.updateBattleLog();
+      await this.delay(2000);
+      this.currentEncounter = null;
+      this.battleLog = [];
+      this.render();
+      return;
+    }
 
     await this.animateDamage('enemy');
 
@@ -395,16 +407,6 @@ export class SearchScreen {
     if (result.stab) damageMsg += ' (STAB!)';
     this.battleLog.push(damageMsg);
     this.updateBattleLog();
-
-    if (enemyFainted) {
-      this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} fainted!`);
-      this.updateBattleLog();
-      await this.delay(1500);
-      this.currentEncounter = null;
-      this.battleLog = [];
-      this.render();
-      return;
-    }
 
     await this.delay(300);
     await this.enemyTurn();
@@ -465,30 +467,28 @@ export class SearchScreen {
     const maxHp = this.companionStats?.hp || 100;
     const damagePercent = Math.floor((result.damage / maxHp) * 100);
     const actualDamage = Math.max(1, Math.min(damagePercent, this.companion.health || 100));
-    const newHealth = Math.max(0, (this.companion.health || 100) - actualDamage);
-    
-    console.log('[SearchScreen] Damage calc - Raw:', result.damage, 'MaxHP:', maxHp, 'DamagePercent:', damagePercent, 'Actual:', actualDamage, 'NewHealth:', newHealth);
+    let companionHp = Math.max(0, (this.companion.health || 100) - actualDamage);
+    await this.storage.set('companionHp', companionHp);
 
-    this.companion.health = newHealth;
-    await this.storage.set('companion', this.companion);
-
-    this.updateHpDisplay('ally', newHealth, 100);
+    this.updateHpDisplay('ally', companionHp, 100);
 
     let damageMsg = `Your ${this.companion.name} took ${actualDamage} damage!`;
     if (result.critical) damageMsg = `Critical hit! ${damageMsg}`;
     this.battleLog.push(damageMsg);
     this.updateBattleLog();
 
-    if (newHealth <= 0) {
-      await this.delay(500);
-      this.battleLog.push(`${this.companion.name} fainted! The wild Pokemon fled.`);
-      this.updateBattleLog();
+    if (companionHp === 0) {
+      this.disableButtons(true);
       await this.delay(1500);
-      this.companion.health = 100;
-      await this.storage.set('companion', this.companion);
+      this.battleLog.push(`${this.companion.name} fainted!`);
+      this.battleLog.push('You lost the battle...');
+      this.updateBattleLog();
+      await this.delay(2000);
       this.currentEncounter = null;
       this.battleLog = [];
       this.render();
+    } else {
+      this.disableButtons(false);
     }
   }
 
