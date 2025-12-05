@@ -3,6 +3,7 @@ import { CatchService } from '../../shared/services/CatchService.js';
 import { SpriteService } from '../../shared/services/SpriteService.js';
 import { EncounterService } from '../../shared/services/EncounterService.js';
 import { MoveService } from '../../shared/services/MoveService.js';
+import { BattleService } from '../../shared/services/BattleService.js';
 
 export class SearchScreen {
   constructor(containerElement) {
@@ -12,10 +13,12 @@ export class SearchScreen {
     this.spriteService = new SpriteService();
     this.encounterService = new EncounterService();
     this.moveService = new MoveService();
+    this.battleService = new BattleService();
     this.currentEncounter = null;
     this.isSearching = false;
     this.companion = null;
     this.companionMoves = null;
+    this.companionStats = null;
     this.battleLog = [];
   }
 
@@ -49,10 +52,44 @@ export class SearchScreen {
   async loadCompanion() {
     try {
       this.companion = await this.storage.get('companion');
-      console.log('[SearchScreen] Companion loaded:', this.companion?.name);
+      if (this.companion) {
+        this.companionStats = this.battleService.calculateCompanionStats(this.companion);
+        this.companion.stats = this.companionStats;
+        this.companion.types = this.getCompanionTypes();
+      }
+      console.log('[SearchScreen] Companion loaded:', this.companion?.name, 'Stats:', this.companionStats);
     } catch (error) {
       console.error('[SearchScreen] Error loading companion:', error);
     }
+  }
+
+  getCompanionTypes() {
+    const pokemonTypes = {
+      1: ['Grass', 'Poison'], 2: ['Grass', 'Poison'], 3: ['Grass', 'Poison'],
+      4: ['Fire'], 5: ['Fire'], 6: ['Fire', 'Flying'],
+      7: ['Water'], 8: ['Water'], 9: ['Water'],
+      25: ['Electric'], 26: ['Electric'],
+      10: ['Bug'], 11: ['Bug'], 12: ['Bug', 'Flying'],
+      13: ['Bug', 'Poison'], 14: ['Bug', 'Poison'], 15: ['Bug', 'Poison'],
+      16: ['Normal', 'Flying'], 17: ['Normal', 'Flying'], 18: ['Normal', 'Flying'],
+      19: ['Normal'], 20: ['Normal'],
+      21: ['Normal', 'Flying'], 22: ['Normal', 'Flying'],
+      23: ['Poison'], 24: ['Poison'],
+      27: ['Ground'], 28: ['Ground'],
+      29: ['Poison'], 30: ['Poison'], 31: ['Poison', 'Ground'],
+      32: ['Poison'], 33: ['Poison'], 34: ['Poison', 'Ground'],
+      35: ['Fairy'], 36: ['Fairy'],
+      37: ['Fire'], 38: ['Fire'],
+      39: ['Normal', 'Fairy'], 40: ['Normal', 'Fairy'],
+      41: ['Poison', 'Flying'], 42: ['Poison', 'Flying'],
+      63: ['Psychic'], 64: ['Psychic'], 65: ['Psychic'],
+      92: ['Ghost', 'Poison'], 93: ['Ghost', 'Poison'], 94: ['Ghost', 'Poison'],
+      133: ['Normal'],
+      144: ['Ice', 'Flying'], 145: ['Electric', 'Flying'], 146: ['Fire', 'Flying'],
+      147: ['Dragon'], 148: ['Dragon'], 149: ['Dragon', 'Flying'],
+      150: ['Psychic'], 151: ['Psychic']
+    };
+    return pokemonTypes[this.companion?.id] || ['Normal'];
   }
 
   async loadEncounterQueue() {
@@ -311,14 +348,39 @@ export class SearchScreen {
     
     await this.animateDamage('enemy');
 
-    const damage = this.calculateMovesDamage(move, this.companion?.level || 10, type, power);
-    const isStab = this.getTypeBonus(type);
+    const attacker = {
+      level: this.companion?.level || 10,
+      stats: this.companionStats || { attack: 50, spAttack: 50 },
+      types: this.companion?.types || ['Normal'],
+      pokemon: { types: this.companion?.types || ['Normal'] }
+    };
+
+    const defender = {
+      stats: this.currentEncounter.stats || { defense: 50, spDefense: 50 },
+      types: this.currentEncounter.pokemon?.types || ['Normal'],
+      pokemon: this.currentEncounter.pokemon,
+      currentHp: this.currentEncounter.currentHp
+    };
+
+    const moveData = {
+      ...move,
+      power: power || move.power,
+      type: type || move.type,
+      damageClass: move.damageClass || 'physical'
+    };
+
+    const result = this.battleService.calculateDamage(attacker, defender, moveData);
     
-    this.currentEncounter.currentHp = Math.max(0, this.currentEncounter.currentHp - damage);
+    this.currentEncounter.currentHp = Math.max(0, this.currentEncounter.currentHp - result.damage);
     
-    let damageMsg = `It dealt ${damage} damage!`;
-    if (isStab) damageMsg += ' (STAB!)';
+    let damageMsg = `It dealt ${result.damage} damage!`;
+    if (result.critical) damageMsg = `Critical hit! ${damageMsg}`;
+    if (result.stab) damageMsg += ' (STAB!)';
     this.battleLog.push(damageMsg);
+    
+    if (result.effectivenessMessage.text) {
+      this.battleLog.push(result.effectivenessMessage.text);
+    }
     this.updateBattleLog();
     
     if (this.currentEncounter.currentHp <= 0) {
@@ -341,24 +403,51 @@ export class SearchScreen {
   async enemyTurn() {
     if (!this.currentEncounter || !this.companion) return;
 
-    const enemyMoves = ['Tackle', 'Quick Attack', 'Scratch', 'Bite'];
-    const enemyMove = enemyMoves[Math.floor(Math.random() * enemyMoves.length)];
-    const enemyPower = 30 + Math.floor(Math.random() * 30);
+    const enemyMove = this.battleService.selectWildPokemonMove(
+      this.currentEncounter.pokemon,
+      this.currentEncounter.level
+    );
     
-    this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} used ${enemyMove}!`);
+    this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} used ${enemyMove.name}!`);
     this.updateBattleLog();
     
     await this.animateAttack('enemy');
+    await this.playMoveAnimation(enemyMove.type, 'ally');
     await this.animateDamage('ally');
     
-    const damage = this.calculateDamage(enemyPower, this.currentEncounter.level, 'Normal');
-    const newHealth = Math.max(0, (this.companion.health || 100) - Math.floor(damage / 3));
+    const attacker = {
+      level: this.currentEncounter.level,
+      stats: this.currentEncounter.stats || { attack: 50, spAttack: 50 },
+      types: this.currentEncounter.pokemon?.types || ['Normal'],
+      pokemon: this.currentEncounter.pokemon
+    };
+
+    const defender = {
+      stats: this.companionStats || { defense: 50, spDefense: 50 },
+      types: this.companion?.types || ['Normal'],
+      pokemon: { types: this.companion?.types || ['Normal'] },
+      currentHp: this.companion.health || 100
+    };
+
+    const result = this.battleService.calculateDamage(attacker, defender, enemyMove);
+    
+    const maxHealth = this.companionStats?.hp || 100;
+    const scaledDamage = Math.floor(result.damage * (100 / maxHealth));
+    const actualDamage = Math.min(scaledDamage, this.companion.health || 100);
+    const newHealth = Math.max(0, (this.companion.health || 100) - actualDamage);
     
     this.companion.health = newHealth;
     await this.storage.set('companion', this.companion);
     
     await this.delay(300);
-    this.battleLog.push(`Your ${this.companion.name} took ${Math.floor(damage / 3)} damage!`);
+    
+    let damageMsg = `Your ${this.companion.name} took ${actualDamage} damage!`;
+    if (result.critical) damageMsg = `Critical hit! ${damageMsg}`;
+    this.battleLog.push(damageMsg);
+    
+    if (result.effectivenessMessage.text) {
+      this.battleLog.push(result.effectivenessMessage.text);
+    }
     this.updateBattleLog();
     
     if (newHealth <= 0) {

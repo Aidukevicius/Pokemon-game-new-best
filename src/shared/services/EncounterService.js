@@ -45,9 +45,8 @@ export class EncounterService {
     
     const pokemon = pokemonOfRarity[selectedIndex];
     
-    // Generate random level (1-50 for common, up to 70 for legendary)
     const maxLevel = this.getMaxLevelForRarity(selectedRarity);
-    const minLevel = selectedRarity === 'legendary' ? 50 : 1;
+    const minLevel = this.getMinLevelForRarity(selectedRarity);
     const level = getRandomInt(minLevel, maxLevel);
     
     // Generate random IVs (Individual Values - 0-31 for each stat)
@@ -110,11 +109,21 @@ export class EncounterService {
 
   getMaxLevelForRarity(rarity) {
     switch (rarity) {
-      case 'common': return 10;
-      case 'uncommon': return 20;
-      case 'rare': return 35;
+      case 'common': return 25;
+      case 'uncommon': return 40;
+      case 'rare': return 55;
+      case 'legendary': return 70;
+      default: return 25;
+    }
+  }
+
+  getMinLevelForRarity(rarity) {
+    switch (rarity) {
+      case 'common': return 3;
+      case 'uncommon': return 15;
+      case 'rare': return 30;
       case 'legendary': return 50;
-      default: return 10;
+      default: return 3;
     }
   }
 
