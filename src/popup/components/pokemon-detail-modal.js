@@ -163,6 +163,7 @@ export class PokemonDetailModal {
         
         <div class="detail-footer">
           <span class="rarity-badge rarity-${baseData.rarity}">${baseData.rarity}</span>
+          <button class="set-companion-btn" data-action="set-companion">Set as Companion</button>
         </div>
       </div>
     `;
@@ -348,6 +349,11 @@ export class PokemonDetailModal {
       }
     });
 
+    const setCompanionBtn = this.overlay.querySelector('[data-action="set-companion"]');
+    if (setCompanionBtn) {
+      setCompanionBtn.addEventListener('click', () => this.setAsCompanion());
+    }
+
     this.attachItemListeners();
     document.addEventListener('keydown', this.handleKeyDown.bind(this));
   }
@@ -410,6 +416,54 @@ export class PokemonDetailModal {
       }
     } catch (error) {
       console.error('[DetailModal] Error equipping item:', error);
+    }
+  }
+
+  async setAsCompanion() {
+    const pokemon = this.currentPokemon;
+    
+    if (!pokemon.db_id && !pokemon.catchId) {
+      console.error('[DetailModal] Cannot set companion: no db_id');
+      alert('This Pokemon cannot be set as companion');
+      return;
+    }
+
+    const confirmed = confirm(`Set ${pokemon.name} as your companion?\n\nYour current companion will be replaced.`);
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch('/api/companion', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pokemon_id: pokemon.id,
+          name: pokemon.name,
+          level: pokemon.level || 1,
+          health: pokemon.health || 100,
+          max_health: pokemon.maxHealth || 100,
+          experience: pokemon.experience || 0,
+          experience_to_next: pokemon.experienceToNext || 100,
+          happiness: pokemon.happiness || 100,
+          nature: pokemon.nature || 'Hardy',
+          item: pokemon.item || null,
+          evs: pokemon.evs || { hp: 0, attack: 0, defense: 0, spAttack: 0, spDefense: 0, speed: 0 },
+          ivs: pokemon.ivs || { hp: 15, attack: 15, defense: 15, spAttack: 15, spDefense: 15, speed: 15 }
+        })
+      });
+
+      if (res.ok) {
+        alert(`${pokemon.name} is now your companion!`);
+        this.close();
+        // Reload the page to reflect the new companion
+        window.location.reload();
+      } else {
+        const error = await res.json();
+        console.error('[DetailModal] Set companion error:', error);
+        alert(error.error || 'Failed to set companion');
+      }
+    } catch (error) {
+      console.error('[DetailModal] Error setting companion:', error);
+      alert('Failed to set companion');
     }
   }
 

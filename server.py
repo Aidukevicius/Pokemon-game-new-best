@@ -63,21 +63,21 @@ def validate_and_clamp_evs(evs):
     """Validate EVs: max 252 per stat, max 510 total"""
     if not evs:
         return {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}
-    
+
     stat_keys = ['hp', 'attack', 'defense', 'spAttack', 'spDefense', 'speed']
     clamped = {}
     total_used = 0
-    
+
     for key in stat_keys:
         value = evs.get(key, 0)
         value = max(0, min(MAX_SINGLE_EV, value))
-        
+
         if total_used + value > MAX_TOTAL_EVS:
             value = MAX_TOTAL_EVS - total_used
-        
+
         clamped[key] = value
         total_used += value
-    
+
     return clamped
 
 
@@ -397,12 +397,12 @@ def add_pokemon():
 
     data = request.json
     nature = data.get('nature', random.choice(NATURES))
-    
+
     raw_evs = data.get('evs', {})
     validated_evs = validate_and_clamp_evs(raw_evs)
-    
+
     ivs = data.get('ivs', {})
-    
+
     new_pokemon = Pokemon(
         pokemon_id=data['id'],
         name=data['name'],
@@ -432,7 +432,7 @@ def add_pokemon():
 def update_pokemon(db_id):
     pokemon = Pokemon.query.get_or_404(db_id)
     data = request.json
-    
+
     if 'item' in data:
         pokemon.item = data['item']
     if 'is_favorite' in data:
@@ -448,14 +448,14 @@ def update_pokemon(db_id):
         }
         current_evs.update(data['evs'])
         validated_evs = validate_and_clamp_evs(current_evs)
-        
+
         pokemon.hp_ev = validated_evs['hp']
         pokemon.attack_ev = validated_evs['attack']
         pokemon.defense_ev = validated_evs['defense']
         pokemon.sp_attack_ev = validated_evs['spAttack']
         pokemon.sp_defense_ev = validated_evs['spDefense']
         pokemon.speed_ev = validated_evs['speed']
-    
+
     db.session.commit()
     return jsonify(pokemon.to_dict())
 
@@ -490,44 +490,57 @@ def get_companion():
 
 @app.route('/api/companion', methods=['PUT'])
 def update_companion():
-    data = request.json
     companion = Companion.query.first()
-    if not companion:
-        companion = Companion(pokemon_id=25, name='Pikachu', nature=random.choice(NATURES))
-        db.session.add(companion)
+    data = request.json
 
-    if 'level' in data:
-        companion.level = data['level']
-    if 'health' in data:
-        companion.health = data['health']
-    if 'maxHealth' in data:
-        companion.max_health = data['maxHealth']
-    if 'experience' in data:
-        companion.experience = data['experience']
-    if 'experienceToNext' in data:
-        companion.experience_to_next = data['experienceToNext']
-    if 'happiness' in data:
-        companion.happiness = data['happiness']
-    if 'lastFed' in data:
-        companion.last_fed = datetime.fromtimestamp(data['lastFed'] / 1000)
-    if 'lastInteraction' in data:
-        companion.last_interaction = datetime.fromtimestamp(data['lastInteraction'] / 1000)
-    if 'item' in data:
-        companion.item = data['item']
-    if 'evs' in data:
-        evs = data['evs']
-        if 'hp' in evs:
-            companion.hp_ev = evs['hp']
-        if 'attack' in evs:
-            companion.attack_ev = evs['attack']
-        if 'defense' in evs:
-            companion.defense_ev = evs['defense']
-        if 'spAttack' in evs:
-            companion.sp_attack_ev = evs['spAttack']
-        if 'spDefense' in evs:
-            companion.sp_defense_ev = evs['spDefense']
-        if 'speed' in evs:
-            companion.speed_ev = evs['speed']
+    # If pokemon_id is provided, replace the entire companion
+    if 'pokemon_id' in data:
+        if companion:
+            db.session.delete(companion)
+
+        evs = data.get('evs', {})
+        ivs = data.get('ivs', {})
+
+        companion = Companion(
+            pokemon_id=data['pokemon_id'],
+            name=data.get('name', 'Unknown'),
+            level=data.get('level', 1),
+            health=data.get('health', 100),
+            max_health=data.get('max_health', 100),
+            experience=data.get('experience', 0),
+            experience_to_next=data.get('experience_to_next', 100),
+            happiness=data.get('happiness', 100),
+            nature=data.get('nature', 'Hardy'),
+            item=data.get('item'),
+            hp_ev=evs.get('hp', 0),
+            attack_ev=evs.get('attack', 0),
+            defense_ev=evs.get('defense', 0),
+            sp_attack_ev=evs.get('spAttack', 0),
+            sp_defense_ev=evs.get('spDefense', 0),
+            speed_ev=evs.get('speed', 0),
+            hp_iv=ivs.get('hp', 15),
+            attack_iv=ivs.get('attack', 15),
+            defense_iv=ivs.get('defense', 15),
+            sp_attack_iv=ivs.get('spAttack', 15),
+            sp_defense_iv=ivs.get('spDefense', 15),
+            speed_iv=ivs.get('speed', 15)
+        )
+        db.session.add(companion)
+    else:
+        # Update existing companion fields
+        if not companion:
+            return jsonify({'error': 'No companion found'}), 404
+
+        if 'health' in data:
+            companion.health = data['health']
+        if 'experience' in data:
+            companion.experience = data['experience']
+        if 'happiness' in data:
+            companion.happiness = data['happiness']
+        if 'last_fed' in data:
+            companion.last_fed = datetime.fromisoformat(data['last_fed'].replace('Z', '+00:00'))
+        if 'last_interaction' in data:
+            companion.last_interaction = datetime.fromisoformat(data['last_interaction'].replace('Z', '+00:00'))
 
     db.session.commit()
     return jsonify(companion.to_dict())
@@ -559,7 +572,7 @@ def seed_pokemon():
     ]
 
     Pokemon.query.delete()
-    
+
     for p in test_pokemon:
         evs = p.get('evs', {})
         ivs = generate_random_ivs()
@@ -621,17 +634,17 @@ def add_item():
     data = request.json
     item_id = data.get('itemId')
     quantity = data.get('quantity', 1)
-    
+
     if item_id not in POKEMON_ITEMS:
         return jsonify({'error': 'Invalid item'}), 400
-    
+
     existing = Item.query.filter_by(item_id=item_id).first()
     if existing:
         existing.quantity += quantity
     else:
         new_item = Item(item_id=item_id, quantity=quantity)
         db.session.add(new_item)
-    
+
     db.session.commit()
     return jsonify({'message': f'Added {quantity}x {POKEMON_ITEMS[item_id]["name"]}'})
 
@@ -640,15 +653,15 @@ def add_item():
 def update_item_quantity(item_id):
     data = request.json
     item = Item.query.filter_by(item_id=item_id).first()
-    
+
     if not item:
         return jsonify({'error': 'Item not found'}), 404
-    
+
     if 'quantity' in data:
         item.quantity = max(0, data['quantity'])
         if item.quantity == 0:
             db.session.delete(item)
-    
+
     db.session.commit()
     return jsonify(item.to_dict() if item.quantity > 0 else {'deleted': True})
 
@@ -658,15 +671,15 @@ def equip_item_to_pokemon(db_id):
     pokemon = Pokemon.query.get_or_404(db_id)
     data = request.json
     item_id = data.get('itemId')
-    
+
     if item_id:
         if item_id not in POKEMON_ITEMS:
             return jsonify({'error': 'Invalid item'}), 400
-        
+
         inventory_item = Item.query.filter_by(item_id=item_id).first()
         if not inventory_item or inventory_item.quantity < 1:
             return jsonify({'error': 'Item not in inventory'}), 400
-        
+
         if pokemon.item:
             old_item_id = None
             for key, val in POKEMON_ITEMS.items():
@@ -679,11 +692,11 @@ def equip_item_to_pokemon(db_id):
                     old_inventory.quantity += 1
                 else:
                     db.session.add(Item(item_id=old_item_id, quantity=1))
-        
+
         inventory_item.quantity -= 1
         if inventory_item.quantity <= 0:
             db.session.delete(inventory_item)
-        
+
         pokemon.item = POKEMON_ITEMS[item_id]['name']
     else:
         if pokemon.item:
@@ -699,7 +712,7 @@ def equip_item_to_pokemon(db_id):
                 else:
                     db.session.add(Item(item_id=old_item_id, quantity=1))
         pokemon.item = None
-    
+
     db.session.commit()
     return jsonify(pokemon.to_dict())
 
@@ -707,7 +720,7 @@ def equip_item_to_pokemon(db_id):
 @app.route('/api/items/seed', methods=['POST'])
 def seed_items():
     Item.query.delete()
-    
+
     starter_items = [
         ('leftovers', 2),
         ('choice-band', 1),
@@ -724,10 +737,10 @@ def seed_items():
         ('power-bracer', 1),
         ('power-lens', 1),
     ]
-    
+
     for item_id, qty in starter_items:
         db.session.add(Item(item_id=item_id, quantity=qty))
-    
+
     db.session.commit()
     return jsonify({'message': 'Items seeded', 'count': len(starter_items)})
 
