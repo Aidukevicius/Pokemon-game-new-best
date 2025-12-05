@@ -415,9 +415,12 @@ export class SearchScreen {
 
     const result = this.battleService.calculateDamage(attacker, defender, enemyMove);
     
+    // Scale damage to be reasonable for 100 HP system
+    // Cap damage at 40% of max health to prevent one-shots
     const maxHealth = this.companionStats?.hp || 100;
     const scaledDamage = Math.floor(result.damage * (100 / maxHealth));
-    const actualDamage = Math.min(scaledDamage, this.companion.health || 100);
+    const cappedDamage = Math.min(scaledDamage, 40); // Max 40 damage per hit
+    const actualDamage = Math.min(cappedDamage, this.companion.health || 100);
     const newHealth = Math.max(0, (this.companion.health || 100) - actualDamage);
     
     this.companion.health = newHealth;
