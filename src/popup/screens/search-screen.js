@@ -350,7 +350,9 @@ export class SearchScreen {
 
     const result = this.battleService.calculateDamage(attacker, defender, moveData);
     
-    this.currentEncounter.currentHp = Math.max(0, this.currentEncounter.currentHp - result.damage);
+    const newHp = Math.max(0, this.currentEncounter.currentHp - result.damage);
+    const enemyFainted = newHp <= 0;
+    this.currentEncounter.currentHp = newHp;
     
     let damageMsg = `It dealt ${result.damage} damage!`;
     if (result.critical) damageMsg = `Critical hit! ${damageMsg}`;
@@ -366,7 +368,7 @@ export class SearchScreen {
     await this.animateDamage('enemy');
     await this.delay(500);
     
-    if (this.currentEncounter.currentHp <= 0) {
+    if (enemyFainted) {
       this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} fainted!`);
       this.updateBattleLog();
       await this.delay(1500);
