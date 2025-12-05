@@ -2,6 +2,7 @@ import { StorageService } from '../../shared/services/StorageService.js';
 import { CatchService } from '../../shared/services/CatchService.js';
 import { SpriteService } from '../../shared/services/SpriteService.js';
 import { EncounterService } from '../../shared/services/EncounterService.js';
+import { MoveService } from '../../shared/services/MoveService.js';
 
 export class SearchScreen {
   constructor(containerElement) {
@@ -10,17 +11,39 @@ export class SearchScreen {
     this.catchService = new CatchService();
     this.spriteService = new SpriteService();
     this.encounterService = new EncounterService();
+    this.moveService = new MoveService();
     this.currentEncounter = null;
     this.isSearching = false;
     this.companion = null;
+    this.companionMoves = null;
     this.battleLog = [];
   }
 
   async initialize() {
     console.log('[SearchScreen] Initializing...');
     await this.loadCompanion();
+    await this.loadCompanionMoves();
     await this.loadEncounterQueue();
     this.render();
+  }
+
+  async loadCompanionMoves() {
+    if (this.companion?.id) {
+      try {
+        const moves = await this.moveService.getPokemonMoves(this.companion.id);
+        if (moves && moves.length > 0) {
+          this.companionMoves = moves;
+          console.log('[SearchScreen] Loaded real moves from PokeAPI:', moves.map(m => m.name));
+        } else {
+          this.companionMoves = this.moveService.getDefaultMovesForType(this.getCompanionType());
+        }
+      } catch (error) {
+        console.error('[SearchScreen] Error loading moves:', error);
+        this.companionMoves = this.moveService.getDefaultMovesForType(this.getCompanionType());
+      }
+    } else {
+      this.companionMoves = this.moveService.getDefaultMovesForType('Electric');
+    }
   }
 
   async loadCompanion() {
@@ -163,9 +186,9 @@ export class SearchScreen {
         <div class="battle-menu-pokemon">
           <div class="moves-grid-2x2">
             ${moves.map((move, i) => `
-              <button class="move-btn-pokemon type-bg-${move.type.toLowerCase()}" data-move="${i}" data-power="${move.power}" data-type="${move.type}" title="${move.desc}">
+              <button class="move-btn-pokemon type-bg-${move.type.toLowerCase()}" data-move="${i}" data-power="${move.power ?? 0}" data-type="${move.type}" data-accuracy="${move.accuracy ?? 100}" data-status="${move.isStatus ? 'true' : 'false'}" data-damage-class="${move.damageClass}" title="${move.desc || move.effect || 'Attacks the target.'}">
                 <span class="move-name-pokemon">${move.name}</span>
-                <span class="move-pp">PP 15/15</span>
+                <span class="move-pp">PP ${move.pp ?? 15}/${move.pp ?? 15}</span>
               </button>
             `).join('')}
           </div>
@@ -188,42 +211,21 @@ export class SearchScreen {
   }
 
   getCompanionMoves() {
-    const companionType = this.getCompanionType();
+    if (this.companionMoves && this.companionMoves.length > 0) {
+      return this.companionMoves.map(move => ({
+        name: move.name,
+        apiName: move.apiName || move.name.toLowerCase().replace(/\s+/g, '-'),
+        type: move.type,
+        power: move.power,
+        pp: move.pp ?? 15,
+        accuracy: move.accuracy ?? 100,
+        desc: move.effect || 'Attacks the target.',
+        damageClass: move.damageClass || 'physical',
+        isStatus: move.damageClass === 'status'
+      }));
+    }
     
-    const movesByType = {
-      'Electric': [
-        { name: 'Thunderbolt', type: 'Electric', power: 90, desc: 'A strong electric bolt. May paralyze.' },
-        { name: 'Quick Attack', type: 'Normal', power: 40, desc: 'Always strikes first.' },
-        { name: 'Thunder Wave', type: 'Electric', power: 30, desc: 'Paralyzes the target.' },
-        { name: 'Slam', type: 'Normal', power: 80, desc: 'Slams with full body force.' }
-      ],
-      'Fire': [
-        { name: 'Flamethrower', type: 'Fire', power: 90, desc: 'Scorching flames. May burn.' },
-        { name: 'Ember', type: 'Fire', power: 40, desc: 'Small flames. May burn.' },
-        { name: 'Scratch', type: 'Normal', power: 40, desc: 'Scratches with sharp claws.' },
-        { name: 'Fire Spin', type: 'Fire', power: 35, desc: 'Traps foe in a fire vortex.' }
-      ],
-      'Water': [
-        { name: 'Water Gun', type: 'Water', power: 40, desc: 'Squirts water at the foe.' },
-        { name: 'Bubble', type: 'Water', power: 40, desc: 'Bubbles may lower Speed.' },
-        { name: 'Tackle', type: 'Normal', power: 40, desc: 'Charges and tackles.' },
-        { name: 'Hydro Pump', type: 'Water', power: 110, desc: 'Powerful water blast!' }
-      ],
-      'Grass': [
-        { name: 'Vine Whip', type: 'Grass', power: 45, desc: 'Whips with vines.' },
-        { name: 'Razor Leaf', type: 'Grass', power: 55, desc: 'Sharp leaves. High crit.' },
-        { name: 'Tackle', type: 'Normal', power: 40, desc: 'Charges and tackles.' },
-        { name: 'Solar Beam', type: 'Grass', power: 120, desc: 'Absorbs light, then attacks!' }
-      ],
-      'Normal': [
-        { name: 'Tackle', type: 'Normal', power: 40, desc: 'Charges and tackles.' },
-        { name: 'Quick Attack', type: 'Normal', power: 40, desc: 'Always strikes first.' },
-        { name: 'Slam', type: 'Normal', power: 80, desc: 'Slams with full body force.' },
-        { name: 'Hyper Beam', type: 'Normal', power: 150, desc: 'Devastating beam! Must recharge.' }
-      ]
-    };
-
-    return movesByType[companionType] || movesByType['Normal'];
+    return this.moveService.getDefaultMovesForType(this.getCompanionType());
   }
 
   getCompanionType() {
@@ -256,9 +258,11 @@ export class SearchScreen {
     moveBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const moveIndex = parseInt(btn.dataset.move);
-        const power = parseInt(btn.dataset.power);
+        const power = parseInt(btn.dataset.power) || 0;
         const type = btn.dataset.type;
-        this.executeMove(moveIndex, power, type);
+        const accuracy = parseInt(btn.dataset.accuracy) || 100;
+        const isStatus = btn.dataset.status === 'true';
+        this.executeMove(moveIndex, power, type, accuracy, isStatus);
       });
     });
 
@@ -269,21 +273,53 @@ export class SearchScreen {
     runBtn?.addEventListener('click', () => this.runAway());
   }
 
-  async executeMove(moveIndex, power, type) {
+  async executeMove(moveIndex, power, type, accuracy = 100, isStatus = false) {
     if (!this.currentEncounter) return;
 
     const moves = this.getCompanionMoves();
     const move = moves[moveIndex];
     
     this.disableButtons(true);
-
-    const damage = this.calculateDamage(power, this.companion?.level || 10, type);
+    
+    const hitRoll = Math.random() * 100;
+    const moveHit = hitRoll < accuracy;
+    
+    this.battleLog.push(`${this.companion?.name || 'Pikachu'} used ${move.name}!`);
+    this.updateBattleLog();
     
     await this.animateAttack('ally');
     await this.playMoveAnimation(move.type, 'enemy');
+    
+    if (!moveHit) {
+      this.battleLog.push(`${this.currentEncounter.pokemon.name} avoided the attack!`);
+      this.updateBattleLog();
+      await this.delay(800);
+      await this.enemyTurn();
+      this.render();
+      return;
+    }
+    
+    if (isStatus) {
+      const statusEffects = this.getStatusEffect(move.name);
+      this.battleLog.push(statusEffects);
+      this.updateBattleLog();
+      await this.delay(800);
+      await this.enemyTurn();
+      this.render();
+      return;
+    }
+    
     await this.animateDamage('enemy');
+
+    const damage = this.calculateMovesDamage(move, this.companion?.level || 10, type, power);
+    const isStab = this.getTypeBonus(type);
     
     this.currentEncounter.currentHp = Math.max(0, this.currentEncounter.currentHp - damage);
+    
+    let damageMsg = `It dealt ${damage} damage!`;
+    if (isStab) damageMsg += ' (STAB!)';
+    this.battleLog.push(damageMsg);
+    this.updateBattleLog();
     
     if (this.currentEncounter.currentHp <= 0) {
       await this.delay(500);
@@ -347,9 +383,84 @@ export class SearchScreen {
     return Math.floor(baseDamage * randomFactor * stab);
   }
 
+  calculateMovesDamage(move, level, type, power) {
+    const fixedDamageMoves = {
+      'dragon-rage': 40,
+      'sonic-boom': 20,
+      'seismic-toss': level,
+      'night-shade': level,
+      'psywave': Math.floor(level * (0.5 + Math.random())),
+      'super-fang': Math.floor((this.currentEncounter?.currentHp || 50) / 2)
+    };
+    
+    const apiName = move.apiName || move.name.toLowerCase().replace(/\s+/g, '-');
+    if (fixedDamageMoves[apiName] !== undefined) {
+      return fixedDamageMoves[apiName];
+    }
+    
+    if (power === 0 || power === null || power === undefined) {
+      return 20;
+    }
+    
+    return this.calculateDamage(power, level, type);
+  }
+
   getTypeBonus(moveType) {
     const companionType = this.getCompanionType();
     return moveType === companionType;
+  }
+
+  getStatusEffect(moveName) {
+    const statusMessages = {
+      'thunder-wave': 'The target was paralyzed!',
+      'thunder wave': 'The target was paralyzed!',
+      'hypnosis': 'The target fell asleep!',
+      'sleep-powder': 'The target fell asleep!',
+      'sleep powder': 'The target fell asleep!',
+      'stun-spore': 'The target was paralyzed!',
+      'stun spore': 'The target was paralyzed!',
+      'poison-powder': 'The target was poisoned!',
+      'poison powder': 'The target was poisoned!',
+      'toxic': 'The target was badly poisoned!',
+      'will-o-wisp': 'The target was burned!',
+      'confuse-ray': 'The target was confused!',
+      'confuse ray': 'The target was confused!',
+      'supersonic': 'The target was confused!',
+      'growl': 'The target\'s Attack fell!',
+      'leer': 'The target\'s Defense fell!',
+      'tail-whip': 'The target\'s Defense fell!',
+      'tail whip': 'The target\'s Defense fell!',
+      'sand-attack': 'The target\'s accuracy fell!',
+      'sand attack': 'The target\'s accuracy fell!',
+      'smokescreen': 'The target\'s accuracy fell!',
+      'flash': 'The target\'s accuracy fell!',
+      'swords-dance': 'Attack sharply rose!',
+      'swords dance': 'Attack sharply rose!',
+      'agility': 'Speed sharply rose!',
+      'amnesia': 'Sp. Def sharply rose!',
+      'defense-curl': 'Defense rose!',
+      'defense curl': 'Defense rose!',
+      'harden': 'Defense rose!',
+      'withdraw': 'Defense rose!',
+      'double-team': 'Evasiveness rose!',
+      'double team': 'Evasiveness rose!',
+      'recover': 'HP was restored!',
+      'rest': 'HP was fully restored. Fell asleep!',
+      'leech-seed': 'A seed was planted!',
+      'leech seed': 'A seed was planted!',
+      'substitute': 'A substitute was created!',
+      'reflect': 'Reflect raised Defense!',
+      'light-screen': 'Light Screen raised Sp. Def!',
+      'light screen': 'Light Screen raised Sp. Def!',
+      'spore': 'The target fell asleep!',
+      'sing': 'The target fell asleep!',
+      'lovely-kiss': 'The target fell asleep!',
+      'lovely kiss': 'The target fell asleep!',
+      'glare': 'The target was paralyzed!'
+    };
+    
+    const normalizedName = moveName.toLowerCase();
+    return statusMessages[normalizedName] || 'But nothing happened...';
   }
 
   async animateAttack(who) {

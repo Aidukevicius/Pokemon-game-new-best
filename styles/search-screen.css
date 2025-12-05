@@ -639,7 +639,7 @@
   background: linear-gradient(135deg, #a8a878 0%, #8a8a60 100%);
 }
 
-/* Simple Attack Animation Layer */
+/* Attack Animation Layer */
 .attack-animation-layer {
   position: absolute;
   top: 0;
@@ -648,30 +648,743 @@
   bottom: 0;
   pointer-events: none;
   z-index: 50;
+  overflow: hidden;
 }
 
-/* Simple flash effect for all moves */
+/* Base move effect */
 .move-effect {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  animation: simple-flash 0.15s ease-in-out 2;
 }
 
-.electric-effect { background: rgba(248, 208, 48, 0.4); }
-.fire-effect { background: rgba(240, 128, 48, 0.4); }
-.water-effect { background: rgba(104, 144, 240, 0.4); }
-.grass-effect { background: rgba(120, 200, 80, 0.4); }
-.normal-effect { background: rgba(168, 168, 120, 0.4); }
-.psychic-effect { background: rgba(248, 88, 136, 0.4); }
-.ice-effect { background: rgba(152, 216, 216, 0.4); }
-.dragon-effect { background: rgba(112, 56, 248, 0.4); }
-.ghost-effect { background: rgba(112, 88, 152, 0.4); }
-.fighting-effect { background: rgba(192, 48, 40, 0.4); }
+/* ========================================
+   ELECTRIC TYPE ANIMATIONS
+   ======================================== */
+.electric-effect {
+  background: transparent;
+}
 
-@keyframes simple-flash {
-  0%, 100% { opacity: 0; }
+.electric-effect::before,
+.electric-effect::after {
+  content: '';
+  position: absolute;
+  background: #f8d030;
+  animation: lightning-bolt 0.1s ease-in-out 4;
+}
+
+.electric-effect::before {
+  width: 4px;
+  height: 60%;
+  top: 10%;
+  left: 30%;
+  transform: rotate(-15deg);
+  box-shadow: 0 0 20px #f8d030, 0 0 40px #f8d030, 0 0 60px #fff;
+}
+
+.electric-effect::after {
+  width: 4px;
+  height: 50%;
+  top: 20%;
+  right: 35%;
+  transform: rotate(20deg);
+  box-shadow: 0 0 20px #f8d030, 0 0 40px #f8d030, 0 0 60px #fff;
+  animation-delay: 0.05s;
+}
+
+@keyframes lightning-bolt {
+  0%, 100% { opacity: 0; transform: scaleY(0.5); }
+  10%, 30%, 50%, 70%, 90% { opacity: 1; transform: scaleY(1); }
+  20%, 40%, 60%, 80% { opacity: 0.3; transform: scaleY(0.8); }
+}
+
+/* ========================================
+   FIRE TYPE ANIMATIONS
+   ======================================== */
+.fire-effect {
+  background: linear-gradient(0deg, rgba(240, 128, 48, 0.6) 0%, rgba(255, 80, 0, 0.3) 50%, transparent 100%);
+  animation: fire-burst 0.5s ease-out;
+}
+
+.fire-effect::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at 50% 80%, rgba(255, 200, 50, 0.8) 0%, rgba(255, 100, 0, 0.4) 40%, transparent 70%);
+  animation: fire-flicker 0.1s ease-in-out 5;
+}
+
+.fire-effect::after {
+  content: '';
+  position: absolute;
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(255, 255, 200, 0.9) 0%, rgba(255, 150, 0, 0.6) 50%, transparent 100%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: flame-dance 0.15s ease-in-out 3;
+}
+
+@keyframes fire-burst {
+  0% { opacity: 0; transform: scale(0.5); }
+  30% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+@keyframes fire-flicker {
+  0%, 100% { opacity: 0.8; }
   50% { opacity: 1; }
+}
+
+@keyframes flame-dance {
+  0%, 100% { transform: translateX(-50%) scaleY(1); }
+  50% { transform: translateX(-50%) scaleY(1.3) scaleX(0.9); }
+}
+
+/* ========================================
+   WATER TYPE ANIMATIONS
+   ======================================== */
+.water-effect {
+  background: linear-gradient(180deg, rgba(104, 144, 240, 0.1) 0%, rgba(104, 144, 240, 0.5) 100%);
+  animation: water-wave 0.6s ease-out;
+}
+
+.water-effect::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 10px,
+    rgba(150, 200, 255, 0.3) 10px,
+    rgba(150, 200, 255, 0.3) 12px
+  );
+  animation: water-ripple 0.15s linear 4;
+}
+
+.water-effect::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  transform: translate(-50%, -50%);
+  border: 4px solid rgba(100, 180, 255, 0.8);
+  border-radius: 50%;
+  animation: water-splash 0.5s ease-out;
+}
+
+@keyframes water-wave {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes water-ripple {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-20px); }
+}
+
+@keyframes water-splash {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 1; border-width: 8px; }
+  100% { transform: translate(-50%, -50%) scale(2); opacity: 0; border-width: 1px; }
+}
+
+/* ========================================
+   GRASS TYPE ANIMATIONS
+   ======================================== */
+.grass-effect {
+  background: radial-gradient(circle at 50% 50%, rgba(120, 200, 80, 0.4) 0%, transparent 70%);
+  animation: grass-burst 0.5s ease-out;
+}
+
+.grass-effect::before,
+.grass-effect::after {
+  content: '🍃';
+  position: absolute;
+  font-size: 24px;
+  animation: leaf-fly 0.5s ease-out;
+}
+
+.grass-effect::before {
+  top: 30%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.grass-effect::after {
+  top: 40%;
+  right: 25%;
+  animation-delay: 0.1s;
+}
+
+@keyframes grass-burst {
+  0% { opacity: 0; transform: scale(0.5); }
+  40% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+@keyframes leaf-fly {
+  0% { opacity: 0; transform: translateY(20px) rotate(0deg); }
+  50% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-40px) rotate(180deg); }
+}
+
+/* ========================================
+   PSYCHIC TYPE ANIMATIONS
+   ======================================== */
+.psychic-effect {
+  background: radial-gradient(circle at 50% 50%, rgba(248, 88, 136, 0.6) 0%, rgba(200, 50, 200, 0.3) 50%, transparent 80%);
+  animation: psychic-pulse 0.6s ease-out;
+}
+
+.psychic-effect::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  transform: translate(-50%, -50%);
+  border: 3px solid rgba(248, 88, 200, 0.8);
+  border-radius: 50%;
+  animation: psychic-ring 0.4s ease-out 2;
+}
+
+.psychic-effect::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255, 150, 255, 0.8) 0%, transparent 70%);
+  animation: psychic-glow 0.3s ease-in-out 2;
+}
+
+@keyframes psychic-pulse {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes psychic-ring {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+}
+
+@keyframes psychic-glow {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+}
+
+/* ========================================
+   ICE TYPE ANIMATIONS
+   ======================================== */
+.ice-effect {
+  background: linear-gradient(180deg, rgba(152, 216, 216, 0.2) 0%, rgba(150, 220, 255, 0.5) 100%);
+  animation: ice-freeze 0.5s ease-out;
+}
+
+.ice-effect::before {
+  content: '❄';
+  position: absolute;
+  font-size: 30px;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: snowflake-spin 0.5s linear;
+  text-shadow: 0 0 10px #98d8d8, 0 0 20px #98d8d8;
+}
+
+.ice-effect::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.6) 50%, transparent 60%);
+  animation: ice-shimmer 0.3s ease-in-out 2;
+}
+
+@keyframes ice-freeze {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes snowflake-spin {
+  0% { transform: translateX(-50%) rotate(0deg) scale(0.5); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(-50%) rotate(180deg) scale(1.5); opacity: 0; }
+}
+
+@keyframes ice-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ========================================
+   GHOST TYPE ANIMATIONS
+   ======================================== */
+.ghost-effect {
+  background: radial-gradient(circle at 50% 50%, rgba(112, 88, 152, 0.6) 0%, rgba(80, 40, 120, 0.3) 50%, transparent 80%);
+  animation: ghost-fade 0.6s ease-out;
+}
+
+.ghost-effect::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80px;
+  height: 80px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(180, 100, 255, 0.5) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: ghost-orb 0.4s ease-in-out 2;
+}
+
+.ghost-effect::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(50, 0, 80, 0.3);
+  animation: ghost-shadow 0.5s ease-out;
+}
+
+@keyframes ghost-fade {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes ghost-orb {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+}
+
+@keyframes ghost-shadow {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ========================================
+   DRAGON TYPE ANIMATIONS
+   ======================================== */
+.dragon-effect {
+  background: radial-gradient(circle at 50% 50%, rgba(112, 56, 248, 0.5) 0%, rgba(80, 24, 200, 0.3) 50%, transparent 80%);
+  animation: dragon-power 0.6s ease-out;
+}
+
+.dragon-effect::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-left: 40px solid transparent;
+  border-right: 40px solid transparent;
+  border-bottom: 80px solid rgba(112, 56, 248, 0.7);
+  transform: translate(-50%, -50%);
+  animation: dragon-spike 0.4s ease-out;
+  filter: blur(2px);
+}
+
+.dragon-effect::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  transform: translate(-50%, -50%);
+  border: 4px solid rgba(140, 80, 255, 0.6);
+  border-radius: 50%;
+  animation: dragon-ring 0.5s ease-out;
+}
+
+@keyframes dragon-power {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes dragon-spike {
+  0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.5) rotate(45deg); opacity: 0; }
+}
+
+@keyframes dragon-ring {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+}
+
+/* ========================================
+   FIGHTING TYPE ANIMATIONS
+   ======================================== */
+.fighting-effect {
+  background: radial-gradient(circle at 50% 50%, rgba(192, 48, 40, 0.5) 0%, transparent 70%);
+  animation: fighting-impact 0.4s ease-out;
+}
+
+.fighting-effect::before {
+  content: '💥';
+  position: absolute;
+  font-size: 40px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: impact-burst 0.4s ease-out;
+}
+
+.fighting-effect::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  transform: translate(-50%, -50%);
+  border: 5px solid rgba(255, 100, 80, 0.8);
+  border-radius: 50%;
+  animation: impact-ring 0.3s ease-out;
+}
+
+@keyframes fighting-impact {
+  0% { opacity: 0; transform: scale(0.5); }
+  30% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+@keyframes impact-burst {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+@keyframes impact-ring {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; border-width: 10px; }
+  100% { transform: translate(-50%, -50%) scale(2); opacity: 0; border-width: 1px; }
+}
+
+/* ========================================
+   NORMAL TYPE ANIMATIONS
+   ======================================== */
+.normal-effect {
+  background: radial-gradient(circle at 50% 50%, rgba(168, 168, 120, 0.4) 0%, transparent 70%);
+  animation: normal-hit 0.4s ease-out;
+}
+
+.normal-effect::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+  background: rgba(200, 200, 150, 0.6);
+  border-radius: 50%;
+  animation: normal-burst 0.3s ease-out;
+}
+
+@keyframes normal-hit {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes normal-burst {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+}
+
+/* ========================================
+   POISON TYPE ANIMATIONS
+   ======================================== */
+.poison-effect {
+  background: radial-gradient(circle at 50% 50%, rgba(160, 64, 160, 0.5) 0%, rgba(100, 40, 100, 0.3) 50%, transparent 80%);
+  animation: poison-cloud 0.6s ease-out;
+}
+
+.poison-effect::before {
+  content: '';
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  width: 80px;
+  height: 80px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(180, 100, 200, 0.6) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: poison-bubble 0.3s ease-out 2;
+}
+
+@keyframes poison-cloud {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes poison-bubble {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.5) translateY(-20px); opacity: 0; }
+}
+
+/* ========================================
+   GROUND TYPE ANIMATIONS
+   ======================================== */
+.ground-effect {
+  background: linear-gradient(0deg, rgba(224, 192, 104, 0.6) 0%, rgba(180, 140, 60, 0.3) 50%, transparent 100%);
+  animation: ground-shake 0.5s ease-out;
+}
+
+.ground-effect::before {
+  content: '';
+  position: absolute;
+  bottom: 20%;
+  left: 50%;
+  width: 120px;
+  height: 40px;
+  transform: translateX(-50%);
+  background: rgba(180, 140, 60, 0.5);
+  border-radius: 50%;
+  animation: ground-dust 0.4s ease-out;
+}
+
+@keyframes ground-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+@keyframes ground-dust {
+  0% { transform: translateX(-50%) scaleX(0.5) scaleY(0.3); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(-50%) scaleX(1.5) scaleY(1); opacity: 0; }
+}
+
+/* ========================================
+   FLYING TYPE ANIMATIONS
+   ======================================== */
+.flying-effect {
+  background: radial-gradient(circle at 50% 50%, rgba(168, 144, 240, 0.3) 0%, transparent 70%);
+  animation: flying-gust 0.5s ease-out;
+}
+
+.flying-effect::before,
+.flying-effect::after {
+  content: '';
+  position: absolute;
+  width: 60px;
+  height: 8px;
+  background: linear-gradient(90deg, transparent 0%, rgba(200, 200, 255, 0.6) 50%, transparent 100%);
+  border-radius: 50%;
+  animation: wind-streak 0.3s ease-out;
+}
+
+.flying-effect::before {
+  top: 35%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.flying-effect::after {
+  top: 55%;
+  right: 20%;
+  animation-delay: 0.1s;
+}
+
+@keyframes flying-gust {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes wind-streak {
+  0% { transform: translateX(-20px); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(40px); opacity: 0; }
+}
+
+/* ========================================
+   ROCK TYPE ANIMATIONS
+   ======================================== */
+.rock-effect {
+  background: radial-gradient(circle at 50% 60%, rgba(184, 160, 56, 0.5) 0%, transparent 70%);
+  animation: rock-crash 0.5s ease-out;
+}
+
+.rock-effect::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: rgba(150, 130, 80, 0.7);
+  animation: rock-shatter 0.4s ease-out;
+}
+
+@keyframes rock-crash {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes rock-shatter {
+  0% { transform: translate(-50%, -50%) rotate(45deg) scale(0); }
+  50% { transform: translate(-50%, -50%) rotate(45deg) scale(1.5); }
+  100% { transform: translate(-50%, -50%) rotate(45deg) scale(1); opacity: 0; }
+}
+
+/* ========================================
+   BUG TYPE ANIMATIONS
+   ======================================== */
+.bug-effect {
+  background: radial-gradient(circle at 50% 50%, rgba(168, 184, 32, 0.4) 0%, transparent 70%);
+  animation: bug-swarm 0.5s ease-out;
+}
+
+.bug-effect::before {
+  content: '🦗';
+  position: absolute;
+  font-size: 20px;
+  top: 40%;
+  left: 40%;
+  animation: bug-fly 0.4s ease-out;
+}
+
+@keyframes bug-swarm {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes bug-fly {
+  0% { transform: translate(0, 0); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translate(30px, -30px); opacity: 0; }
+}
+
+/* ========================================
+   DARK TYPE ANIMATIONS
+   ======================================== */
+.dark-effect {
+  background: radial-gradient(circle at 50% 50%, rgba(112, 88, 72, 0.6) 0%, rgba(40, 30, 30, 0.4) 50%, transparent 80%);
+  animation: dark-void 0.5s ease-out;
+}
+
+.dark-effect::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80px;
+  height: 80px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.8) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: dark-pulse 0.4s ease-out;
+}
+
+@keyframes dark-void {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes dark-pulse {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+}
+
+/* ========================================
+   STEEL TYPE ANIMATIONS
+   ======================================== */
+.steel-effect {
+  background: linear-gradient(135deg, rgba(184, 184, 208, 0.3) 0%, rgba(150, 150, 180, 0.5) 50%, rgba(184, 184, 208, 0.3) 100%);
+  animation: steel-shine 0.5s ease-out;
+}
+
+.steel-effect::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.6) 50%, transparent 100%);
+  animation: steel-glint 0.4s ease-out;
+}
+
+@keyframes steel-shine {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes steel-glint {
+  0% { left: -50%; }
+  100% { left: 150%; }
+}
+
+/* ========================================
+   FAIRY TYPE ANIMATIONS
+   ======================================== */
+.fairy-effect {
+  background: radial-gradient(circle at 50% 50%, rgba(238, 153, 172, 0.5) 0%, rgba(220, 130, 160, 0.3) 50%, transparent 80%);
+  animation: fairy-sparkle 0.6s ease-out;
+}
+
+.fairy-effect::before {
+  content: '✨';
+  position: absolute;
+  font-size: 24px;
+  top: 40%;
+  left: 45%;
+  animation: sparkle-float 0.5s ease-out;
+}
+
+.fairy-effect::after {
+  content: '💫';
+  position: absolute;
+  font-size: 20px;
+  top: 50%;
+  right: 35%;
+  animation: sparkle-float 0.5s ease-out 0.1s;
+}
+
+@keyframes fairy-sparkle {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes sparkle-float {
+  0% { transform: translateY(10px) scale(0.5); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-20px) scale(1.2); opacity: 0; }
 }
