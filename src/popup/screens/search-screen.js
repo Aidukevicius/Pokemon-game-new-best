@@ -4,6 +4,7 @@ import { SpriteService } from '../../shared/services/SpriteService.js';
 import { EncounterService } from '../../shared/services/EncounterService.js';
 import { MoveService } from '../../shared/services/MoveService.js';
 import { BattleService } from '../../shared/services/BattleService.js';
+import { getPokemonById } from '../../shared/data/pokemon-database.js';
 
 export class SearchScreen {
   constructor(containerElement) {
@@ -64,32 +65,12 @@ export class SearchScreen {
   }
 
   getCompanionTypes() {
-    const pokemonTypes = {
-      1: ['Grass', 'Poison'], 2: ['Grass', 'Poison'], 3: ['Grass', 'Poison'],
-      4: ['Fire'], 5: ['Fire'], 6: ['Fire', 'Flying'],
-      7: ['Water'], 8: ['Water'], 9: ['Water'],
-      25: ['Electric'], 26: ['Electric'],
-      10: ['Bug'], 11: ['Bug'], 12: ['Bug', 'Flying'],
-      13: ['Bug', 'Poison'], 14: ['Bug', 'Poison'], 15: ['Bug', 'Poison'],
-      16: ['Normal', 'Flying'], 17: ['Normal', 'Flying'], 18: ['Normal', 'Flying'],
-      19: ['Normal'], 20: ['Normal'],
-      21: ['Normal', 'Flying'], 22: ['Normal', 'Flying'],
-      23: ['Poison'], 24: ['Poison'],
-      27: ['Ground'], 28: ['Ground'],
-      29: ['Poison'], 30: ['Poison'], 31: ['Poison', 'Ground'],
-      32: ['Poison'], 33: ['Poison'], 34: ['Poison', 'Ground'],
-      35: ['Fairy'], 36: ['Fairy'],
-      37: ['Fire'], 38: ['Fire'],
-      39: ['Normal', 'Fairy'], 40: ['Normal', 'Fairy'],
-      41: ['Poison', 'Flying'], 42: ['Poison', 'Flying'],
-      63: ['Psychic'], 64: ['Psychic'], 65: ['Psychic'],
-      92: ['Ghost', 'Poison'], 93: ['Ghost', 'Poison'], 94: ['Ghost', 'Poison'],
-      133: ['Normal'],
-      144: ['Ice', 'Flying'], 145: ['Electric', 'Flying'], 146: ['Fire', 'Flying'],
-      147: ['Dragon'], 148: ['Dragon'], 149: ['Dragon', 'Flying'],
-      150: ['Psychic'], 151: ['Psychic']
-    };
-    return pokemonTypes[this.companion?.id] || ['Normal'];
+    if (!this.companion?.id) return ['Normal'];
+    const pokemonData = getPokemonById(this.companion.id);
+    if (pokemonData && pokemonData.types) {
+      return pokemonData.types;
+    }
+    return ['Normal'];
   }
 
   async loadEncounterQueue() {

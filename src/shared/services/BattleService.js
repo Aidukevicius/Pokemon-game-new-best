@@ -85,7 +85,7 @@ export class BattleService {
     const defenderTypes = defender.pokemon?.types || defender.types || ['Normal'];
     const typeEffectiveness = this.getTypeEffectiveness(move.type, defenderTypes);
 
-    const critical = Math.random() < 0.0625 ? 1.5 : 1;
+    const critical = Math.random() < 0.0625 ? 2.0 : 1;
 
     const randomFactor = 0.85 + (Math.random() * 0.15);
 
