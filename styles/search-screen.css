@@ -420,6 +420,28 @@
   box-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 }
 
+/* Battle Log Box */
+.battle-log-box {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 3px solid #475569;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin: 4px 8px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.log-text {
+  color: #f1f5f9;
+  font-size: 10px;
+  font-weight: bold;
+  margin: 0;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  line-height: 1.4;
+}
+
 /* HP Bar Styles */
 .hp-bar-container {
   display: flex;

@@ -205,6 +205,10 @@ export class SearchScreen {
 
         <div class="effectiveness-overlay" id="effectivenessOverlay"></div>
 
+        <div class="battle-log-box" id="battleLog">
+          <p class="log-text"></p>
+        </div>
+
         <div class="battle-menu-pokemon">
           <div class="moves-grid-2x2">
             ${moves.map((move, i) => {
