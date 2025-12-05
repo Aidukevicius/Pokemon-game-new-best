@@ -109,6 +109,12 @@ The preview server runs on port 5000 displaying `preview.html`, which embeds pop
 3. Load unpacked extension from this directory
 
 ## Recent Changes
+- **2025-12-05**: Integrated PokeAPI for real Pokemon move data (power, accuracy, PP, effects)
+- **2025-12-05**: Created MoveService.js for fetching and caching move data from PokeAPI
+- **2025-12-05**: Implemented 15+ type-specific CSS animations for move effects (Electric, Fire, Water, Grass, Psychic, Ice, Ghost, Dragon, Fighting, Rock, Ground, Poison, Bug, Flying, Normal)
+- **2025-12-05**: Fixed status move handling - uses damageClass instead of power to differentiate
+- **2025-12-05**: Added fixed-damage move support (Dragon Rage=40, Seismic Toss/Night Shade=level, Super Fang=half HP)
+- **2025-12-05**: Battle log now shows damage dealt and STAB bonus indicators
 - **2025-12-04**: Redesigned battle screen - larger battle field (280px), bigger Pokemon sprites (96px)
 - **2025-12-04**: Removed "Wild Pokemon appeared" message and catch rate indicator from battle UI
 - **2025-12-04**: Added Pokemon type badges displayed below wild Pokemon
