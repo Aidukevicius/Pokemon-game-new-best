@@ -196,9 +196,12 @@ export class SearchScreen {
                   <div class="hp-fill ${companionHpPercent < 20 ? 'critical' : companionHpPercent < 50 ? 'warning' : ''}" 
                        style="width: ${companionHpPercent}%"></div>
                 </div>
+                <span class="hp-text">${Math.round(this.companion?.health || 100)}/${this.companionStats?.hp || 100}</span>
               </div>
             </div>
           </div>
+          
+          <div class="effectiveness-overlay" id="effectivenessOverlay"></div>
         </div>
 
         <div class="battle-menu-pokemon">
@@ -354,6 +357,12 @@ export class SearchScreen {
     const enemyFainted = newHp <= 0;
     this.currentEncounter.currentHp = newHp;
     
+    this.updateHpDisplay('enemy', newHp, this.currentEncounter.maxHp);
+    
+    await this.animateDamage('enemy');
+    
+    await this.showEffectivenessOverlay(result, move.name);
+    
     let damageMsg = `It dealt ${result.damage} damage!`;
     if (result.critical) damageMsg = `Critical hit! ${damageMsg}`;
     if (result.stab) damageMsg += ' (STAB!)';
@@ -363,10 +372,6 @@ export class SearchScreen {
       this.battleLog.push(result.effectivenessMessage.text);
     }
     this.updateBattleLog();
-    this.render();
-    
-    await this.animateDamage('enemy');
-    await this.delay(500);
     
     if (enemyFainted) {
       this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} fainted!`);
@@ -381,7 +386,7 @@ export class SearchScreen {
     await this.delay(300);
     await this.enemyTurn();
     
-    this.render();
+    this.disableButtons(false);
   }
 
   async enemyTurn() {
@@ -415,18 +420,18 @@ export class SearchScreen {
 
     const result = this.battleService.calculateDamage(attacker, defender, enemyMove);
     
-    // Scale damage to be reasonable for 100 HP system
-    // Cap damage at 40% of max health to prevent one-shots
     const maxHealth = this.companionStats?.hp || 100;
     const scaledDamage = Math.floor(result.damage * (100 / maxHealth));
-    const cappedDamage = Math.min(scaledDamage, 40); // Max 40 damage per hit
+    const cappedDamage = Math.min(scaledDamage, 40);
     const actualDamage = Math.min(cappedDamage, this.companion.health || 100);
     const newHealth = Math.max(0, (this.companion.health || 100) - actualDamage);
     
     this.companion.health = newHealth;
     await this.storage.set('companion', this.companion);
     
-    await this.delay(300);
+    this.updateHpDisplay('ally', newHealth, maxHealth);
+    
+    await this.showEffectivenessOverlay(result, enemyMove.name);
     
     let damageMsg = `Your ${this.companion.name} took ${actualDamage} damage!`;
     if (result.critical) damageMsg = `Critical hit! ${damageMsg}`;
@@ -448,8 +453,6 @@ export class SearchScreen {
       this.battleLog = [];
       this.render();
     }
-    
-    this.disableButtons(false);
   }
 
   calculateDamage(power, level, type) {
@@ -594,6 +597,31 @@ export class SearchScreen {
     }
   }
 
+  updateHpDisplay(target, currentHp, maxHp) {
+    const hpPercent = Math.max(0, (currentHp / maxHp) * 100);
+    const isAlly = target === 'ally';
+    
+    const plate = this.container.querySelector(isAlly ? '.ally-plate' : '.enemy-pokemon-large .pokemon-info-plate');
+    if (!plate) return;
+    
+    const hpFill = plate.querySelector('.hp-fill');
+    const hpText = plate.querySelector('.hp-text');
+    
+    if (hpFill) {
+      hpFill.style.width = `${hpPercent}%`;
+      hpFill.classList.remove('critical', 'warning');
+      if (hpPercent < 20) {
+        hpFill.classList.add('critical');
+      } else if (hpPercent < 50) {
+        hpFill.classList.add('warning');
+      }
+    }
+    
+    if (hpText) {
+      hpText.textContent = `${Math.round(currentHp)}/${Math.round(maxHp)}`;
+    }
+  }
+
   disableButtons(disabled) {
     const buttons = this.container.querySelectorAll('.move-btn-pokemon, .action-btn-pokemon');
     buttons.forEach(btn => btn.disabled = disabled);
@@ -601,6 +629,43 @@ export class SearchScreen {
 
   delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async showEffectivenessOverlay(result, moveName) {
+    const overlay = this.container.querySelector('#effectivenessOverlay');
+    if (!overlay) return;
+
+    const messages = [];
+    
+    if (result.critical) {
+      messages.push({ text: 'Critical hit!', class: 'critical-msg' });
+    }
+    
+    if (result.effectivenessMessage && result.effectivenessMessage.text) {
+      let overlayClass = 'normal-effectiveness';
+      if (result.effectiveness === 0) {
+        overlayClass = 'immune-effectiveness';
+      } else if (result.effectiveness > 1) {
+        overlayClass = 'super-effectiveness';
+      } else if (result.effectiveness < 1) {
+        overlayClass = 'weak-effectiveness';
+      }
+      messages.push({ text: result.effectivenessMessage.text, class: overlayClass });
+    }
+    
+    if (result.stab) {
+      messages.push({ text: 'Same type attack bonus!', class: 'stab-msg' });
+    }
+
+    for (const msg of messages) {
+      overlay.innerHTML = `<div class="effectiveness-message ${msg.class}">${msg.text}</div>`;
+      overlay.classList.add('active');
+      await this.delay(1000);
+      overlay.classList.remove('active');
+      await this.delay(200);
+    }
+    
+    overlay.innerHTML = '';
   }
 
   toggleSearch() {

@@ -1388,3 +1388,113 @@
   50% { opacity: 1; }
   100% { transform: translateY(-20px) scale(1.2); opacity: 0; }
 }
+
+/* ========================================
+   EFFECTIVENESS OVERLAY - Pokemon Style
+   ======================================== */
+.effectiveness-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.effectiveness-overlay.active {
+  opacity: 1;
+}
+
+.effectiveness-message {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  animation: message-pop 0.3s ease-out;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border: 3px solid;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+@keyframes message-pop {
+  0% { 
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% { 
+    transform: scale(1.1);
+  }
+  100% { 
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Super Effective - Green/Yellow glow */
+.super-effectiveness {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-color: #15803d;
+  color: #ffffff;
+  animation: message-pop 0.3s ease-out, super-glow 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes super-glow {
+  0% { box-shadow: 0 4px 20px rgba(34, 197, 94, 0.5), 0 0 30px rgba(34, 197, 94, 0.3); }
+  100% { box-shadow: 0 4px 30px rgba(34, 197, 94, 0.8), 0 0 50px rgba(34, 197, 94, 0.5); }
+}
+
+/* Not Very Effective - Gray/Dim */
+.weak-effectiveness {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  border-color: #374151;
+  color: #e5e7eb;
+}
+
+/* No Effect / Immune - Dark with red */
+.immune-effectiveness {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  border-color: #ef4444;
+  color: #f87171;
+  animation: message-pop 0.3s ease-out, immune-pulse 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes immune-pulse {
+  0% { border-color: #ef4444; }
+  100% { border-color: #991b1b; }
+}
+
+/* Critical Hit - Orange/Red explosive */
+.critical-msg {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border-color: #c2410c;
+  color: #ffffff;
+  animation: message-pop 0.3s ease-out, critical-shake 0.1s ease-in-out 3;
+}
+
+@keyframes critical-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px) rotate(-1deg); }
+  75% { transform: translateX(3px) rotate(1deg); }
+}
+
+/* STAB Bonus - Blue */
+.stab-msg {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-color: #1d4ed8;
+  color: #ffffff;
+  font-size: 11px;
+}
+
+/* Normal effectiveness - No special styling needed, won't show */
+.normal-effectiveness {
+  display: none;
+}
