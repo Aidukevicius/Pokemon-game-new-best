@@ -1,6 +1,7 @@
 .search-screen {
   padding: 10px;
   min-height: 100%;
+  position: relative;
 }
 
 .search-header {
@@ -1402,7 +1403,7 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  z-index: 100;
+  z-index: 200;
   opacity: 0;
   transition: opacity 0.2s ease;
 }

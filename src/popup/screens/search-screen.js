@@ -201,8 +201,9 @@ export class SearchScreen {
             </div>
           </div>
 
-          <div class="effectiveness-overlay" id="effectivenessOverlay"></div>
         </div>
+
+        <div class="effectiveness-overlay" id="effectivenessOverlay"></div>
 
         <div class="battle-menu-pokemon">
           <div class="moves-grid-2x2">
