@@ -163,7 +163,10 @@ export class PokemonDetailModal {
         
         <div class="detail-footer">
           <span class="rarity-badge rarity-${baseData.rarity}">${baseData.rarity}</span>
-          <button class="set-companion-btn" data-action="set-companion">Set as Companion</button>
+          <div class="detail-actions">
+            <button class="add-to-team-btn" data-action="add-to-team">Add to Team</button>
+            <button class="set-companion-btn" data-action="set-companion">Set as Companion</button>
+          </div>
         </div>
       </div>
     `;
@@ -354,6 +357,11 @@ export class PokemonDetailModal {
       setCompanionBtn.addEventListener('click', () => this.setAsCompanion());
     }
 
+    const addToTeamBtn = this.overlay.querySelector('[data-action="add-to-team"]');
+    if (addToTeamBtn) {
+      addToTeamBtn.addEventListener('click', () => this.addToTeam());
+    }
+
     this.attachItemListeners();
     document.addEventListener('keydown', this.handleKeyDown.bind(this));
   }
@@ -416,6 +424,46 @@ export class PokemonDetailModal {
       }
     } catch (error) {
       console.error('[DetailModal] Error equipping item:', error);
+    }
+  }
+
+  async addToTeam() {
+    const pokemon = this.currentPokemon;
+    
+    if (!pokemon.db_id && !pokemon.catchId) {
+      console.error('[DetailModal] Cannot add to team: no db_id');
+      alert('This Pokemon cannot be added to team');
+      return;
+    }
+
+    try {
+      // Get current favorites
+      const storageService = new (await import('../../shared/services/StorageService.js')).StorageService();
+      let favorites = await storageService.get('favorite_pokemon') || [];
+      
+      // Check if already in favorites
+      const pokemonDbId = pokemon.db_id || pokemon.catchId;
+      if (favorites.some(p => (p.db_id || p.catchId) === pokemonDbId)) {
+        alert(`${pokemon.name} is already in your team!`);
+        return;
+      }
+      
+      // Check if team is full
+      if (favorites.length >= 6) {
+        alert('Your team is full! Remove a Pokemon first.');
+        return;
+      }
+
+      // Add to favorites
+      favorites.push(pokemon);
+      await storageService.set('favorite_pokemon', favorites);
+      
+      alert(`${pokemon.name} has been added to your team!`);
+      this.close();
+      window.location.reload();
+    } catch (error) {
+      console.error('[DetailModal] Error adding to team:', error);
+      alert('Failed to add to team');
     }
   }
 

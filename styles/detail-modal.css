@@ -436,6 +436,13 @@
   gap: 8px;
 }
 
+.detail-actions {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  justify-content: flex-end;
+}
+
 .rarity-badge {
   font-size: 7px;
   text-transform: uppercase;
@@ -750,5 +757,33 @@
 .set-companion-btn:active {
   transform: translate(1px, 1px);
   box-shadow: 0px 0px 0 #0f172a;
+  filter: none;
+}
+
+.add-to-team-btn {
+  padding: 4px 8px;
+  background: #15803d;
+  color: white;
+  border: 2px solid #166534;
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+  box-shadow: 1px 1px 0 #052e16;
+  filter: none;
+}
+
+.add-to-team-btn:hover {
+  background: #166534;
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0 #052e16;
+  filter: none;
+}
+
+.add-to-team-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 0px 0px 0 #052e16;
   filter: none;
 }
