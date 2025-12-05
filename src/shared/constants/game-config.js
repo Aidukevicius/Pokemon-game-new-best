@@ -1,9 +1,7 @@
-// GAME CONFIGURATION CONSTANTS PLACEHOLDER
+
+// GAME CONFIGURATION CONSTANTS
 // All game balance and configuration values
 
-// WHAT GOES HERE:
-
-/*
 // ENCOUNTER CONFIGURATION
 export const ENCOUNTER_CONFIG = {
   // How many unique websites must be visited to trigger 1 encounter
@@ -19,6 +17,21 @@ export const ENCOUNTER_CONFIG = {
     rare: 12,        // 12% chance
     legendary: 3     // 3% chance
   }
+};
+
+// COMPANION CONFIGURATION
+export const COMPANION_CONFIG = {
+  // Starting level
+  startingLevel: 5,
+  
+  // Max level
+  maxLevel: 100,
+  
+  // Experience needed for first level up
+  baseExperienceToNext: 100,
+  
+  // Experience multiplier per level
+  experienceMultiplier: 1.15
 };
 
 // CATCH CONFIGURATION
@@ -106,4 +119,3 @@ export const NOTIFICATION_CONFIG = {
   legendaryEncounterTitle: '⭐ A LEGENDARY Pokémon appeared!',
   duration: 5000 // 5 seconds
 };
-*/

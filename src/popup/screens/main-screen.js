@@ -28,9 +28,9 @@ export class MainScreen {
 
     if (!data) {
       this.companionPokemon = {
-        id: 25,
+        id: 25, // Pikachu
         name: 'Pikachu',
-        level: 1,
+        level: 5,
         health: 100,
         maxHealth: 100,
         experience: 0,
@@ -188,7 +188,7 @@ export class MainScreen {
     const pokemon = this.pokemonCollection.find(p => 
       String(p.db_id) === String(dbId) || String(p.catchId) === String(dbId)
     );
-    
+
     if (pokemon) {
       console.log('[MainScreen] Opening slot pokemon detail:', pokemon.name);
       showPokemonDetail(pokemon);

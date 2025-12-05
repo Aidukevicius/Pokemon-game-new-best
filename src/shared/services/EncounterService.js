@@ -110,11 +110,11 @@ export class EncounterService {
 
   getMaxLevelForRarity(rarity) {
     switch (rarity) {
-      case 'common': return 30;
-      case 'uncommon': return 45;
-      case 'rare': return 60;
-      case 'legendary': return 70;
-      default: return 30;
+      case 'common': return 10;
+      case 'uncommon': return 20;
+      case 'rare': return 35;
+      case 'legendary': return 50;
+      default: return 10;
     }
   }
 
