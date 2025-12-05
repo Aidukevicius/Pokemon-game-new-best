@@ -375,7 +375,10 @@ export class SearchScreen {
       this.updateBattleLog();
       await this.delay(300);
       await this.enemyTurn();
-      this.disableButtons(false);
+      if (this.currentEncounter) {
+        this.disableButtons(false);
+        this.render();
+      }
       return;
     }
 
@@ -406,7 +409,10 @@ export class SearchScreen {
     await this.delay(300);
     await this.enemyTurn();
 
-    this.disableButtons(false);
+    if (this.currentEncounter) {
+      this.disableButtons(false);
+      this.render();
+    }
   }
 
   async enemyTurn() {
@@ -416,6 +422,8 @@ export class SearchScreen {
       this.currentEncounter.pokemon,
       this.currentEncounter.level
     );
+
+    console.log('[SearchScreen] Enemy using move:', enemyMove.name, 'Power:', enemyMove.power, 'Type:', enemyMove.type);
 
     this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} used ${enemyMove.name}!`);
     this.updateBattleLog();
@@ -437,7 +445,12 @@ export class SearchScreen {
       currentHp: this.companion.health || 100
     };
 
+    console.log('[SearchScreen] Attacker stats:', attacker.stats, 'Level:', attacker.level);
+    console.log('[SearchScreen] Defender stats:', defender.stats);
+
     const result = this.battleService.calculateDamage(attacker, defender, enemyMove);
+
+    console.log('[SearchScreen] Damage result:', result);
 
     await this.showEffectivenessOverlay(result, enemyMove.name);
 
@@ -449,16 +462,17 @@ export class SearchScreen {
 
     await this.animateDamage('ally');
 
-    const maxHealth = this.companionStats?.hp || 100;
-    const scaledDamage = Math.floor(result.damage * (100 / maxHealth));
-    const cappedDamage = Math.min(scaledDamage, 40);
-    const actualDamage = Math.min(cappedDamage, this.companion.health || 100);
+    const maxHp = this.companionStats?.hp || 100;
+    const damagePercent = Math.floor((result.damage / maxHp) * 100);
+    const actualDamage = Math.max(1, Math.min(damagePercent, this.companion.health || 100));
     const newHealth = Math.max(0, (this.companion.health || 100) - actualDamage);
+    
+    console.log('[SearchScreen] Damage calc - Raw:', result.damage, 'MaxHP:', maxHp, 'DamagePercent:', damagePercent, 'Actual:', actualDamage, 'NewHealth:', newHealth);
 
     this.companion.health = newHealth;
     await this.storage.set('companion', this.companion);
 
-    this.updateHpDisplay('ally', newHealth, maxHealth);
+    this.updateHpDisplay('ally', newHealth, 100);
 
     let damageMsg = `Your ${this.companion.name} took ${actualDamage} damage!`;
     if (result.critical) damageMsg = `Critical hit! ${damageMsg}`;

@@ -61,7 +61,17 @@ export class BattleService {
     const accuracy = move.accuracy ?? 100;
     const hitRoll = Math.random() * 100;
     
+    console.log('[BattleService] calculateDamage called:', {
+      move: move.name,
+      power: move.power,
+      type: move.type,
+      damageClass: move.damageClass,
+      accuracy: accuracy,
+      hitRoll: hitRoll
+    });
+    
     if (hitRoll > accuracy) {
+      console.log('[BattleService] Attack missed!');
       return {
         damage: 0,
         effectiveness: 1,
@@ -72,7 +82,8 @@ export class BattleService {
       };
     }
 
-    if (move.power === 0 || move.power === null || !move.power) {
+    if (move.power === 0 || move.power === null || move.power === undefined) {
+      console.log('[BattleService] Fixed damage move detected');
       return this.handleFixedDamageMove(move, attacker.level, defender.currentHp);
     }
 
@@ -81,11 +92,13 @@ export class BattleService {
     
     const isPhysical = (move.damageClass === 'physical');
     const attackStat = isPhysical ? 
-      (attacker.stats?.attack || 50) : 
-      (attacker.stats?.spAttack || 50);
+      (attacker.stats?.attack || attacker.stats?.Attack || 50) : 
+      (attacker.stats?.spAttack || attacker.stats?.['special-attack'] || 50);
     const defenseStat = isPhysical ? 
-      (defender.stats?.defense || 50) : 
-      (defender.stats?.spDefense || 50);
+      (defender.stats?.defense || defender.stats?.Defense || 50) : 
+      (defender.stats?.spDefense || defender.stats?.['special-defense'] || 50);
+    
+    console.log('[BattleService] Stats used - Attack:', attackStat, 'Defense:', defenseStat, 'isPhysical:', isPhysical);
 
     const baseDamage = Math.floor(
       ((((2 * level) / 5 + 2) * power * (attackStat / defenseStat)) / 50) + 2
@@ -109,6 +122,8 @@ export class BattleService {
     if (typeEffectiveness === 0) {
       finalDamage = 0;
     }
+
+    console.log('[BattleService] Final damage:', finalDamage, 'Base:', baseDamage, 'STAB:', stab, 'Effectiveness:', typeEffectiveness, 'Critical:', critical);
 
     return {
       damage: finalDamage,
