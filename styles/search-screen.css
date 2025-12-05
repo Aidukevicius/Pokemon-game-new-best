@@ -257,7 +257,7 @@
 .battle-field-large {
   position: relative;
   flex: 1;
-  min-height: 180px;
+  min-height: 200px;
   background: linear-gradient(180deg, #87ceeb 0%, #98d1a8 50%, #5a9a5a 80%, #3d7a3d 100%);
   border: 4px solid #2d4a2d;
   border-radius: 4px;
@@ -351,8 +351,8 @@
 }
 
 .battle-sprite-lg {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
@@ -361,8 +361,8 @@
 }
 
 .battle-sprite-lg.ally {
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
   transform: scaleX(-1);
 }
 
@@ -425,12 +425,13 @@
   background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   border: 3px solid #475569;
   border-radius: 4px;
-  padding: 6px 10px;
-  margin: 3px 6px;
-  min-height: 24px;
+  padding: 8px 12px;
+  margin: 4px 6px;
+  height: 40px;
   display: flex;
   align-items: center;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+  overflow: hidden;
 }
 
 .log-text {
@@ -440,6 +441,7 @@
   margin: 0;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
   line-height: 1.4;
+  width: 100%;
 }
 
 /* HP Bar Styles */
@@ -518,7 +520,7 @@
 .move-btn-pokemon {
   border: 2px solid rgba(255,255,255,0.3);
   border-radius: 6px;
-  padding: 8px 5px;
+  padding: 10px 6px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -526,7 +528,7 @@
   justify-content: center;
   gap: 2px;
   transition: all 0.1s ease;
-  min-height: 34px;
+  min-height: 38px;
 }
 
 .move-btn-pokemon:hover:not(:disabled) {
