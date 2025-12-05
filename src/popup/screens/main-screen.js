@@ -51,6 +51,10 @@ export class MainScreen {
   async loadCollection() {
     const collection = await this.storageService.get('pokemon_collection');
     this.pokemonCollection = collection || [];
+    
+    // Load favorites separately
+    const favorites = await this.storageService.get('favorite_pokemon');
+    this.favoritePokemon = favorites || [];
   }
 
   async render() {
@@ -185,9 +189,16 @@ export class MainScreen {
   }
 
   showSlotPokemonDetail(dbId, pokemonId) {
-    const pokemon = this.pokemonCollection.find(p => 
+    // Check favorites first, then full collection
+    let pokemon = this.favoritePokemon.find(p => 
       String(p.db_id) === String(dbId) || String(p.catchId) === String(dbId)
     );
+    
+    if (!pokemon) {
+      pokemon = this.pokemonCollection.find(p => 
+        String(p.db_id) === String(dbId) || String(p.catchId) === String(dbId)
+      );
+    }
 
     if (pokemon) {
       console.log('[MainScreen] Opening slot pokemon detail:', pokemon.name);
@@ -202,7 +213,7 @@ export class MainScreen {
   }
 
   renderFavoriteSlots() {
-    const favorites = this.pokemonCollection.slice(0, 6);
+    const favorites = this.favoritePokemon || [];
 
     let slotsHTML = '';
     for (let i = 0; i < 6; i++) {
