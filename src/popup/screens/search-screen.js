@@ -144,10 +144,10 @@ export class SearchScreen {
     const spriteUrl = this.spriteService.getSpriteUrl(encounter.pokemon.id);
     const hpPercent = (encounter.currentHp / encounter.maxHp) * 100;
     const companionHpPercent = this.companion ? (this.companion.health / 100) * 100 : 100;
-    
+
     const moves = this.getCompanionMoves();
     const enemyTypes = encounter.pokemon.types || ['Normal'];
-    
+
     this.container.innerHTML = `
       <div class="search-screen battle-mode">
         <div class="battle-field-large">
@@ -200,7 +200,7 @@ export class SearchScreen {
               </div>
             </div>
           </div>
-          
+
           <div class="effectiveness-overlay" id="effectivenessOverlay"></div>
         </div>
 
@@ -221,13 +221,13 @@ export class SearchScreen {
               const accText = `Acc: ${acc}%`;
               const tooltip = `${powerText} | ${accText}`;
               return `
-              <button class="move-btn-pokemon type-bg-${move.type.toLowerCase()}" data-move="${i}" data-power="${power}" data-type="${move.type}" data-accuracy="${acc}" data-status="${isStatusMove ? 'true' : 'false'}" data-damage-class="${move.damageClass}" title="${tooltip}">
+              <button class="move-btn-pokemon type-bg-${move.type.toLowerCase()}" data-move="${i}" data-power="${power}" data-type="${type}" data-accuracy="${acc}" data-status="${isStatusMove ? 'true' : 'false'}" data-damage-class="${move.damageClass}" title="${tooltip}">
                 <span class="move-name-pokemon">${move.name}</span>
                 <span class="move-pp">PP ${move.pp ?? 15}/${move.pp ?? 15}</span>
               </button>
             `;}).join('')}
           </div>
-          
+
           <div class="actions-row-pokemon">
             <button class="action-btn-pokemon catch-pokemon" data-action="catch">
               <span>CATCH</span>
@@ -259,7 +259,7 @@ export class SearchScreen {
         isStatus: move.damageClass === 'status'
       }));
     }
-    
+
     return this.moveService.getDefaultMovesForType(this.getCompanionType());
   }
 
@@ -313,18 +313,18 @@ export class SearchScreen {
 
     const moves = this.getCompanionMoves();
     const move = moves[moveIndex];
-    
+
     this.disableButtons(true);
-    
+
     const hitRoll = Math.random() * 100;
     const moveHit = hitRoll < accuracy;
-    
+
     this.battleLog.push(`${this.companion?.name || 'Pikachu'} used ${move.name}!`);
     this.updateBattleLog();
-    
+
     await this.animateAttack('ally');
     await this.playMoveAnimation(move.type, 'enemy');
-    
+
     if (!moveHit) {
       this.battleLog.push(`${this.currentEncounter.pokemon.name} avoided the attack!`);
       this.updateBattleLog();
@@ -333,7 +333,7 @@ export class SearchScreen {
       this.render();
       return;
     }
-    
+
     if (isStatus) {
       const statusEffects = this.getStatusEffect(move.name);
       this.battleLog.push(statusEffects);
@@ -343,7 +343,7 @@ export class SearchScreen {
       this.render();
       return;
     }
-    
+
     const attacker = {
       level: this.companion?.level || 10,
       stats: this.companionStats || { attack: 50, spAttack: 50 },
@@ -366,9 +366,9 @@ export class SearchScreen {
     };
 
     const result = this.battleService.calculateDamage(attacker, defender, moveData);
-    
+
     await this.showEffectivenessOverlay(result, move.name);
-    
+
     if (result.missed) {
       this.battleLog.push(`${this.companion.name}'s attack missed!`);
       this.updateBattleLog();
@@ -377,21 +377,21 @@ export class SearchScreen {
       this.disableButtons(false);
       return;
     }
-    
+
     const newHp = Math.max(0, this.currentEncounter.currentHp - result.damage);
     const enemyFainted = newHp <= 0;
     this.currentEncounter.currentHp = newHp;
-    
+
     this.updateHpDisplay('enemy', newHp, this.currentEncounter.maxHp);
-    
+
     await this.animateDamage('enemy');
-    
+
     let damageMsg = `It dealt ${result.damage} damage!`;
     if (result.critical) damageMsg = `Critical hit! ${damageMsg}`;
     if (result.stab) damageMsg += ' (STAB!)';
     this.battleLog.push(damageMsg);
     this.updateBattleLog();
-    
+
     if (enemyFainted) {
       this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} fainted!`);
       this.updateBattleLog();
@@ -404,7 +404,7 @@ export class SearchScreen {
 
     await this.delay(300);
     await this.enemyTurn();
-    
+
     this.disableButtons(false);
   }
 
@@ -415,13 +415,13 @@ export class SearchScreen {
       this.currentEncounter.pokemon,
       this.currentEncounter.level
     );
-    
+
     this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} used ${enemyMove.name}!`);
     this.updateBattleLog();
-    
+
     await this.animateAttack('enemy');
     await this.playMoveAnimation(enemyMove.type, 'ally');
-    
+
     const attacker = {
       level: this.currentEncounter.level,
       stats: this.currentEncounter.stats || { attack: 50, spAttack: 50 },
@@ -437,33 +437,33 @@ export class SearchScreen {
     };
 
     const result = this.battleService.calculateDamage(attacker, defender, enemyMove);
-    
+
     await this.showEffectivenessOverlay(result, enemyMove.name);
-    
+
     if (result.missed) {
       this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name}'s attack missed!`);
       this.updateBattleLog();
       return;
     }
-    
+
     await this.animateDamage('ally');
-    
+
     const maxHealth = this.companionStats?.hp || 100;
     const scaledDamage = Math.floor(result.damage * (100 / maxHealth));
     const cappedDamage = Math.min(scaledDamage, 40);
     const actualDamage = Math.min(cappedDamage, this.companion.health || 100);
     const newHealth = Math.max(0, (this.companion.health || 100) - actualDamage);
-    
+
     this.companion.health = newHealth;
     await this.storage.set('companion', this.companion);
-    
+
     this.updateHpDisplay('ally', newHealth, maxHealth);
-    
+
     let damageMsg = `Your ${this.companion.name} took ${actualDamage} damage!`;
     if (result.critical) damageMsg = `Critical hit! ${damageMsg}`;
     this.battleLog.push(damageMsg);
     this.updateBattleLog();
-    
+
     if (newHealth <= 0) {
       await this.delay(500);
       this.battleLog.push(`${this.companion.name} fainted! The wild Pokemon fled.`);
@@ -493,16 +493,16 @@ export class SearchScreen {
       'psywave': Math.floor(level * (0.5 + Math.random())),
       'super-fang': Math.floor((this.currentEncounter?.currentHp || 50) / 2)
     };
-    
+
     const apiName = move.apiName || move.name.toLowerCase().replace(/\s+/g, '-');
     if (fixedDamageMoves[apiName] !== undefined) {
       return fixedDamageMoves[apiName];
     }
-    
+
     if (power === 0 || power === null || power === undefined) {
       return 20;
     }
-    
+
     return this.calculateDamage(power, level, type);
   }
 
@@ -559,7 +559,7 @@ export class SearchScreen {
       'lovely kiss': 'The target fell asleep!',
       'glare': 'The target was paralyzed!'
     };
-    
+
     const normalizedName = moveName.toLowerCase();
     return statusMessages[normalizedName] || 'But nothing happened...';
   }
@@ -590,7 +590,7 @@ export class SearchScreen {
 
     const animationClass = this.getAnimationClass(moveType);
     animationLayer.innerHTML = `<div class="move-effect ${animationClass}"></div>`;
-    
+
     await this.delay(600);
     animationLayer.innerHTML = '';
   }
@@ -622,13 +622,13 @@ export class SearchScreen {
   updateHpDisplay(target, currentHp, maxHp) {
     const hpPercent = Math.max(0, (currentHp / maxHp) * 100);
     const isAlly = target === 'ally';
-    
+
     const plate = this.container.querySelector(isAlly ? '.ally-plate' : '.enemy-pokemon-large .pokemon-info-plate');
     if (!plate) return;
-    
+
     const hpFill = plate.querySelector('.hp-fill');
     const hpText = plate.querySelector('.hp-text');
-    
+
     if (hpFill) {
       hpFill.style.width = `${hpPercent}%`;
       hpFill.classList.remove('critical', 'warning');
@@ -638,7 +638,7 @@ export class SearchScreen {
         hpFill.classList.add('warning');
       }
     }
-    
+
     if (hpText) {
       hpText.textContent = `${Math.round(currentHp)}/${Math.round(maxHp)}`;
     }
@@ -661,16 +661,16 @@ export class SearchScreen {
     }
 
     const messages = [];
-    
+
     if (result.missed) {
       console.log('[SearchScreen] Move missed! Showing overlay');
       messages.push({ text: 'It missed!', class: 'missed-msg' });
     }
-    
+
     if (result.critical) {
       messages.push({ text: 'Critical hit!', class: 'critical-msg' });
     }
-    
+
     if (result.effectiveness !== undefined && result.effectiveness !== 1) {
       let overlayClass = 'normal-effectiveness';
       let text = '';
@@ -701,7 +701,7 @@ export class SearchScreen {
       overlay.classList.remove('active');
       await this.delay(100);
     }
-    
+
     overlay.innerHTML = '';
   }
 
@@ -714,11 +714,11 @@ export class SearchScreen {
 
   async triggerTestEncounter(rarity = 'common') {
     console.log('[SearchScreen] Triggering test encounter:', rarity);
-    
+
     await this.loadCompanion();
-    
+
     const encounter = this.encounterService.generateEncounter('normal');
-    
+
     if (rarity !== 'common') {
       const targetPokemon = this.getRandomPokemonByRarity(rarity);
       if (targetPokemon) {
@@ -736,7 +736,7 @@ export class SearchScreen {
         encounter.maxHp = stats.hp;
       }
     }
-    
+
     this.battleLog = [`A wild ${encounter.pokemon.name} appeared!`];
     this.currentEncounter = encounter;
     this.render();
@@ -787,24 +787,24 @@ export class SearchScreen {
 
   async attemptCatch() {
     const statusEl = this.container.querySelector('#battleLog');
-    
+
     if (!this.currentEncounter) return;
-    
+
     this.disableButtons(true);
-    
+
     this.battleLog.push('You threw a Pokeball!');
     this.updateBattleLog();
-    
+
     await this.delay(1000);
-    
+
     const result = await this.catchService.attemptCatch(this.currentEncounter);
-    
+
     if (result.success) {
       this.battleLog.push(`Gotcha! ${this.currentEncounter.pokemon.name} was caught!`);
       this.updateBattleLog();
-      
+
       await this.saveCaughtPokemonToServer(this.currentEncounter);
-      
+
       await this.delay(2000);
       this.currentEncounter = null;
       this.battleLog = [];
@@ -831,7 +831,7 @@ export class SearchScreen {
         ivs: encounter.ivs,
         evs: encounter.evs
       };
-      
+
       await this.storage.addPokemon(pokemonData);
       console.log('[SearchScreen] Pokemon saved to collection');
     } catch (error) {
@@ -842,7 +842,7 @@ export class SearchScreen {
   async runAway() {
     this.battleLog.push('Got away safely!');
     this.updateBattleLog();
-    
+
     await this.delay(1000);
     this.currentEncounter = null;
     this.battleLog = [];
