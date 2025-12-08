@@ -746,10 +746,10 @@ def seed_items():
     Item.query.delete()
 
     starter_items = [
-        ('poke-ball', 20),
-        ('great-ball', 10),
-        ('ultra-ball', 5),
-        ('master-ball', 1),
+        ('poke-ball', 50),
+        ('great-ball', 30),
+        ('ultra-ball', 15),
+        ('master-ball', 5),
         ('leftovers', 2),
         ('choice-band', 1),
         ('choice-specs', 1),
