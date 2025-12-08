@@ -331,7 +331,7 @@ export class SearchScreen {
     await this.playMoveAnimation(move.type, 'enemy');
 
     if (!moveHit) {
-      this.battleLog.push(`${this.currentEncounter.pokemon.name} avoided the attack!`);
+      this.battleLog.push(`Attack missed! ${this.currentEncounter.pokemon.name} avoided it!`);
       this.updateBattleLog();
       await this.delay(1500);
       await this.enemyTurn();
@@ -408,18 +408,17 @@ export class SearchScreen {
 
     await this.animateDamage('enemy');
 
-    if (result.critical) {
-      this.battleLog.push('A critical hit!');
-      this.updateBattleLog();
-      await this.delay(1200);
-    }
-    
-    let damageMsg = `It dealt ${result.damage} damage!`;
-    if (result.stab) damageMsg += ' (STAB bonus!)';
+    let damageMsg = '';
+    if (result.critical) damageMsg += 'Critical hit! ';
+    if (result.effectiveness > 1) damageMsg += "Super effective! ";
+    else if (result.effectiveness < 1 && result.effectiveness > 0) damageMsg += "Not very effective... ";
+    else if (result.effectiveness === 0) damageMsg += "No effect! ";
+    damageMsg += `Dealt ${result.damage} damage!`;
+    if (result.stab) damageMsg += ' (STAB)';
     this.battleLog.push(damageMsg);
     this.updateBattleLog();
 
-    await this.delay(1200);
+    await this.delay(1500);
     await this.enemyTurn();
 
     if (this.currentEncounter) {
@@ -465,11 +464,10 @@ export class SearchScreen {
 
     console.log('[SearchScreen] Damage result:', result);
 
-    await this.showEffectivenessOverlay(result, enemyMove.name);
-
     if (result.missed) {
-      this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name}'s attack missed!`);
+      this.battleLog.push(`${this.currentEncounter.pokemon.name}'s attack missed!`);
       this.updateBattleLog();
+      await this.delay(1200);
       return;
     }
 
@@ -483,17 +481,16 @@ export class SearchScreen {
 
     this.updateHpDisplay('ally', companionHp, 100);
 
-    if (result.critical) {
-      this.battleLog.push('A critical hit!');
-      this.updateBattleLog();
-      await this.delay(1200);
-    }
-
-    let damageMsg = `Your ${this.companion.name} took ${actualDamage} damage!`;
+    let damageMsg = '';
+    if (result.critical) damageMsg += 'Critical hit! ';
+    if (result.effectiveness > 1) damageMsg += "Super effective! ";
+    else if (result.effectiveness < 1 && result.effectiveness > 0) damageMsg += "Not very effective... ";
+    else if (result.effectiveness === 0) damageMsg += "No effect! ";
+    damageMsg += `${this.companion.name} took ${actualDamage} damage!`;
     this.battleLog.push(damageMsg);
     this.updateBattleLog();
 
-    await this.delay(1200);
+    await this.delay(1500);
 
     if (companionHp === 0) {
       this.disableButtons(true);
