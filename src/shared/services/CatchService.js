@@ -14,6 +14,8 @@ export class CatchService {
    * @returns {Object} Result of catch attempt
    */
   async attemptCatch(encounter, ballType = 'poke-ball', serverInventory = null) {
+    let ballsRemaining = 0;
+    
     // If serverInventory provided, we're using server-side items
     if (serverInventory) {
       const ball = serverInventory.find(item => item.itemId === ballType);
@@ -24,6 +26,7 @@ export class CatchService {
           message: `You don't have any ${this.getBallDisplayName(ballType)}s!`
         };
       }
+      ballsRemaining = ball.quantity - 1;
     } else {
       // Fall back to local storage
       const inventory = await this.storage.get('inventory') || { 'poke-ball': 5 };
@@ -37,6 +40,7 @@ export class CatchService {
         };
       }
       inventory[ballType]--;
+      ballsRemaining = inventory[ballType];
       await this.storage.set('inventory', inventory);
     }
 
@@ -58,7 +62,7 @@ export class CatchService {
         pokemon: encounter,
         message: `${encounter.pokemon.name} was caught!`,
         coinReward,
-        ballsRemaining: inventory[ballType + 's']
+        ballsRemaining
       };
     } else {
       // Pokemon escaped
@@ -67,7 +71,7 @@ export class CatchService {
         reason: 'escaped',
         message: `${encounter.pokemon.name} broke free!`,
         catchRate: this.getCatchRatePercentage(encounter, ballType),
-        ballsRemaining: inventory[ballType + 's']
+        ballsRemaining
       };
     }
   }
