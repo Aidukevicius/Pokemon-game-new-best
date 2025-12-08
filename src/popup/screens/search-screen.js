@@ -40,7 +40,7 @@ export class SearchScreen {
       const items = await res.json();
       this.pokeballs = items.filter(item => item.category === 'pokeball');
       console.log('[SearchScreen] Loaded pokeballs:', this.pokeballs);
-      
+
       if (this.pokeballs.length > 0) {
         const currentBall = this.pokeballs.find(b => b.item_id === this.selectedBallType);
         if (!currentBall || currentBall.quantity <= 0) {
@@ -272,7 +272,7 @@ export class SearchScreen {
               <span>RUN</span>
             </button>
           </div>
-          
+
           <div class="ball-selector-dropdown" id="ballSelectorDropdown" style="display: none;">
             ${this.pokeballs.map(ball => `
               <div class="ball-option ${ball.item_id === this.selectedBallType ? 'selected' : ''} ${ball.quantity <= 0 ? 'disabled' : ''}" 
@@ -354,27 +354,48 @@ export class SearchScreen {
     catchBtn?.addEventListener('click', () => this.attemptCatch());
     runBtn?.addEventListener('click', () => this.runAway());
 
+    // Ball selector dropdown toggle
     const ballSelectorBtn = this.container.querySelector('#ballSelectorBtn');
-    const ballDropdown = this.container.querySelector('#ballSelectorDropdown');
-    
-    ballSelectorBtn?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isVisible = ballDropdown.style.display !== 'none';
-      ballDropdown.style.display = isVisible ? 'none' : 'block';
-    });
+    const ballSelectorDropdown = this.container.querySelector('#ballSelectorDropdown');
 
-    const ballOptions = this.container.querySelectorAll('.ball-option:not(.disabled)');
-    ballOptions.forEach(option => {
-      option.addEventListener('click', () => {
-        this.selectedBallType = option.dataset.ball;
-        ballDropdown.style.display = 'none';
-        this.render();
+    if (ballSelectorBtn && ballSelectorDropdown) {
+      ballSelectorBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isVisible = ballSelectorDropdown.style.display === 'block';
+        ballSelectorDropdown.style.display = isVisible ? 'none' : 'block';
       });
-    });
 
-    document.addEventListener('click', () => {
-      if (ballDropdown) ballDropdown.style.display = 'none';
-    });
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!ballSelectorBtn.contains(e.target) && !ballSelectorDropdown.contains(e.target)) {
+          ballSelectorDropdown.style.display = 'none';
+        }
+      });
+
+      // Ball option selection
+      const ballOptions = this.container.querySelectorAll('.ball-option');
+      ballOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          if (option.classList.contains('disabled')) return;
+
+          const ballType = option.dataset.ball;
+          this.selectedBallType = ballType;
+
+          // Update selected state
+          ballOptions.forEach(opt => opt.classList.remove('selected'));
+          option.classList.add('selected');
+
+          // Update button display
+          const ballIcon = ballSelectorBtn.querySelector('.ball-icon');
+          const ballCount = ballSelectorBtn.querySelector('.ball-count');
+          if (ballIcon) ballIcon.src = this.getBallSprite(ballType);
+          if (ballCount) ballCount.textContent = this.getBallCount(ballType);
+
+          // Close dropdown
+          ballSelectorDropdown.style.display = 'none';
+        });
+      });
+    }
   }
 
   getBallSprite(ballType) {
@@ -948,9 +969,9 @@ export class SearchScreen {
         this.battleLog.push(`Oh no! ${this.currentEncounter.pokemon.name} broke free!`);
         this.updateBattleLog();
         await this.delay(1500);
-        
+
         await this.enemyTurn();
-        
+
         if (this.currentEncounter) {
           this.render();
         }
