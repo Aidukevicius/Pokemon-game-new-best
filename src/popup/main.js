@@ -52,12 +52,18 @@ async function initializeApp() {
     searchContainer.style.display = 'none';
     screensContainer.appendChild(searchContainer);
 
+    const pokedexContainer = document.createElement('div');
+    pokedexContainer.id = 'pokedex-screen-container';
+    pokedexContainer.className = 'screen-container';
+    pokedexContainer.style.display = 'none';
+    screensContainer.appendChild(pokedexContainer);
+
     // Initialize screens
     console.log('[Main] Creating screens...');
     const mainScreen = new MainScreen(mainContainer);
     const storageScreen = new StorageScreen(storageContainer);
     const collectionScreen = new CollectionScreen(collectionContainer);
-    const pokedexScreen = new PokedexScreen(collectionContainer);
+    const pokedexScreen = new PokedexScreen(pokedexContainer);
     const settingsScreen = new SettingsScreen(settingsContainer);
     const searchScreen = new SearchScreen(searchContainer);
 
