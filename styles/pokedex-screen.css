@@ -186,15 +186,15 @@
 }
 
 .pokedex-card .card-name {
-  font-size: 8px;
-  font-weight: bold;
-  color: #1e293b;
+  font-size: 6px;
   margin-top: 2px;
+  color: #1e293b;
+  text-transform: capitalize;
+  font-weight: bold;
+  letter-spacing: 0.2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
 }
 
 .pokedex-card.unseen .card-name {
