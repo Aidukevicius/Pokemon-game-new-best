@@ -42,11 +42,11 @@ export class SearchScreen {
       console.log('[SearchScreen] Loaded pokeballs:', this.pokeballs);
 
       if (this.pokeballs.length > 0) {
-        const currentBall = this.pokeballs.find(b => b.item_id === this.selectedBallType);
+        const currentBall = this.pokeballs.find(b => b.itemId === this.selectedBallType);
         if (!currentBall || currentBall.quantity <= 0) {
           const availableBall = this.pokeballs.find(b => b.quantity > 0);
           if (availableBall) {
-            this.selectedBallType = availableBall.item_id;
+            this.selectedBallType = availableBall.itemId;
           }
         }
       }
@@ -275,8 +275,8 @@ export class SearchScreen {
 
           <div class="ball-selector-dropdown" id="ballSelectorDropdown" style="display: none;">
             ${this.pokeballs.map(ball => `
-              <div class="ball-option ${ball.item_id === this.selectedBallType ? 'selected' : ''} ${ball.quantity <= 0 ? 'disabled' : ''}" 
-                   data-ball="${ball.item_id}">
+              <div class="ball-option ${ball.itemId === this.selectedBallType ? 'selected' : ''} ${ball.quantity <= 0 ? 'disabled' : ''}" 
+                   data-ball="${ball.itemId}">
                 <img src="${ball.sprite}" alt="${ball.name}" class="ball-option-icon">
                 <span class="ball-option-name">${ball.name}</span>
                 <span class="ball-option-qty">x${ball.quantity}</span>
@@ -449,7 +449,7 @@ export class SearchScreen {
   }
 
   getBallCount(ballType) {
-    const ball = this.pokeballs.find(b => b.item_id === ballType);
+    const ball = this.pokeballs.find(b => b.itemId === ballType);
     return ball ? ball.quantity : 0;
   }
 
@@ -982,7 +982,7 @@ export class SearchScreen {
       return;
     }
 
-    const ball = this.pokeballs.find(b => b.item_id === this.selectedBallType);
+    const ball = this.pokeballs.find(b => b.itemId === this.selectedBallType);
     console.log('[SearchScreen] Found ball:', ball);
     
     if (!ball || ball.quantity <= 0) {

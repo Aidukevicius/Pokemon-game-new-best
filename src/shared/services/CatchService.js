@@ -16,7 +16,7 @@ export class CatchService {
   async attemptCatch(encounter, ballType = 'poke-ball', serverInventory = null) {
     // If serverInventory provided, we're using server-side items
     if (serverInventory) {
-      const ball = serverInventory.find(item => item.item_id === ballType);
+      const ball = serverInventory.find(item => item.itemId === ballType);
       if (!ball || ball.quantity <= 0) {
         return {
           success: false,
