@@ -13,6 +13,8 @@ export class SearchScreen {
     this.catchService = new CatchService();
     this.spriteService = new SpriteService();
     this.encounterService = new EncounterService();
+    this.selectedBallType = 'poke-ball';
+    this.pokeballs = [];
     this.moveService = new MoveService();
     this.battleService = new BattleService();
     this.currentEncounter = null;
@@ -28,7 +30,30 @@ export class SearchScreen {
     await this.loadCompanion();
     await this.loadCompanionMoves();
     await this.loadEncounterQueue();
+    await this.loadPokeballs();
     this.render();
+  }
+
+  async loadPokeballs() {
+    try {
+      const res = await fetch('/api/items');
+      const items = await res.json();
+      this.pokeballs = items.filter(item => item.category === 'pokeball');
+      console.log('[SearchScreen] Loaded pokeballs:', this.pokeballs);
+      
+      if (this.pokeballs.length > 0) {
+        const currentBall = this.pokeballs.find(b => b.item_id === this.selectedBallType);
+        if (!currentBall || currentBall.quantity <= 0) {
+          const availableBall = this.pokeballs.find(b => b.quantity > 0);
+          if (availableBall) {
+            this.selectedBallType = availableBall.item_id;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('[SearchScreen] Error loading pokeballs:', error);
+      this.pokeballs = [];
+    }
   }
 
   async loadCompanionMoves() {
@@ -234,12 +259,29 @@ export class SearchScreen {
           </div>
 
           <div class="actions-row-pokemon">
-            <button class="action-btn-pokemon catch-pokemon" data-action="catch">
-              <span>CATCH</span>
-            </button>
+            <div class="catch-container">
+              <button class="ball-selector-btn" id="ballSelectorBtn" title="Change Pokeball">
+                <img src="${this.getBallSprite(this.selectedBallType)}" alt="${this.selectedBallType}" class="ball-icon">
+                <span class="ball-count">${this.getBallCount(this.selectedBallType)}</span>
+              </button>
+              <button class="action-btn-pokemon catch-pokemon" data-action="catch">
+                <span>CATCH</span>
+              </button>
+            </div>
             <button class="action-btn-pokemon run-pokemon" data-action="run">
               <span>RUN</span>
             </button>
+          </div>
+          
+          <div class="ball-selector-dropdown" id="ballSelectorDropdown" style="display: none;">
+            ${this.pokeballs.map(ball => `
+              <div class="ball-option ${ball.item_id === this.selectedBallType ? 'selected' : ''} ${ball.quantity <= 0 ? 'disabled' : ''}" 
+                   data-ball="${ball.item_id}">
+                <img src="${ball.sprite}" alt="${ball.name}" class="ball-option-icon">
+                <span class="ball-option-name">${ball.name}</span>
+                <span class="ball-option-qty">x${ball.quantity}</span>
+              </div>
+            `).join('')}
           </div>
         </div>
 
@@ -311,6 +353,43 @@ export class SearchScreen {
 
     catchBtn?.addEventListener('click', () => this.attemptCatch());
     runBtn?.addEventListener('click', () => this.runAway());
+
+    const ballSelectorBtn = this.container.querySelector('#ballSelectorBtn');
+    const ballDropdown = this.container.querySelector('#ballSelectorDropdown');
+    
+    ballSelectorBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isVisible = ballDropdown.style.display !== 'none';
+      ballDropdown.style.display = isVisible ? 'none' : 'block';
+    });
+
+    const ballOptions = this.container.querySelectorAll('.ball-option:not(.disabled)');
+    ballOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        this.selectedBallType = option.dataset.ball;
+        ballDropdown.style.display = 'none';
+        this.render();
+      });
+    });
+
+    document.addEventListener('click', () => {
+      if (ballDropdown) ballDropdown.style.display = 'none';
+    });
+  }
+
+  getBallSprite(ballType) {
+    const sprites = {
+      'poke-ball': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png',
+      'great-ball': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/great-ball.png',
+      'ultra-ball': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ultra-ball.png',
+      'master-ball': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png'
+    };
+    return sprites[ballType] || sprites['poke-ball'];
+  }
+
+  getBallCount(ballType) {
+    const ball = this.pokeballs.find(b => b.item_id === ballType);
+    return ball ? ball.quantity : 0;
   }
 
   async executeMove(moveIndex, power, type, accuracy = 100, isStatus = false) {
@@ -822,14 +901,33 @@ export class SearchScreen {
 
     if (!this.currentEncounter) return;
 
+    const ball = this.pokeballs.find(b => b.item_id === this.selectedBallType);
+    if (!ball || ball.quantity <= 0) {
+      this.battleLog.push(`No ${this.catchService.getBallDisplayName(this.selectedBallType)}s left!`);
+      this.updateBattleLog();
+      return;
+    }
+
     this.disableButtons(true);
 
-    this.battleLog.push('You threw a Pokeball!');
+    const ballName = this.catchService.getBallDisplayName(this.selectedBallType);
+    this.battleLog.push(`You threw a ${ballName}!`);
     this.updateBattleLog();
 
     await this.delay(1500);
 
-    const result = await this.catchService.attemptCatch(this.currentEncounter);
+    const result = await this.catchService.attemptCatch(this.currentEncounter, this.selectedBallType, this.pokeballs);
+
+    try {
+      await fetch(`/api/items/${this.selectedBallType}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity: ball.quantity - 1 })
+      });
+      ball.quantity--;
+    } catch (error) {
+      console.error('[SearchScreen] Error updating ball count:', error);
+    }
 
     if (result.success) {
       this.battleLog.push(`Gotcha! ${this.currentEncounter.pokemon.name} was caught!`);

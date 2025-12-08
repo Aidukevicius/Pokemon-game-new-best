@@ -13,22 +13,32 @@ export class CatchService {
    * @param {string} ballType - Type of Pokeball used (default: 'pokeball')
    * @returns {Object} Result of catch attempt
    */
-  async attemptCatch(encounter, ballType = 'pokeball') {
-    // Check if player has Pokeballs
-    const inventory = await this.storage.get('inventory') || { pokeballs: 5, greatballs: 0, ultraballs: 0 };
-    const ballCount = inventory[ballType + 's'] || 0;
-    
-    if (ballCount <= 0) {
-      return {
-        success: false,
-        reason: 'no_pokeballs',
-        message: `You don't have any ${ballType}s!`
-      };
+  async attemptCatch(encounter, ballType = 'poke-ball', serverInventory = null) {
+    // If serverInventory provided, we're using server-side items
+    if (serverInventory) {
+      const ball = serverInventory.find(item => item.item_id === ballType);
+      if (!ball || ball.quantity <= 0) {
+        return {
+          success: false,
+          reason: 'no_pokeballs',
+          message: `You don't have any ${this.getBallDisplayName(ballType)}s!`
+        };
+      }
+    } else {
+      // Fall back to local storage
+      const inventory = await this.storage.get('inventory') || { 'poke-ball': 5 };
+      const ballCount = inventory[ballType] || 0;
+      
+      if (ballCount <= 0) {
+        return {
+          success: false,
+          reason: 'no_pokeballs',
+          message: `You don't have any ${this.getBallDisplayName(ballType)}s!`
+        };
+      }
+      inventory[ballType]--;
+      await this.storage.set('inventory', inventory);
     }
-
-    // Use one Pokeball
-    inventory[ballType + 's']--;
-    await this.storage.set('inventory', inventory);
 
     // Calculate catch rate using Gen 1 formula
     const catchSuccess = this.calculateCatchSuccess(encounter, ballType);
@@ -68,13 +78,18 @@ export class CatchService {
    * catchRate = ((3 * maxHP - 2 * currentHP) * rate * ballBonus) / (3 * maxHP)
    */
   calculateCatchSuccess(encounter, ballType) {
+    // Master Ball always catches
+    if (ballType === 'master-ball') {
+      return true;
+    }
+    
     const { pokemon, currentHp, maxHp } = encounter;
     
     // Ball bonus multiplier
     const ballBonus = {
-      pokeball: 1.0,
-      greatball: 1.5,
-      ultraball: 2.0
+      'poke-ball': 1.0,
+      'great-ball': 1.5,
+      'ultra-ball': 2.0
     }[ballType] || 1.0;
     
     // Gen 1 catch rate formula
@@ -94,9 +109,11 @@ export class CatchService {
   /**
    * Get catch rate as percentage for display
    */
-  getCatchRatePercentage(encounter, ballType = 'pokeball') {
+  getCatchRatePercentage(encounter, ballType = 'poke-ball') {
+    if (ballType === 'master-ball') return 100;
+    
     const { pokemon, currentHp, maxHp } = encounter;
-    const ballBonus = { pokeball: 1.0, greatball: 1.5, ultraball: 2.0 }[ballType] || 1.0;
+    const ballBonus = { 'poke-ball': 1.0, 'great-ball': 1.5, 'ultra-ball': 2.0 }[ballType] || 1.0;
     
     const numerator = (3 * maxHp - 2 * currentHp) * pokemon.catchRate * ballBonus;
     const denominator = 3 * maxHp;
@@ -148,11 +165,24 @@ export class CatchService {
   }
 
   /**
+   * Get ball display name
+   */
+  getBallDisplayName(ballType) {
+    const names = {
+      'poke-ball': 'Poke Ball',
+      'great-ball': 'Great Ball',
+      'ultra-ball': 'Ultra Ball',
+      'master-ball': 'Master Ball'
+    };
+    return names[ballType] || ballType;
+  }
+
+  /**
    * Get current Pokeball count
    */
-  async getPokeballCount(ballType = 'pokeball') {
-    const inventory = await this.storage.get('inventory') || { pokeballs: 5 };
-    return inventory[ballType + 's'] || 0;
+  async getPokeballCount(ballType = 'poke-ball') {
+    const inventory = await this.storage.get('inventory') || { 'poke-ball': 5 };
+    return inventory[ballType] || 0;
   }
 
   /**

@@ -108,6 +108,9 @@ The preview server runs on port 5000 displaying `preview.html`, which embeds pop
 3. Load unpacked extension from this directory
 
 ## Recent Changes
+- **2025-12-08**: Added Pokeball selector in battle screen with dropdown menu to switch between ball types
+- **2025-12-08**: Added Poke Ball, Great Ball, Ultra Ball, and Master Ball items with different catch rate multipliers
+- **2025-12-08**: Items screen now seeds with Pokeballs (20 Poke, 10 Great, 5 Ultra, 1 Master)
 - **2025-12-08**: Combined critical hit, super effective, and miss messages into single battle log entries
 - **2025-12-08**: Enlarged Pokemon name/HP plates with bigger text (12px name, 11px level) and taller HP bars (14px)
 - **2025-12-08**: Improved companion Pokemon display with high-quality smooth rendering (non-pixelated)

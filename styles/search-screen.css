@@ -626,6 +626,106 @@
   gap: 3px;
 }
 
+/* Catch container with ball selector */
+.catch-container {
+  display: flex;
+  gap: 2px;
+  flex: 1;
+}
+
+.ball-selector-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  background: linear-gradient(180deg, #4a5568 0%, #2d3748 100%);
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  min-width: 40px;
+}
+
+.ball-selector-btn:hover {
+  filter: brightness(1.15);
+  transform: scale(1.02);
+}
+
+.ball-icon {
+  width: 24px;
+  height: 24px;
+  image-rendering: pixelated;
+}
+
+.ball-count {
+  font-size: 9px;
+  color: #f1f5f9;
+  font-weight: bold;
+}
+
+.catch-container .action-btn-pokemon {
+  flex: 1;
+}
+
+/* Ball selector dropdown */
+.ball-selector-dropdown {
+  position: absolute;
+  bottom: 70px;
+  left: 4px;
+  right: 4px;
+  background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
+  border: 3px solid #4a5568;
+  border-radius: 8px;
+  padding: 6px;
+  z-index: 100;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.4);
+}
+
+.ball-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.1s ease;
+}
+
+.ball-option:hover:not(.disabled) {
+  background: rgba(255,255,255,0.1);
+}
+
+.ball-option.selected {
+  background: rgba(59, 130, 246, 0.3);
+  border: 1px solid #3b82f6;
+}
+
+.ball-option.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ball-option-icon {
+  width: 28px;
+  height: 28px;
+  image-rendering: pixelated;
+}
+
+.ball-option-name {
+  flex: 1;
+  font-size: 11px;
+  font-weight: bold;
+  color: #f1f5f9;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.ball-option-qty {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
 .action-btn-pokemon {
   flex: 1;
   border: 2px solid rgba(255,255,255,0.3);

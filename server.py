@@ -199,6 +199,30 @@ class Companion(db.Model):
 
 
 POKEMON_ITEMS = {
+    'poke-ball': {
+        'name': 'Poke Ball',
+        'description': 'A basic ball for catching Pokemon. 1x catch rate.',
+        'category': 'pokeball',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png'
+    },
+    'great-ball': {
+        'name': 'Great Ball',
+        'description': 'A better ball with higher catch rate. 1.5x catch rate.',
+        'category': 'pokeball',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/great-ball.png'
+    },
+    'ultra-ball': {
+        'name': 'Ultra Ball',
+        'description': 'A high-performance ball. 2x catch rate.',
+        'category': 'pokeball',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ultra-ball.png'
+    },
+    'master-ball': {
+        'name': 'Master Ball',
+        'description': 'The ultimate ball. Never fails to catch.',
+        'category': 'pokeball',
+        'sprite': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png'
+    },
     'leftovers': {
         'name': 'Leftovers',
         'description': 'Restores HP gradually during battle.',
@@ -722,6 +746,10 @@ def seed_items():
     Item.query.delete()
 
     starter_items = [
+        ('poke-ball', 20),
+        ('great-ball', 10),
+        ('ultra-ball', 5),
+        ('master-ball', 1),
         ('leftovers', 2),
         ('choice-band', 1),
         ('choice-specs', 1),

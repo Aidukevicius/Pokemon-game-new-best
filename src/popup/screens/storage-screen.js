@@ -97,6 +97,7 @@ export class StorageScreen {
 
   getCategoryName(category) {
     const names = {
+      'pokeball': 'Poke Balls',
       'hold': 'Hold Items',
       'berry': 'Berries',
       'training': 'Training',
