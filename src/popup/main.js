@@ -6,6 +6,7 @@ import { StorageScreen } from './screens/storage-screen.js';
 import { CollectionScreen } from './screens/collection-screen.js';
 import { SettingsScreen } from './screens/settings-screen.js';
 import { SearchScreen } from './screens/search-screen.js';
+import { PokedexScreen } from './screens/pokedex-screen.js';
 
 console.log('[Main] Script loaded');
 console.log('[Main] Screens imported');
@@ -56,13 +57,15 @@ async function initializeApp() {
     const mainScreen = new MainScreen(mainContainer);
     const storageScreen = new StorageScreen(storageContainer);
     const collectionScreen = new CollectionScreen(collectionContainer);
+    const pokedexScreen = new PokedexScreen(collectionContainer);
     const settingsScreen = new SettingsScreen(settingsContainer);
     const searchScreen = new SearchScreen(searchContainer);
 
     const screens = {
       main: mainScreen,
       storage: storageScreen,
-      pokedex: collectionScreen,
+      pokedex: pokedexScreen,
+      collection: collectionScreen,
       settings: settingsScreen,
       search: searchScreen
     };
@@ -71,6 +74,7 @@ async function initializeApp() {
     await mainScreen.initialize();
     await storageScreen.initialize();
     await collectionScreen.initialize();
+    await pokedexScreen.initialize();
     await settingsScreen.initialize();
     await searchScreen.initialize();
 

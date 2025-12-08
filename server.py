@@ -384,6 +384,30 @@ class Item(db.Model):
         }
 
 
+class PokedexEntry(db.Model):
+    __tablename__ = 'pokedex_entries'
+
+    id = db.Column(db.Integer, primary_key=True)
+    pokemon_id = db.Column(db.Integer, nullable=False, unique=True)
+    encountered = db.Column(db.Boolean, default=False)
+    caught = db.Column(db.Boolean, default=False)
+    times_encountered = db.Column(db.Integer, default=0)
+    times_caught = db.Column(db.Integer, default=0)
+    first_encountered_at = db.Column(db.DateTime, nullable=True)
+    first_caught_at = db.Column(db.DateTime, nullable=True)
+
+    def to_dict(self):
+        return {
+            'pokemonId': self.pokemon_id,
+            'encountered': self.encountered,
+            'caught': self.caught,
+            'timesEncountered': self.times_encountered,
+            'timesCaught': self.times_caught,
+            'firstEncounteredAt': self.first_encountered_at.isoformat() if self.first_encountered_at else None,
+            'firstCaughtAt': self.first_caught_at.isoformat() if self.first_caught_at else None
+        }
+
+
 with app.app_context():
     db.create_all()
 
@@ -771,6 +795,87 @@ def seed_items():
 
     db.session.commit()
     return jsonify({'message': 'Items seeded', 'count': len(starter_items)})
+
+
+@app.route('/api/pokedex', methods=['GET'])
+def get_pokedex():
+    entries = PokedexEntry.query.all()
+    entries_dict = {e.pokemon_id: e.to_dict() for e in entries}
+    return jsonify(entries_dict)
+
+
+@app.route('/api/pokedex/encounter', methods=['POST'])
+def record_encounter():
+    data = request.json
+    pokemon_id = data.get('pokemonId')
+    
+    if not pokemon_id or pokemon_id < 1 or pokemon_id > 151:
+        return jsonify({'error': 'Invalid Pokemon ID'}), 400
+    
+    entry = PokedexEntry.query.filter_by(pokemon_id=pokemon_id).first()
+    
+    if not entry:
+        entry = PokedexEntry(
+            pokemon_id=pokemon_id,
+            encountered=True,
+            times_encountered=1,
+            first_encountered_at=datetime.utcnow()
+        )
+        db.session.add(entry)
+    else:
+        entry.encountered = True
+        entry.times_encountered += 1
+        if not entry.first_encountered_at:
+            entry.first_encountered_at = datetime.utcnow()
+    
+    db.session.commit()
+    return jsonify(entry.to_dict())
+
+
+@app.route('/api/pokedex/catch', methods=['POST'])
+def record_catch():
+    data = request.json
+    pokemon_id = data.get('pokemonId')
+    
+    if not pokemon_id or pokemon_id < 1 or pokemon_id > 151:
+        return jsonify({'error': 'Invalid Pokemon ID'}), 400
+    
+    entry = PokedexEntry.query.filter_by(pokemon_id=pokemon_id).first()
+    
+    if not entry:
+        entry = PokedexEntry(
+            pokemon_id=pokemon_id,
+            encountered=True,
+            caught=True,
+            times_encountered=1,
+            times_caught=1,
+            first_encountered_at=datetime.utcnow(),
+            first_caught_at=datetime.utcnow()
+        )
+        db.session.add(entry)
+    else:
+        entry.caught = True
+        entry.times_caught += 1
+        if not entry.first_caught_at:
+            entry.first_caught_at = datetime.utcnow()
+    
+    db.session.commit()
+    return jsonify(entry.to_dict())
+
+
+@app.route('/api/pokedex/stats', methods=['GET'])
+def get_pokedex_stats():
+    total = 151
+    encountered = PokedexEntry.query.filter_by(encountered=True).count()
+    caught = PokedexEntry.query.filter_by(caught=True).count()
+    
+    return jsonify({
+        'total': total,
+        'encountered': encountered,
+        'caught': caught,
+        'encounterPercent': round((encountered / total) * 100, 1),
+        'catchPercent': round((caught / total) * 100, 1)
+    })
 
 
 if __name__ == '__main__':

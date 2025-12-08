@@ -925,7 +925,36 @@ export class SearchScreen {
 
     this.battleLog = [`A wild ${encounter.pokemon.name} appeared!`];
     this.currentEncounter = encounter;
+    
+    this.recordPokedexEncounter(encounter.pokemon.id);
+    
     this.render();
+  }
+  
+  async recordPokedexEncounter(pokemonId) {
+    try {
+      await fetch('/api/pokedex/encounter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pokemonId })
+      });
+      console.log('[SearchScreen] Recorded Pokedex encounter for Pokemon:', pokemonId);
+    } catch (error) {
+      console.error('[SearchScreen] Error recording Pokedex encounter:', error);
+    }
+  }
+  
+  async recordPokedexCatch(pokemonId) {
+    try {
+      await fetch('/api/pokedex/catch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pokemonId })
+      });
+      console.log('[SearchScreen] Recorded Pokedex catch for Pokemon:', pokemonId);
+    } catch (error) {
+      console.error('[SearchScreen] Error recording Pokedex catch:', error);
+    }
   }
 
   getRandomPokemonByRarity(rarity) {
@@ -1018,6 +1047,7 @@ export class SearchScreen {
       this.updateBattleLog();
 
       await this.saveCaughtPokemonToServer(this.currentEncounter);
+      await this.recordPokedexCatch(this.currentEncounter.pokemon.id);
 
       await this.delay(2500);
       this.currentEncounter = null;
