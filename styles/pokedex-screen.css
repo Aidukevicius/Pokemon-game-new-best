@@ -250,67 +250,98 @@
 }
 
 .pokedex-detail-modal {
-  background: white;
+  background: linear-gradient(180deg, #e8e8e8 0%, #d0d0d0 100%);
   width: 100%;
   max-width: 320px;
   max-height: 90vh;
   overflow-y: auto;
   padding: 16px;
   position: relative;
+  border: 4px solid #1a1a2e;
+  box-shadow: 
+    0 0 0 2px #3a3a5e,
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .pokedex-detail-modal .close-btn {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: none;
-  border: none;
-  font-size: 20px;
+  width: 24px;
+  height: 24px;
+  background: #e74c3c;
+  color: white;
+  border: 2px solid #c0392b;
+  font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
-  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2);
+}
+
+.pokedex-detail-modal .close-btn:hover {
+  background: #c0392b;
 }
 
 .detail-header {
   text-align: center;
   margin-bottom: 12px;
+  background: linear-gradient(180deg, #4a6fa5 0%, #3d5a80 100%);
+  padding: 12px;
+  border: 3px solid #1a1a2e;
+  border-radius: 8px;
+  color: white;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
 }
 
 .detail-number {
   font-size: 10px;
-  color: #64748b;
+  opacity: 0.8;
+  letter-spacing: 1px;
 }
 
 .detail-name {
   font-size: 18px;
   margin: 4px 0;
-  text-transform: capitalize;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .detail-types {
   display: flex;
   justify-content: center;
   gap: 4px;
+  margin-top: 8px;
 }
 
 .detail-sprite-area {
   text-align: center;
   padding: 16px;
-  background: #f8fafc;
+  background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 70%);
+  border: 3px solid #475569;
   border-radius: 8px;
   margin-bottom: 12px;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .detail-sprite {
   width: 96px;
   height: 96px;
   image-rendering: pixelated;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
 .detail-stats-section {
-  background: #f1f5f9;
+  background: #f5f5f5;
   padding: 12px;
+  border: 3px solid #475569;
   border-radius: 8px;
   margin-bottom: 12px;
+  box-shadow: 4px 4px 0 rgba(71, 85, 105, 0.2);
 }
 
 .stat-row {
@@ -318,7 +349,7 @@
   justify-content: space-between;
   font-size: 10px;
   padding: 4px 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 2px solid #cbd5e1;
 }
 
 .stat-row:last-child {
@@ -326,7 +357,10 @@
 }
 
 .stat-label {
-  color: #64748b;
+  color: #475569;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .stat-value {
@@ -335,16 +369,78 @@
 }
 
 .detail-base-stats {
-  background: #f8fafc;
+  background: #f5f5f5;
   padding: 12px;
+  border: 3px solid #475569;
   border-radius: 8px;
+  box-shadow: 4px 4px 0 rgba(71, 85, 105, 0.2);
 }
 
 .detail-base-stats h3 {
   font-size: 10px;
   margin: 0 0 8px 0;
   text-transform: uppercase;
-  color: #64748b;
+  color: #1e293b;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.base-stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.base-stat span:first-child {
+  font-size: 8px;
+  text-transform: uppercase;
+  color: #475569;
+  width: 60px;
+  font-weight: bold;
+}
+
+.base-stat .stat-bar {
+  flex: 1;
+  height: 12px;
+  background: #cbd5e1;
+  border: 2px solid #475569;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.base-stat .stat-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  transition: width 0.3s ease;
+}
+
+.base-stat .stat-fill.atk {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.base-stat .stat-fill.def {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.base-stat .stat-fill.spa {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+}
+
+.base-stat .stat-fill.spd {
+  background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+}
+
+.base-stat .stat-fill.spe {
+  background: linear-gradient(90deg, #ec4899, #db2777);
+}
+
+.base-stat span:last-child {
+  font-size: 9px;
+  font-weight: bold;
+  color: #1e293b;
+  width: 32px;
+  text-align: right;
 }
 
 .base-stat {
