@@ -291,7 +291,7 @@
   text-align: center;
   margin-bottom: 12px;
   background: linear-gradient(180deg, #4a6fa5 0%, #3d5a80 100%);
-  padding: 12px;
+  padding: 10px 12px;
   border: 3px solid #1a1a2e;
   border-radius: 8px;
   color: white;
@@ -299,23 +299,29 @@
 }
 
 .detail-number {
-  font-size: 10px;
+  font-size: 9px;
   opacity: 0.8;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
+  font-weight: normal;
 }
 
 .detail-name {
-  font-size: 18px;
-  margin: 4px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-size: 14px;
+  margin: 3px 0;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+  line-height: 1.2;
+  word-wrap: break-word;
+  max-width: 100%;
 }
 
 .detail-types {
   display: flex;
   justify-content: center;
   gap: 4px;
-  margin-top: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
 }
 
 .detail-sprite-area {
@@ -358,14 +364,16 @@
 
 .stat-label {
   color: #475569;
-  font-weight: bold;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
+  font-size: 9px;
 }
 
 .stat-value {
-  font-weight: bold;
+  font-weight: 600;
   color: #1e293b;
+  font-size: 10px;
 }
 
 .detail-base-stats {
@@ -377,27 +385,28 @@
 }
 
 .detail-base-stats h3 {
-  font-size: 10px;
+  font-size: 9px;
   margin: 0 0 8px 0;
   text-transform: uppercase;
   color: #1e293b;
-  font-weight: bold;
-  letter-spacing: 0.5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
 }
 
 .base-stat {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: 6px;
+  margin-bottom: 5px;
 }
 
 .base-stat span:first-child {
   font-size: 8px;
   text-transform: uppercase;
   color: #475569;
-  width: 60px;
-  font-weight: bold;
+  width: 52px;
+  font-weight: 600;
+  text-align: right;
 }
 
 .base-stat .stat-bar {
@@ -437,28 +446,9 @@
 
 .base-stat span:last-child {
   font-size: 9px;
-  font-weight: bold;
+  font-weight: 600;
   color: #1e293b;
-  width: 32px;
-  text-align: right;
-}
-
-.base-stat {
-  display: grid;
-  grid-template-columns: 50px 1fr 30px;
-  align-items: center;
-  gap: 8px;
-  font-size: 9px;
-  margin-bottom: 4px;
-}
-
-.base-stat span:first-child {
-  color: #64748b;
-  text-align: right;
-}
-
-.base-stat span:last-child {
-  font-weight: bold;
+  width: 28px;
   text-align: right;
 }
 
