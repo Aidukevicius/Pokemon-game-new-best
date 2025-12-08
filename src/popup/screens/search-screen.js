@@ -352,12 +352,17 @@ export class SearchScreen {
     const runBtn = this.container.querySelector('[data-action="run"]');
 
     if (catchBtn) {
+      console.log('[SearchScreen] Attaching catch button listener');
       catchBtn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('[SearchScreen] Catch button clicked');
+        console.log('[SearchScreen] Catch button clicked!');
+        console.log('[SearchScreen] Selected ball type:', this.selectedBallType);
+        console.log('[SearchScreen] Current encounter:', this.currentEncounter);
         this.attemptCatch();
       });
+    } else {
+      console.error('[SearchScreen] Catch button not found!');
     }
     
     if (runBtn) {
@@ -384,10 +389,12 @@ export class SearchScreen {
       // Ball option selection
       const ballOptions = this.container.querySelectorAll('.ball-option');
       console.log('[SearchScreen] Found ball options:', ballOptions.length);
+      console.log('[SearchScreen] Current pokeballs:', this.pokeballs);
       
       ballOptions.forEach(option => {
         option.addEventListener('click', (e) => {
           e.stopPropagation();
+          e.preventDefault();
           
           if (option.classList.contains('disabled')) {
             console.log('[SearchScreen] Ball disabled, ignoring click');
@@ -395,8 +402,10 @@ export class SearchScreen {
           }
 
           const ballType = option.dataset.ball;
-          console.log('[SearchScreen] Selected ball type:', ballType);
+          console.log('[SearchScreen] Ball option clicked:', ballType);
+          console.log('[SearchScreen] Previous selectedBallType:', this.selectedBallType);
           this.selectedBallType = ballType;
+          console.log('[SearchScreen] New selectedBallType:', this.selectedBallType);
 
           // Update selected state
           ballOptions.forEach(opt => opt.classList.remove('selected'));
@@ -405,11 +414,18 @@ export class SearchScreen {
           // Update button display
           const ballIcon = ballSelectorBtn.querySelector('.ball-icon');
           const ballCount = ballSelectorBtn.querySelector('.ball-count');
-          if (ballIcon) ballIcon.src = this.getBallSprite(ballType);
-          if (ballCount) ballCount.textContent = this.getBallCount(ballType);
+          if (ballIcon) {
+            ballIcon.src = this.getBallSprite(ballType);
+            console.log('[SearchScreen] Updated ball icon to:', ballIcon.src);
+          }
+          if (ballCount) {
+            ballCount.textContent = this.getBallCount(ballType);
+            console.log('[SearchScreen] Updated ball count to:', ballCount.textContent);
+          }
 
           // Close dropdown
           ballSelectorDropdown.style.display = 'none';
+          console.log('[SearchScreen] Dropdown closed');
         });
       });
 
@@ -802,7 +818,21 @@ export class SearchScreen {
 
   disableButtons(disabled) {
     const buttons = this.container.querySelectorAll('.move-btn-pokemon, .action-btn-pokemon');
-    buttons.forEach(btn => btn.disabled = disabled);
+    console.log('[SearchScreen] Setting buttons disabled state to:', disabled, 'for', buttons.length, 'buttons');
+    buttons.forEach(btn => {
+      // Don't disable the ball selector button
+      if (btn.classList.contains('ball-selector-btn')) {
+        return;
+      }
+      btn.disabled = disabled;
+      if (disabled) {
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.5';
+      } else {
+        btn.style.pointerEvents = 'auto';
+        btn.style.opacity = '1';
+      }
+    });
   }
 
   delay(ms) {
