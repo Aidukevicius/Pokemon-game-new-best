@@ -351,34 +351,55 @@ export class SearchScreen {
     const catchBtn = this.container.querySelector('[data-action="catch"]');
     const runBtn = this.container.querySelector('[data-action="run"]');
 
-    catchBtn?.addEventListener('click', () => this.attemptCatch());
-    runBtn?.addEventListener('click', () => this.runAway());
+    if (catchBtn) {
+      catchBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('[SearchScreen] Catch button clicked');
+        this.attemptCatch();
+      });
+    }
+    
+    if (runBtn) {
+      runBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('[SearchScreen] Run button clicked');
+        this.runAway();
+      });
+    }
 
     // Ball selector dropdown toggle
     const ballSelectorBtn = this.container.querySelector('#ballSelectorBtn');
     const ballSelectorDropdown = this.container.querySelector('#ballSelectorDropdown');
 
     if (ballSelectorBtn && ballSelectorDropdown) {
-      ballSelectorBtn.addEventListener('click', (e) => {
+      // Remove any existing listeners
+      const newBallSelectorBtn = ballSelectorBtn.cloneNode(true);
+      ballSelectorBtn.parentNode.replaceChild(newBallSelectorBtn, ballSelectorBtn);
+
+      newBallSelectorBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        console.log('[SearchScreen] Ball selector clicked');
         const isVisible = ballSelectorDropdown.style.display === 'block';
         ballSelectorDropdown.style.display = isVisible ? 'none' : 'block';
       });
 
-      // Close dropdown when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!ballSelectorBtn.contains(e.target) && !ballSelectorDropdown.contains(e.target)) {
-          ballSelectorDropdown.style.display = 'none';
-        }
-      });
-
       // Ball option selection
       const ballOptions = this.container.querySelectorAll('.ball-option');
+      console.log('[SearchScreen] Found ball options:', ballOptions.length);
+      
       ballOptions.forEach(option => {
-        option.addEventListener('click', () => {
-          if (option.classList.contains('disabled')) return;
+        option.addEventListener('click', (e) => {
+          e.stopPropagation();
+          
+          if (option.classList.contains('disabled')) {
+            console.log('[SearchScreen] Ball disabled, ignoring click');
+            return;
+          }
 
           const ballType = option.dataset.ball;
+          console.log('[SearchScreen] Selected ball type:', ballType);
           this.selectedBallType = ballType;
 
           // Update selected state
@@ -386,8 +407,8 @@ export class SearchScreen {
           option.classList.add('selected');
 
           // Update button display
-          const ballIcon = ballSelectorBtn.querySelector('.ball-icon');
-          const ballCount = ballSelectorBtn.querySelector('.ball-count');
+          const ballIcon = newBallSelectorBtn.querySelector('.ball-icon');
+          const ballCount = newBallSelectorBtn.querySelector('.ball-count');
           if (ballIcon) ballIcon.src = this.getBallSprite(ballType);
           if (ballCount) ballCount.textContent = this.getBallCount(ballType);
 
@@ -395,6 +416,15 @@ export class SearchScreen {
           ballSelectorDropdown.style.display = 'none';
         });
       });
+
+      // Close dropdown when clicking outside
+      setTimeout(() => {
+        document.addEventListener('click', (e) => {
+          if (!newBallSelectorBtn.contains(e.target) && !ballSelectorDropdown.contains(e.target)) {
+            ballSelectorDropdown.style.display = 'none';
+          }
+        });
+      }, 100);
     }
   }
 
@@ -918,12 +948,21 @@ export class SearchScreen {
   }
 
   async attemptCatch() {
-    const statusEl = this.container.querySelector('#battleLog');
+    console.log('[SearchScreen] attemptCatch called');
+    console.log('[SearchScreen] Current encounter:', this.currentEncounter);
+    console.log('[SearchScreen] Selected ball type:', this.selectedBallType);
+    console.log('[SearchScreen] Available pokeballs:', this.pokeballs);
 
-    if (!this.currentEncounter) return;
+    if (!this.currentEncounter) {
+      console.log('[SearchScreen] No encounter, returning');
+      return;
+    }
 
     const ball = this.pokeballs.find(b => b.item_id === this.selectedBallType);
+    console.log('[SearchScreen] Found ball:', ball);
+    
     if (!ball || ball.quantity <= 0) {
+      console.log('[SearchScreen] No balls available');
       this.battleLog.push(`No ${this.catchService.getBallDisplayName(this.selectedBallType)}s left!`);
       this.updateBattleLog();
       return;
