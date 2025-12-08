@@ -374,11 +374,7 @@ export class SearchScreen {
     const ballSelectorDropdown = this.container.querySelector('#ballSelectorDropdown');
 
     if (ballSelectorBtn && ballSelectorDropdown) {
-      // Remove any existing listeners
-      const newBallSelectorBtn = ballSelectorBtn.cloneNode(true);
-      ballSelectorBtn.parentNode.replaceChild(newBallSelectorBtn, ballSelectorBtn);
-
-      newBallSelectorBtn.addEventListener('click', (e) => {
+      ballSelectorBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         console.log('[SearchScreen] Ball selector clicked');
         const isVisible = ballSelectorDropdown.style.display === 'block';
@@ -407,8 +403,8 @@ export class SearchScreen {
           option.classList.add('selected');
 
           // Update button display
-          const ballIcon = newBallSelectorBtn.querySelector('.ball-icon');
-          const ballCount = newBallSelectorBtn.querySelector('.ball-count');
+          const ballIcon = ballSelectorBtn.querySelector('.ball-icon');
+          const ballCount = ballSelectorBtn.querySelector('.ball-count');
           if (ballIcon) ballIcon.src = this.getBallSprite(ballType);
           if (ballCount) ballCount.textContent = this.getBallCount(ballType);
 
@@ -418,13 +414,11 @@ export class SearchScreen {
       });
 
       // Close dropdown when clicking outside
-      setTimeout(() => {
-        document.addEventListener('click', (e) => {
-          if (!newBallSelectorBtn.contains(e.target) && !ballSelectorDropdown.contains(e.target)) {
-            ballSelectorDropdown.style.display = 'none';
-          }
-        });
-      }, 100);
+      document.addEventListener('click', (e) => {
+        if (!ballSelectorBtn.contains(e.target) && !ballSelectorDropdown.contains(e.target)) {
+          ballSelectorDropdown.style.display = 'none';
+        }
+      });
     }
   }
 
