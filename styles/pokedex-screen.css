@@ -10,9 +10,11 @@
 }
 
 .pokedex-header {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  background: #fff;
+  border: 3px solid #475569;
+  border-radius: 8px;
   padding: 12px;
-  color: white;
+  box-shadow: 4px 4px 0 rgba(71, 85, 105, 0.3);
 }
 
 .pokedex-title {
@@ -20,7 +22,7 @@
   margin: 0 0 8px 0;
   text-transform: uppercase;
   letter-spacing: 2px;
-  text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+  color: #1e293b;
 }
 
 .pokedex-stats {
@@ -30,19 +32,25 @@
 }
 
 .pokedex-stats .stat-badge {
-  background: rgba(255, 255, 255, 0.2);
+  background: #f1f5f9;
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 9px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid #cbd5e1;
+  color: #475569;
+  font-weight: bold;
 }
 
 .pokedex-stats .stat-badge.encountered {
-  background: rgba(59, 130, 246, 0.3);
+  background: #dbeafe;
+  border-color: #3b82f6;
+  color: #1e40af;
 }
 
 .pokedex-stats .stat-badge.caught {
-  background: rgba(34, 197, 94, 0.3);
+  background: #dcfce7;
+  border-color: #22c55e;
+  color: #166534;
 }
 
 .progress-bar-container {
@@ -54,7 +62,8 @@
 .progress-bar {
   flex: 1;
   height: 8px;
-  background: rgba(0,0,0,0.3);
+  background: #cbd5e1;
+  border: 2px solid #475569;
   border-radius: 4px;
   overflow: hidden;
 }
@@ -68,6 +77,8 @@
 .progress-text {
   font-size: 8px;
   white-space: nowrap;
+  color: #475569;
+  font-weight: bold;
 }
 
 .pokedex-controls {
