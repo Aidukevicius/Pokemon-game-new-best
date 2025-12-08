@@ -217,13 +217,14 @@
 
 .battle-mode {
   background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-  border: 4px solid #0f3460;
+  border: 3px solid #0f3460;
   border-radius: 0;
-  padding: 6px;
+  padding: 4px;
   min-height: 100%;
   position: relative;
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 /* Power LED for battle mode */
@@ -257,11 +258,11 @@
 .battle-field-large {
   position: relative;
   flex: 1;
-  min-height: 200px;
+  min-height: 220px;
   background: linear-gradient(180deg, #87ceeb 0%, #98d1a8 50%, #5a9a5a 80%, #3d7a3d 100%);
-  border: 4px solid #2d4a2d;
+  border: 3px solid #2d4a2d;
   border-radius: 4px;
-  margin-bottom: 2px;
+  margin-bottom: 0;
   overflow: hidden;
   box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
 }
@@ -287,33 +288,33 @@
 /* Enemy Pokemon - top right area */
 .enemy-pokemon-large {
   position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 50%;
+  top: 4px;
+  right: 4px;
+  width: 52%;
   z-index: 2;
 }
 
 /* Ally Pokemon - bottom left area */
 .ally-pokemon-large {
   position: absolute;
-  bottom: 6px;
-  left: 6px;
-  width: 50%;
+  bottom: 4px;
+  left: 4px;
+  width: 52%;
   z-index: 2;
 }
 
 /* Pokemon info plate - combines name, level, HP */
 .pokemon-info-plate {
   background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
-  border: 3px solid #475569;
+  border: 2px solid #475569;
   border-radius: 4px;
-  padding: 4px 8px;
-  margin-bottom: 4px;
-  box-shadow: 3px 3px 0 rgba(0,0,0,0.25);
+  padding: 3px 6px;
+  margin-bottom: 2px;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.25);
 }
 
 .ally-plate {
-  margin-top: 4px;
+  margin-top: 2px;
   margin-bottom: 0;
 }
 
@@ -342,17 +343,17 @@
 /* Large Pokemon Sprite Area */
 .pokemon-sprite-large {
   text-align: center;
-  padding: 4px;
+  padding: 2px;
 }
 
 .ally-sprite-lg {
   text-align: center;
-  padding: 4px;
+  padding: 2px;
 }
 
 .battle-sprite-lg {
-  width: 72px;
-  height: 72px;
+  width: 96px;
+  height: 96px;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
@@ -361,8 +362,8 @@
 }
 
 .battle-sprite-lg.ally {
-  width: 90px;
-  height: 90px;
+  width: 110px;
+  height: 110px;
   transform: scaleX(-1);
 }
 
@@ -425,9 +426,9 @@
   background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   border: 3px solid #475569;
   border-radius: 4px;
-  padding: 8px 12px;
-  margin: 4px 6px;
-  height: 40px;
+  padding: 8px 10px;
+  margin: 2px 0;
+  height: 36px;
   display: flex;
   align-items: center;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
@@ -505,30 +506,30 @@
 
 .battle-menu-pokemon {
   background: #303030;
-  border: 3px solid #505050;
-  border-radius: 8px;
-  padding: 6px;
+  border: 2px solid #505050;
+  border-radius: 6px;
+  padding: 4px;
 }
 
 .moves-grid-2x2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
-  margin-bottom: 4px;
+  gap: 3px;
+  margin-bottom: 3px;
 }
 
 .move-btn-pokemon {
   border: 2px solid rgba(255,255,255,0.3);
-  border-radius: 6px;
-  padding: 10px 6px;
+  border-radius: 5px;
+  padding: 8px 5px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 1px;
   transition: all 0.1s ease;
-  min-height: 38px;
+  min-height: 34px;
 }
 
 .move-btn-pokemon:hover:not(:disabled) {
@@ -622,14 +623,14 @@
 /* Pokemon-style Action buttons row */
 .actions-row-pokemon {
   display: flex;
-  gap: 4px;
+  gap: 3px;
 }
 
 .action-btn-pokemon {
   flex: 1;
   border: 2px solid rgba(255,255,255,0.3);
-  border-radius: 6px;
-  padding: 8px;
+  border-radius: 5px;
+  padding: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;

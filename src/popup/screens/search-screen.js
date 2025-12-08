@@ -333,7 +333,7 @@ export class SearchScreen {
     if (!moveHit) {
       this.battleLog.push(`${this.currentEncounter.pokemon.name} avoided the attack!`);
       this.updateBattleLog();
-      await this.delay(800);
+      await this.delay(1500);
       await this.enemyTurn();
       this.render();
       return;
@@ -343,7 +343,7 @@ export class SearchScreen {
       const statusEffects = this.getStatusEffect(move.name);
       this.battleLog.push(statusEffects);
       this.updateBattleLog();
-      await this.delay(800);
+      await this.delay(1500);
       await this.enemyTurn();
       this.render();
       return;
@@ -393,11 +393,13 @@ export class SearchScreen {
 
     if (this.currentEncounter.currentHp === 0) {
       this.disableButtons(true);
-      await this.delay(1500);
+      await this.delay(2000);
       this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} fainted!`);
-      this.battleLog.push('You won the battle!');
       this.updateBattleLog();
       await this.delay(2000);
+      this.battleLog.push('You won the battle!');
+      this.updateBattleLog();
+      await this.delay(2500);
       this.currentEncounter = null;
       this.battleLog = [];
       this.render();
@@ -406,13 +408,18 @@ export class SearchScreen {
 
     await this.animateDamage('enemy');
 
+    if (result.critical) {
+      this.battleLog.push('A critical hit!');
+      this.updateBattleLog();
+      await this.delay(1200);
+    }
+    
     let damageMsg = `It dealt ${result.damage} damage!`;
-    if (result.critical) damageMsg = `Critical hit! ${damageMsg}`;
-    if (result.stab) damageMsg += ' (STAB!)';
+    if (result.stab) damageMsg += ' (STAB bonus!)';
     this.battleLog.push(damageMsg);
     this.updateBattleLog();
 
-    await this.delay(300);
+    await this.delay(1200);
     await this.enemyTurn();
 
     if (this.currentEncounter) {
@@ -476,18 +483,27 @@ export class SearchScreen {
 
     this.updateHpDisplay('ally', companionHp, 100);
 
+    if (result.critical) {
+      this.battleLog.push('A critical hit!');
+      this.updateBattleLog();
+      await this.delay(1200);
+    }
+
     let damageMsg = `Your ${this.companion.name} took ${actualDamage} damage!`;
-    if (result.critical) damageMsg = `Critical hit! ${damageMsg}`;
     this.battleLog.push(damageMsg);
     this.updateBattleLog();
 
+    await this.delay(1200);
+
     if (companionHp === 0) {
       this.disableButtons(true);
-      await this.delay(1500);
+      await this.delay(2000);
       this.battleLog.push(`${this.companion.name} fainted!`);
-      this.battleLog.push('You lost the battle...');
       this.updateBattleLog();
       await this.delay(2000);
+      this.battleLog.push('You lost the battle...');
+      this.updateBattleLog();
+      await this.delay(2500);
       this.currentEncounter = null;
       this.battleLog = [];
       this.render();
@@ -814,7 +830,7 @@ export class SearchScreen {
     this.battleLog.push('You threw a Pokeball!');
     this.updateBattleLog();
 
-    await this.delay(1000);
+    await this.delay(1500);
 
     const result = await this.catchService.attemptCatch(this.currentEncounter);
 
@@ -824,17 +840,26 @@ export class SearchScreen {
 
       await this.saveCaughtPokemonToServer(this.currentEncounter);
 
-      await this.delay(2000);
+      await this.delay(2500);
       this.currentEncounter = null;
       this.battleLog = [];
       this.render();
     } else {
       if (result.reason === 'no_pokeballs') {
         this.battleLog.push(`You don't have any Pokeballs!`);
+        this.updateBattleLog();
+        await this.delay(1500);
       } else {
         this.battleLog.push(`Oh no! ${this.currentEncounter.pokemon.name} broke free!`);
+        this.updateBattleLog();
+        await this.delay(1500);
+        
+        await this.enemyTurn();
+        
+        if (this.currentEncounter) {
+          this.render();
+        }
       }
-      this.updateBattleLog();
       this.disableButtons(false);
     }
   }

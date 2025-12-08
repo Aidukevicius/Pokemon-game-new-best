@@ -99,6 +99,13 @@
   z-index: 1;
 }
 
+.pokemon-sprite.high-quality {
+  image-rendering: auto;
+  image-rendering: smooth;
+  image-rendering: high-quality;
+  -webkit-image-rendering: high-quality;
+}
+
 .pokemon-sprite:hover {
   transform: scale(1.1);
 }

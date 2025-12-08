@@ -136,7 +136,7 @@ export class MainScreen {
           id="pokemonSprite"
           src="${spriteUrl}"
           alt="${this.companionPokemon.name}"
-          class="pokemon-sprite"
+          class="pokemon-sprite high-quality"
           onerror="this.src='${fallbackUrl}';"
         />
       </div>
