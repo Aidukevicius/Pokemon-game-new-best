@@ -108,6 +108,11 @@ The preview server runs on port 5000 displaying `preview.html`, which embeds pop
 3. Load unpacked extension from this directory
 
 ## Recent Changes
+- **2025-12-08**: Improved companion Pokemon display with high-quality smooth rendering (non-pixelated)
+- **2025-12-08**: Added enemy counter-attack after failed Pokeball catch attempts
+- **2025-12-08**: Slowed down battle sequence for better message readability (1.2-2.5s delays)
+- **2025-12-08**: Critical hit messages now display separately in battle log before damage
+- **2025-12-08**: Made battle screen more compact with larger Pokemon sprites (96px enemy, 110px ally)
 - **2025-12-05**: Implemented authentic Gen 3+ damage formula with complete 18-type effectiveness chart
 - **2025-12-05**: Added BattleService with STAB, critical hits (2.0x Gen3 multiplier), type immunities
 - **2025-12-05**: Implemented physical/special move split using damageClass from PokeAPI
