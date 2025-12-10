@@ -3,8 +3,14 @@
 ## Project Overview
 A lofi SNES-style Pokemon catching game implemented as a Chrome extension. Users can encounter and catch Pokemon while browsing the web. Features a mobile-shaped popup (360x640px) with tab-based navigation for different screens.
 
-## Current State (December 5, 2025)
-**Phase**: Battle System Complete - Authentic Gen 3+ Mechanics
+## Current State (December 10, 2025)
+**Phase**: Leveling & EV System Complete
+- Full experience/leveling system with Gen 5+ experience formula
+- EV (Effort Value) rewards from defeating wild Pokemon
+- All 151 Gen 1 Pokemon have proper EV yields and base experience values
+- Level-up notifications with stat recalculation
+- Max 510 total EVs, 252 per stat (authentic Pokemon limits)
+- Experience-based level progression using Medium Fast growth rate
 - Authentic Gen 3+ damage formula with STAB, critical hits (2.0x), and type effectiveness
 - Complete 18-type effectiveness chart with immunities, resistances, and super effective matchups
 - Physical/special move split based on PokeAPI damageClass
