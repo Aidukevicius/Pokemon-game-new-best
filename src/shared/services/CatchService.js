@@ -26,7 +26,8 @@ export class CatchService {
           message: `You don't have any ${this.getBallDisplayName(ballType)}s!`
         };
       }
-      ballsRemaining = ball.quantity - 1;
+      // Don't decrement here - caller handles server update
+      ballsRemaining = ball.quantity;
     } else {
       // Fall back to local storage
       const inventory = await this.storage.get('inventory') || { 'poke-ball': 5 };
