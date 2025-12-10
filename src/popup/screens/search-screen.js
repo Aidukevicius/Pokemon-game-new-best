@@ -987,6 +987,7 @@ export class SearchScreen {
     console.log('[SearchScreen] Triggering test encounter:', rarity);
 
     await this.loadCompanion();
+    await this.loadPokeballs();
 
     const encounter = this.encounterService.generateEncounter('normal');
 
@@ -1197,9 +1198,11 @@ export class SearchScreen {
 
   show() {
     this.container.style.display = 'block';
-    this.loadCompanion().then(() => {
-      this.loadEncounterQueue().then(() => this.render());
-    });
+    Promise.all([
+      this.loadCompanion(),
+      this.loadPokeballs(),
+      this.loadEncounterQueue()
+    ]).then(() => this.render());
   }
 
   hide() {
