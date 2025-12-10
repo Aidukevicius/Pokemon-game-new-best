@@ -522,6 +522,7 @@ export class SearchScreen {
     const moves = this.getCompanionMoves();
     const move = moves[moveIndex];
 
+    // Disable buttons immediately and keep them disabled
     this.disableButtons(true);
 
     const hitRoll = Math.random() * 100;
@@ -537,9 +538,9 @@ export class SearchScreen {
       this.battleLog.push(`Attack missed! ${this.currentEncounter.pokemon.name} avoided it!`);
       this.updateBattleLog();
       await this.delay(1500);
+      // Enemy turn will handle re-enabling buttons
       await this.enemyTurn();
       this.battleInProgress = false;
-      this.render();
       return;
     }
 
@@ -548,9 +549,9 @@ export class SearchScreen {
       this.battleLog.push(statusEffects);
       this.updateBattleLog();
       await this.delay(1500);
+      // Enemy turn will handle re-enabling buttons
       await this.enemyTurn();
       this.battleInProgress = false;
-      this.render();
       return;
     }
 
@@ -583,12 +584,9 @@ export class SearchScreen {
       this.battleLog.push(`${this.companion.name}'s attack missed!`);
       this.updateBattleLog();
       await this.delay(300);
+      // Enemy turn will handle re-enabling buttons
       await this.enemyTurn();
       this.battleInProgress = false;
-      if (this.currentEncounter) {
-        this.disableButtons(false);
-        this.render();
-      }
       return;
     }
 
@@ -598,7 +596,7 @@ export class SearchScreen {
     this.render();
 
     if (this.currentEncounter.currentHp === 0) {
-      this.disableButtons(true);
+      // Keep buttons disabled during victory sequence
       await this.delay(2000);
       this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} fainted!`);
       this.updateBattleLog();
@@ -626,10 +624,9 @@ export class SearchScreen {
     this.updateBattleLog();
 
     await this.delay(1500);
+    // Enemy turn will re-enable buttons when it completes
     await this.enemyTurn();
     this.battleInProgress = false;
-    
-    // Don't re-enable buttons here - enemyTurn() handles it
   }
 
   async enemyTurn() {
