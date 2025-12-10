@@ -42,25 +42,31 @@ export class ShopScreen {
         <div class="shop-items">
           <div class="shop-item" data-item="pokeball" data-price="10">
             <div class="item-icon">⚪</div>
-            <h3>Pokéball</h3>
-            <p>Standard catching ball</p>
-            <div class="price">10 coins</div>
+            <div class="item-info">
+              <h3>Pokéball</h3>
+              <p>Standard catching ball</p>
+              <div class="price">💰 10</div>
+            </div>
             <button class="buy-button">Buy</button>
           </div>
 
           <div class="shop-item" data-item="greatball" data-price="30">
             <div class="item-icon">🔵</div>
-            <h3>Great Ball</h3>
-            <p>Better catch rate</p>
-            <div class="price">30 coins</div>
+            <div class="item-info">
+              <h3>Great Ball</h3>
+              <p>Better catch rate</p>
+              <div class="price">💰 30</div>
+            </div>
             <button class="buy-button">Buy</button>
           </div>
 
           <div class="shop-item" data-item="ultraball" data-price="50">
             <div class="item-icon">🟡</div>
-            <h3>Ultra Ball</h3>
-            <p>Highest catch rate</p>
-            <div class="price">50 coins</div>
+            <div class="item-info">
+              <h3>Ultra Ball</h3>
+              <p>Highest catch rate</p>
+              <div class="price">💰 50</div>
+            </div>
             <button class="buy-button">Buy</button>
           </div>
         </div>
