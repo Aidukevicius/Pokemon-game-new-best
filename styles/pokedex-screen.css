@@ -8,6 +8,12 @@
   overflow-x: hidden;
   box-sizing: border-box;
   max-height: calc(100vh - 60px);
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.pokedex-screen::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .pokedex-header {
@@ -119,6 +125,12 @@
   overflow-y: auto;
   min-height: 0;
   padding-bottom: 8px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.pokedex-grid::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .pokedex-card {
@@ -267,6 +279,12 @@
     0 0 0 2px #3a3a5e,
     0 8px 32px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.pokedex-detail-modal::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .pokedex-detail-modal .close-btn {
