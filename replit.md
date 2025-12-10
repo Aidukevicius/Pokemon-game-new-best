@@ -108,6 +108,10 @@ The preview server runs on port 5000 displaying `preview.html`, which embeds pop
 3. Load unpacked extension from this directory
 
 ## Recent Changes
+- **2025-12-10**: Fixed Pokemon sprite sizing - both ally and enemy now use equal 88x88px dimensions with object-fit:contain
+- **2025-12-10**: Fixed Pokeball selection persistence - selectedBallType stored in localStorage, auto-switches when ball depleted
+- **2025-12-10**: Fixed battle log dialog box - consistent 56px height with overflow scrolling for longer messages
+- **2025-12-10**: Added updateBallSelectorUI() to immediately refresh ball icon/count when selection changes
 - **2025-12-08**: Added Pokeball selector in battle screen with dropdown menu to switch between ball types
 - **2025-12-08**: Added Poke Ball, Great Ball, Ultra Ball, and Master Ball items with different catch rate multipliers
 - **2025-12-08**: Items screen now seeds with Pokeballs (20 Poke, 10 Great, 5 Ultra, 1 Master)
