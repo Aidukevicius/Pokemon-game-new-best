@@ -1,155 +1,135 @@
-// SHOP/TRADING SCREEN COMPONENT PLACEHOLDER
+// SHOP/TRADING SCREEN
 // Buy items and trade Pokemon
 
-// WHAT GOES HERE:
-
-/*
-CLASS: ShopScreen
-
-RESPONSIBILITIES:
-- Display shop items for purchase
-- Handle transactions
-- Show currency/points balance
-- Trading functionality (future)
-- Daily deals (future)
-
-IMPORTS:
 import { StorageService } from '../../shared/services/StorageService.js';
 
-CURRENCY SYSTEM:
-- PokéCoins earned by:
-  * Catching Pokemon
-  * Daily login bonus
-  * Completing achievements
-- Stored in player data
+export class ShopScreen {
+  constructor(containerElement) {
+    this.container = containerElement;
+    this.storage = new StorageService();
+    this.inventory = null;
+    this.playerData = null;
+  }
 
-SHOP ITEMS:
-- Pokéballs: 10 coins each
-- Great Balls: 30 coins each (future)
-- Ultra Balls: 50 coins each (future)
-- Potions: 20 coins each (future)
-- Rare items: varies (future)
+  async initialize() {
+    console.log('[ShopScreen] Initializing...');
+    await this.loadData();
+    this.render();
+  }
 
-METHODS:
+  async loadData() {
+    this.inventory = await this.storage.get('inventory') || {
+      pokeballs: 5,
+      greatballs: 0,
+      ultraballs: 0
+    };
+    this.playerData = await this.storage.get('playerData') || {
+      coins: 100
+    };
+  }
 
-constructor(containerElement)
-- Store reference to shop container
-- Initialize StorageService
-- Load shop data
+  render() {
+    this.container.innerHTML = `
+      <div class="shop-screen">
+        <div class="shop-header">
+          <h2>PokéMart</h2>
+          <div class="balance">
+            <span class="coin-icon">💰</span>
+            <span class="coin-amount">${this.playerData.coins}</span>
+          </div>
+        </div>
 
-render()
-- Build shop interface:
-  * Header with currency balance
-  * Shop items grid
-  * Item purchase cards
-- SNES-style shop aesthetic (like retro RPG shop)
+        <div class="shop-items">
+          <div class="shop-item" data-item="pokeball" data-price="10">
+            <div class="item-icon">⚪</div>
+            <h3>Pokéball</h3>
+            <p>Standard catching ball</p>
+            <div class="price">10 coins</div>
+            <button class="buy-button">Buy</button>
+          </div>
 
-displayBalance()
-- Show player's PokéCoin balance
-- Prominent display in header
-- Update when purchase made
+          <div class="shop-item" data-item="greatball" data-price="30">
+            <div class="item-icon">🔵</div>
+            <h3>Great Ball</h3>
+            <p>Better catch rate</p>
+            <div class="price">30 coins</div>
+            <button class="buy-button">Buy</button>
+          </div>
 
-displayShopItems()
-- Render grid of items for sale
-- Each item shows:
-  * Item icon
-  * Item name
-  * Price in PokéCoins
-  * Description
-  * "Buy" button
-- SNES-style item cards
+          <div class="shop-item" data-item="ultraball" data-price="50">
+            <div class="item-icon">🟡</div>
+            <h3>Ultra Ball</h3>
+            <p>Highest catch rate</p>
+            <div class="price">50 coins</div>
+            <button class="buy-button">Buy</button>
+          </div>
+        </div>
 
-onBuyClick(itemId, price)
-- Check if player has enough coins
-- If yes:
-  * Deduct coins
-  * Add item to inventory
-  * Show success message
-  * Update balance display
-- If no:
-  * Show "Not enough coins!" message
-  * Shake the item card
+        <div class="shop-message" style="display: none;"></div>
+      </div>
+    `;
 
-purchaseItem(itemId, quantity)
-- Deduct currency from player
-- Add item to storage
-- Save to StorageService
-- Return success/fail
+    this.attachEventListeners();
+  }
 
-showPurchaseConfirm(item, price)
-- SNES-style dialog box:
-  "Buy [item] for [price] coins?"
-  [Yes] [No]
+  attachEventListeners() {
+    const buyButtons = this.container.querySelectorAll('.buy-button');
+    buyButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        const itemCard = e.target.closest('.shop-item');
+        const itemId = itemCard.dataset.item;
+        const price = parseInt(itemCard.dataset.price);
+        this.handlePurchase(itemId, price);
+      });
+    });
+  }
 
-showPurchaseSuccess(item)
-- Animation/message
-- "You bought [item]!"
-- Maybe pixel art coins flying animation
+  async handlePurchase(itemId, price) {
+    if (this.playerData.coins < price) {
+      this.showMessage('Not enough coins!', 'error');
+      return;
+    }
 
-showInsufficientFunds()
-- Error message
-- "Not enough PokéCoins!"
-- Suggest how to earn more
+    // Deduct coins
+    this.playerData.coins -= price;
 
-TRADING SECTION (Future):
-- Trade Pokemon with other players
-- List your Pokemon for trade
-- Browse available trades
-- Trading interface
+    // Add item to inventory
+    const itemKey = itemId + 's'; // pokeball -> pokeballs
+    this.inventory[itemKey] = (this.inventory[itemKey] || 0) + 1;
 
-DAILY DEALS:
-- Special discounted items
-- Rotate daily
-- Limited quantity
+    // Save to storage
+    await this.storage.set('playerData', this.playerData);
+    await this.storage.set('inventory', this.inventory);
 
-show()
-- Make shop screen visible
-- Refresh items and balance
+    // Update UI
+    this.updateBalance();
+    this.showMessage(`Bought ${itemId}!`, 'success');
+  }
 
-hide()
-- Hide shop screen
+  updateBalance() {
+    const balanceEl = this.container.querySelector('.coin-amount');
+    if (balanceEl) {
+      balanceEl.textContent = this.playerData.coins;
+    }
+  }
 
-HTML STRUCTURE:
-<div class="shop-screen">
-  <div class="shop-header">
-    <h2>PokéMart</h2>
-    <div class="balance">
-      <img src="coin-icon.png" alt="PokéCoins">
-      <span class="coin-amount">150</span>
-    </div>
-  </div>
-  
-  <div class="shop-items">
-    <div class="shop-item">
-      <img src="pokeball.png" alt="Pokéball">
-      <h3>Pokéball</h3>
-      <p>Standard catching ball</p>
-      <div class="price">10 coins</div>
-      <button class="buy-button">Buy</button>
-    </div>
-    <!-- More items -->
-  </div>
-  
-  <div class="trading-section">
-    <!-- Future trading UI -->
-  </div>
-</div>
+  showMessage(text, type) {
+    const messageEl = this.container.querySelector('.shop-message');
+    messageEl.textContent = text;
+    messageEl.className = `shop-message ${type}`;
+    messageEl.style.display = 'block';
 
-STYLING NOTES:
-- Retro RPG shop aesthetic
-- SNES-style price tags
-- Item cards with pixel borders
-- Coin icon next to balance
-- Buy button: SNES style, disabled if can't afford
-- Success animation: coins sparkle
+    setTimeout(() => {
+      messageEl.style.display = 'none';
+    }, 2000);
+  }
 
-EARNING COINS:
-- 5 coins per Pokemon caught
-- 10 bonus coins for rare Pokemon
-- 50 bonus coins for legendary
-- Daily login: 20 coins
-- Achievements: varies
+  show() {
+    this.container.style.display = 'block';
+    this.loadData().then(() => this.updateBalance());
+  }
 
-EXPORTS:
-export class ShopScreen { ... }
-*/
+  hide() {
+    this.container.style.display = 'none';
+  }
+}

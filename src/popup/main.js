@@ -7,6 +7,7 @@ import { CollectionScreen } from './screens/collection-screen.js';
 import { SettingsScreen } from './screens/settings-screen.js';
 import { SearchScreen } from './screens/search-screen.js';
 import { PokedexScreen } from './screens/pokedex-screen.js';
+import { ShopScreen } from './screens/shop-screen.js';
 
 console.log('[Main] Script loaded');
 console.log('[Main] Screens imported');
@@ -58,6 +59,12 @@ async function initializeApp() {
     pokedexContainer.style.display = 'none';
     screensContainer.appendChild(pokedexContainer);
 
+    const shopContainer = document.createElement('div');
+    shopContainer.id = 'shop-screen-container';
+    shopContainer.className = 'screen-container';
+    shopContainer.style.display = 'none';
+    screensContainer.appendChild(shopContainer);
+
     // Initialize screens
     console.log('[Main] Creating screens...');
     const mainScreen = new MainScreen(mainContainer);
@@ -66,6 +73,7 @@ async function initializeApp() {
     const pokedexScreen = new PokedexScreen(pokedexContainer);
     const settingsScreen = new SettingsScreen(settingsContainer);
     const searchScreen = new SearchScreen(searchContainer);
+    const shopScreen = new ShopScreen(shopContainer);
 
     const screens = {
       main: mainScreen,
@@ -73,7 +81,8 @@ async function initializeApp() {
       pokedex: pokedexScreen,
       collection: collectionScreen,
       settings: settingsScreen,
-      search: searchScreen
+      search: searchScreen,
+      shop: shopScreen
     };
 
     console.log('[Main] Initializing MainScreen...');
@@ -83,6 +92,7 @@ async function initializeApp() {
     await pokedexScreen.initialize();
     await settingsScreen.initialize();
     await searchScreen.initialize();
+    await shopScreen.initialize();
 
     console.log('[Main] Showing MainScreen...');
     mainScreen.show();
