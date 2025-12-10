@@ -548,6 +548,8 @@
 .move-btn-pokemon:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  filter: grayscale(80%) brightness(0.8);
+  pointer-events: none;
 }
 
 .move-name-pokemon {
@@ -759,6 +761,8 @@
 .action-btn-pokemon:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  filter: grayscale(80%) brightness(0.8);
+  pointer-events: none;
 }
 
 .catch-pokemon {
