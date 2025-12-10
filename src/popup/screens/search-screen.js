@@ -378,6 +378,10 @@ export class SearchScreen {
     const moveBtns = this.container.querySelectorAll('.move-btn-pokemon');
     moveBtns.forEach(btn => {
       btn.addEventListener('click', () => {
+        if (this.battleInProgress) {
+          console.log('[SearchScreen] Battle in progress, ignoring button click');
+          return;
+        }
         const moveIndex = parseInt(btn.dataset.move);
         const power = parseInt(btn.dataset.power) || 0;
         const type = btn.dataset.type;
@@ -386,6 +390,10 @@ export class SearchScreen {
         this.executeMove(moveIndex, power, type, accuracy, isStatus);
       });
     });
+    
+    if (this.battleInProgress) {
+      this.disableButtons(true);
+    }
 
     const catchBtn = this.container.querySelector('[data-action="catch"]');
     const runBtn = this.container.querySelector('[data-action="run"]');
@@ -395,6 +403,10 @@ export class SearchScreen {
       catchBtn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
+        if (this.battleInProgress) {
+          console.log('[SearchScreen] Battle in progress, ignoring catch click');
+          return;
+        }
         console.log('[SearchScreen] Catch button clicked!');
         console.log('[SearchScreen] Selected ball type:', this.selectedBallType);
         console.log('[SearchScreen] Current encounter:', this.currentEncounter);
@@ -408,6 +420,10 @@ export class SearchScreen {
       runBtn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
+        if (this.battleInProgress) {
+          console.log('[SearchScreen] Battle in progress, ignoring run click');
+          return;
+        }
         console.log('[SearchScreen] Run button clicked');
         this.runAway();
       });
