@@ -615,11 +615,8 @@ export class SearchScreen {
 
     await this.delay(1500);
     await this.enemyTurn();
-
-    if (this.currentEncounter) {
-      this.disableButtons(false);
-      this.render();
-    }
+    
+    // Don't re-enable buttons here - enemyTurn() handles it
   }
 
   async enemyTurn() {
@@ -663,6 +660,8 @@ export class SearchScreen {
       this.battleLog.push(`${this.currentEncounter.pokemon.name}'s attack missed!`);
       this.updateBattleLog();
       await this.delay(1200);
+      // Re-enable buttons after enemy miss
+      this.disableButtons(false);
       return;
     }
 
@@ -700,6 +699,7 @@ export class SearchScreen {
       this.battleLog = [];
       this.render();
     } else {
+      // Re-enable buttons after enemy turn completes
       this.disableButtons(false);
     }
   }
