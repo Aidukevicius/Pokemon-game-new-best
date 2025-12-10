@@ -635,6 +635,9 @@ export class SearchScreen {
   async enemyTurn() {
     if (!this.currentEncounter || !this.companion) return;
 
+    // Keep buttons disabled during enemy turn
+    this.disableButtons(true);
+
     const enemyMove = this.battleService.selectWildPokemonMove(
       this.currentEncounter.pokemon,
       this.currentEncounter.level
@@ -1087,6 +1090,7 @@ export class SearchScreen {
       console.log('[SearchScreen] No balls available');
       this.battleLog.push(`No ${this.catchService.getBallDisplayName(this.selectedBallType)}s left!`);
       this.updateBattleLog();
+      await this.delay(1500);
       return;
     }
 
@@ -1138,13 +1142,14 @@ export class SearchScreen {
         this.updateBattleLog();
         await this.delay(1500);
 
+        // Keep buttons disabled during enemy counter-attack
         await this.enemyTurn();
 
         if (this.currentEncounter) {
           this.render();
         }
       }
-      this.disableButtons(false);
+      // Only re-enable if catch was successful or enemy turn handled it
     }
   }
 
