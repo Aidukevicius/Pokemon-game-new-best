@@ -13,7 +13,7 @@ export class SearchScreen {
     this.catchService = new CatchService();
     this.spriteService = new SpriteService();
     this.encounterService = new EncounterService();
-    this.selectedBallType = 'poke-ball';
+    this.selectedBallType = localStorage.getItem('selectedBallType') || 'poke-ball';
     this.pokeballs = [];
     this.moveService = new MoveService();
     this.battleService = new BattleService();
@@ -41,18 +41,56 @@ export class SearchScreen {
       this.pokeballs = items.filter(item => item.category === 'pokeball');
       console.log('[SearchScreen] Loaded pokeballs:', this.pokeballs);
 
-      if (this.pokeballs.length > 0) {
-        const currentBall = this.pokeballs.find(b => b.itemId === this.selectedBallType);
-        if (!currentBall || currentBall.quantity <= 0) {
-          const availableBall = this.pokeballs.find(b => b.quantity > 0);
-          if (availableBall) {
-            this.selectedBallType = availableBall.itemId;
-          }
-        }
-      }
+      this.ensureValidBallSelection();
     } catch (error) {
       console.error('[SearchScreen] Error loading pokeballs:', error);
       this.pokeballs = [];
+    }
+  }
+
+  ensureValidBallSelection() {
+    const previousBall = this.selectedBallType;
+    
+    if (this.pokeballs.length > 0) {
+      const currentBall = this.pokeballs.find(b => b.itemId === this.selectedBallType);
+      if (!currentBall || currentBall.quantity <= 0) {
+        const availableBall = this.pokeballs.find(b => b.quantity > 0);
+        if (availableBall) {
+          this.selectedBallType = availableBall.itemId;
+          localStorage.setItem('selectedBallType', availableBall.itemId);
+          console.log('[SearchScreen] Auto-switched to available ball:', this.selectedBallType);
+        } else {
+          const firstBall = this.pokeballs[0];
+          if (firstBall) {
+            this.selectedBallType = firstBall.itemId;
+            localStorage.setItem('selectedBallType', firstBall.itemId);
+          }
+          console.log('[SearchScreen] No balls with quantity > 0, using first ball type');
+        }
+      }
+    } else {
+      const storedBall = localStorage.getItem('selectedBallType');
+      if (storedBall) {
+        this.selectedBallType = storedBall;
+      }
+    }
+    
+    if (previousBall !== this.selectedBallType) {
+      this.updateBallSelectorUI();
+    }
+  }
+
+  updateBallSelectorUI() {
+    const ballSelectorBtn = this.container.querySelector('#ballSelectorBtn');
+    if (ballSelectorBtn) {
+      const ballIcon = ballSelectorBtn.querySelector('.ball-icon');
+      const ballCount = ballSelectorBtn.querySelector('.ball-count');
+      if (ballIcon) {
+        ballIcon.src = this.getBallSprite(this.selectedBallType);
+      }
+      if (ballCount) {
+        ballCount.textContent = this.getBallCount(this.selectedBallType);
+      }
     }
   }
 
@@ -405,6 +443,7 @@ export class SearchScreen {
           console.log('[SearchScreen] Ball option clicked:', ballType);
           console.log('[SearchScreen] Previous selectedBallType:', this.selectedBallType);
           this.selectedBallType = ballType;
+          localStorage.setItem('selectedBallType', ballType);
           console.log('[SearchScreen] New selectedBallType:', this.selectedBallType);
 
           // Update selected state
@@ -1038,6 +1077,7 @@ export class SearchScreen {
         body: JSON.stringify({ quantity: ball.quantity - 1 })
       });
       ball.quantity--;
+      this.ensureValidBallSelection();
     } catch (error) {
       console.error('[SearchScreen] Error updating ball count:', error);
     }
