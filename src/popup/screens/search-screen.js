@@ -1068,19 +1068,11 @@ export class SearchScreen {
 
     await this.delay(1500);
 
-    const result = await this.catchService.attemptCatch(this.currentEncounter, this.selectedBallType, this.pokeballs);
+    const result = await this.catchService.attemptCatch(this.currentEncounter, this.selectedBallType, this.pokeballse, this.pokeballs);
 
-    try {
-      await fetch(`/api/items/${this.selectedBallType}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity: ball.quantity - 1 })
-      });
-      ball.quantity--;
-      this.ensureValidBallSelection();
-    } catch (error) {
-      console.error('[SearchScreen] Error updating ball count:', error);
-    }
+    // Don't update inventory here - CatchService handles it via serverInventory parameter
+    // Just refresh the display after the result
+    this.ensureValidBallSelection();
 
     if (result.success) {
       this.battleLog.push(`Gotcha! ${this.currentEncounter.pokemon.name} was caught!`);
