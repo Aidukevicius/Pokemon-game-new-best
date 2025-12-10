@@ -23,6 +23,7 @@ export class SearchScreen {
     this.companionMoves = null;
     this.companionStats = null;
     this.battleLog = [];
+    this.battleInProgress = false;
   }
 
   async initialize() {
@@ -510,7 +511,14 @@ export class SearchScreen {
 
   async executeMove(moveIndex, power, type, accuracy = 100, isStatus = false) {
     if (!this.currentEncounter) return;
-
+    
+    // Prevent spam clicking
+    if (this.battleInProgress) {
+      console.log('[SearchScreen] Battle in progress, ignoring move');
+      return;
+    }
+    
+    this.battleInProgress = true;
     const moves = this.getCompanionMoves();
     const move = moves[moveIndex];
 
@@ -530,6 +538,7 @@ export class SearchScreen {
       this.updateBattleLog();
       await this.delay(1500);
       await this.enemyTurn();
+      this.battleInProgress = false;
       this.render();
       return;
     }
@@ -540,6 +549,7 @@ export class SearchScreen {
       this.updateBattleLog();
       await this.delay(1500);
       await this.enemyTurn();
+      this.battleInProgress = false;
       this.render();
       return;
     }
@@ -574,6 +584,7 @@ export class SearchScreen {
       this.updateBattleLog();
       await this.delay(300);
       await this.enemyTurn();
+      this.battleInProgress = false;
       if (this.currentEncounter) {
         this.disableButtons(false);
         this.render();
@@ -597,6 +608,7 @@ export class SearchScreen {
       await this.delay(2500);
       this.currentEncounter = null;
       this.battleLog = [];
+      this.battleInProgress = false;
       this.render();
       return;
     }
@@ -615,6 +627,7 @@ export class SearchScreen {
 
     await this.delay(1500);
     await this.enemyTurn();
+    this.battleInProgress = false;
     
     // Don't re-enable buttons here - enemyTurn() handles it
   }
@@ -697,6 +710,7 @@ export class SearchScreen {
       await this.delay(2500);
       this.currentEncounter = null;
       this.battleLog = [];
+      this.battleInProgress = false;
       this.render();
     } else {
       // Re-enable buttons after enemy turn completes
