@@ -233,7 +233,12 @@ export class MainScreen {
       } else {
         slotsHTML += `
           <div class="pokemon-slot empty">
-            <span class="empty-icon">?</span>
+            <svg class="empty-pokeball-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>
+              <line x1="2" y1="12" x2="22" y2="12" stroke="#cbd5e1" stroke-width="1.5"/>
+              <circle cx="12" cy="12" r="3" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>
+              <path d="M 12 2 A 10 10 0 0 1 22 12" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>
+            </svg>
           </div>
         `;
       }
