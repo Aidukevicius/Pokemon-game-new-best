@@ -1143,10 +1143,10 @@ export class SearchScreen {
         await this.enemyTurn();
 
         if (this.currentEncounter) {
+          this.disableButtons(false);
           this.render();
         }
       }
-      // Only re-enable if catch was successful or enemy turn handled it
     }
   }
 
