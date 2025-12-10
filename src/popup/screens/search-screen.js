@@ -4,6 +4,7 @@ import { SpriteService } from '../../shared/services/SpriteService.js';
 import { EncounterService } from '../../shared/services/EncounterService.js';
 import { MoveService } from '../../shared/services/MoveService.js';
 import { BattleService } from '../../shared/services/BattleService.js';
+import { LevelingService } from '../../shared/services/LevelingService.js';
 import { getPokemonById } from '../../shared/data/pokemon-database.js';
 
 export class SearchScreen {
@@ -13,6 +14,7 @@ export class SearchScreen {
     this.catchService = new CatchService();
     this.spriteService = new SpriteService();
     this.encounterService = new EncounterService();
+    this.levelingService = new LevelingService();
     this.selectedBallType = localStorage.getItem('selectedBallType') || 'poke-ball';
     this.pokeballs = [];
     this.moveService = new MoveService();
@@ -616,10 +618,12 @@ export class SearchScreen {
       await this.delay(2000);
       this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} fainted!`);
       this.updateBattleLog();
+      await this.delay(1500);
+      
+      // Award experience and EVs
+      await this.awardBattleRewards(this.currentEncounter);
+      
       await this.delay(2000);
-      this.battleLog.push('You won the battle!');
-      this.updateBattleLog();
-      await this.delay(2500);
       this.currentEncounter = null;
       this.battleLog = [];
       this.battleInProgress = false;
@@ -1040,6 +1044,116 @@ export class SearchScreen {
       console.log('[SearchScreen] Recorded Pokedex catch for Pokemon:', pokemonId);
     } catch (error) {
       console.error('[SearchScreen] Error recording Pokedex catch:', error);
+    }
+  }
+
+  async awardBattleRewards(defeatedEncounter) {
+    if (!this.companion) return;
+
+    const defeatedPokemon = {
+      id: defeatedEncounter.pokemon.id,
+      level: defeatedEncounter.level,
+      baseExp: this.levelingService.getBaseExperience(defeatedEncounter.pokemon.id)
+    };
+
+    // Calculate experience gained
+    const expGained = this.levelingService.calculateExperienceGain(
+      defeatedPokemon,
+      this.companion.level || 1,
+      true
+    );
+
+    // Get EV yield from defeated Pokemon
+    const evYield = this.levelingService.getEVYield(defeatedEncounter.pokemon.id);
+
+    // Check for level up
+    const currentExp = this.companion.experience || 0;
+    const currentLevel = this.companion.level || 1;
+    const levelResult = this.levelingService.checkLevelUp(currentLevel, currentExp, expGained);
+
+    // Apply EVs
+    const currentEVs = this.companion.evs || { hp: 0, attack: 0, defense: 0, spAttack: 0, spDefense: 0, speed: 0 };
+    const newEVs = this.levelingService.applyEVs(currentEVs, evYield);
+
+    // Show experience gained message
+    this.battleLog.push(`${this.companion.name} gained ${expGained} EXP!`);
+    this.updateBattleLog();
+    await this.delay(1500);
+
+    // Show EV gains
+    const evGainText = this.levelingService.formatEVGains(evYield);
+    if (evGainText) {
+      this.battleLog.push(`${this.companion.name} gained EVs: ${evGainText}`);
+      this.updateBattleLog();
+      await this.delay(1500);
+    }
+
+    // Handle level up
+    if (levelResult.didLevelUp) {
+      for (let i = 0; i < levelResult.levelsGained; i++) {
+        const newLevel = currentLevel + i + 1;
+        this.battleLog.push(`${this.companion.name} grew to level ${newLevel}!`);
+        this.updateBattleLog();
+        await this.delay(2000);
+      }
+    }
+
+    // Update companion locally
+    this.companion.experience = levelResult.newTotalExp;
+    this.companion.level = levelResult.newLevel;
+    this.companion.evs = newEVs;
+
+    // Recalculate stats after level up and EV gains
+    if (levelResult.didLevelUp) {
+      this.companionStats = this.battleService.calculateCompanionStats(this.companion);
+      this.companion.stats = this.companionStats;
+      
+      // Heal companion to new max HP on level up (optional, like Pokemon games)
+      const newMaxHp = this.companionStats.hp;
+      const hpGain = newMaxHp - (this.companion.maxHealth || 100);
+      if (hpGain > 0) {
+        this.companion.health = Math.min(newMaxHp, (this.companion.health || 100) + hpGain);
+        this.companion.maxHealth = newMaxHp;
+      }
+    }
+
+    // Save to server
+    await this.saveCompanionProgress(levelResult, newEVs);
+
+    // Also save to local storage
+    await this.storage.set('companion', this.companion);
+
+    console.log('[SearchScreen] Battle rewards applied:', {
+      expGained,
+      evYield,
+      levelResult,
+      newEVs
+    });
+  }
+
+  async saveCompanionProgress(levelResult, newEVs) {
+    try {
+      const updateData = {
+        experience: levelResult.newTotalExp,
+        level: levelResult.newLevel,
+        evs: newEVs
+      };
+
+      // If leveled up, also update health
+      if (levelResult.didLevelUp && this.companion) {
+        updateData.health = this.companion.health;
+        updateData.max_health = this.companion.maxHealth;
+      }
+
+      await fetch('/api/companion', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData)
+      });
+
+      console.log('[SearchScreen] Saved companion progress to server');
+    } catch (error) {
+      console.error('[SearchScreen] Error saving companion progress:', error);
     }
   }
 

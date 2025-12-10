@@ -581,14 +581,47 @@ def update_companion():
 
         if 'health' in data:
             companion.health = data['health']
+        if 'max_health' in data:
+            companion.max_health = data['max_health']
         if 'experience' in data:
             companion.experience = data['experience']
+        if 'level' in data:
+            companion.level = data['level']
         if 'happiness' in data:
             companion.happiness = data['happiness']
         if 'last_fed' in data:
             companion.last_fed = datetime.fromisoformat(data['last_fed'].replace('Z', '+00:00'))
         if 'last_interaction' in data:
             companion.last_interaction = datetime.fromisoformat(data['last_interaction'].replace('Z', '+00:00'))
+        
+        # Handle EV updates
+        if 'evs' in data:
+            evs = data['evs']
+            if 'hp' in evs:
+                companion.hp_ev = min(252, max(0, evs['hp']))
+            if 'attack' in evs:
+                companion.attack_ev = min(252, max(0, evs['attack']))
+            if 'defense' in evs:
+                companion.defense_ev = min(252, max(0, evs['defense']))
+            if 'spAttack' in evs:
+                companion.sp_attack_ev = min(252, max(0, evs['spAttack']))
+            if 'spDefense' in evs:
+                companion.sp_defense_ev = min(252, max(0, evs['spDefense']))
+            if 'speed' in evs:
+                companion.speed_ev = min(252, max(0, evs['speed']))
+            
+            # Validate total EVs don't exceed 510
+            total_evs = (companion.hp_ev + companion.attack_ev + companion.defense_ev + 
+                        companion.sp_attack_ev + companion.sp_defense_ev + companion.speed_ev)
+            if total_evs > 510:
+                # Scale down proportionally
+                scale = 510 / total_evs
+                companion.hp_ev = int(companion.hp_ev * scale)
+                companion.attack_ev = int(companion.attack_ev * scale)
+                companion.defense_ev = int(companion.defense_ev * scale)
+                companion.sp_attack_ev = int(companion.sp_attack_ev * scale)
+                companion.sp_defense_ev = int(companion.sp_defense_ev * scale)
+                companion.speed_ev = int(companion.speed_ev * scale)
 
     db.session.commit()
     return jsonify(companion.to_dict())
