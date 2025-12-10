@@ -312,7 +312,7 @@ export class SearchScreen {
           </div>
 
           <div class="ball-selector-dropdown" id="ballSelectorDropdown" style="display: none;">
-            ${this.pokeballs.map(ball => `
+            ${this.getSortedPokeballs().map(ball => `
               <div class="ball-option ${ball.itemId === this.selectedBallType ? 'selected' : ''} ${ball.quantity <= 0 ? 'disabled' : ''}" 
                    data-ball="${ball.itemId}">
                 <img src="${ball.sprite}" alt="${ball.name}" class="ball-option-icon">
@@ -490,6 +490,22 @@ export class SearchScreen {
   getBallCount(ballType) {
     const ball = this.pokeballs.find(b => b.itemId === ballType);
     return ball ? ball.quantity : 0;
+  }
+
+  getSortedPokeballs() {
+    // Define the order from worst to best
+    const ballOrder = {
+      'poke-ball': 1,
+      'great-ball': 2,
+      'ultra-ball': 3,
+      'master-ball': 4
+    };
+    
+    return [...this.pokeballs].sort((a, b) => {
+      const orderA = ballOrder[a.itemId] || 0;
+      const orderB = ballOrder[b.itemId] || 0;
+      return orderA - orderB;
+    });
   }
 
   async executeMove(moveIndex, power, type, accuracy = 100, isStatus = false) {
