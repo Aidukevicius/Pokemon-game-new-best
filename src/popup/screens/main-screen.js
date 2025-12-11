@@ -79,12 +79,12 @@ export class MainScreen {
 
         <div class="snes-container companion-stats">
           <div class="stat-row">
-            <span class="stat-label">Health</span>
+            <span class="stat-label">HEALTH</span>
             <div class="stat-bar health-bar">
               <div class="stat-fill ${this.getHealthColorClass()}" 
                    style="width: ${this.companionPokemon.health}%">
-                <span class="stat-value">${this.companionPokemon.health}%</span>
               </div>
+              <span class="stat-value-overlay">${this.getHealthDisplay()}</span>
             </div>
           </div>
 
@@ -93,8 +93,8 @@ export class MainScreen {
             <div class="stat-bar exp-bar">
               <div class="stat-fill exp-fill" 
                    style="width: ${this.getExpPercentage()}%">
-                <span class="stat-value">${this.companionPokemon.experience}/${this.companionPokemon.experienceToNext}</span>
               </div>
+              <span class="stat-value-overlay">${this.getExpDisplay()}</span>
             </div>
           </div>
 
@@ -151,7 +151,29 @@ export class MainScreen {
   }
 
   getExpPercentage() {
-    return Math.floor((this.companionPokemon.experience / this.companionPokemon.experienceToNext) * 100);
+    const totalForLevel = this.companionPokemon.experience + this.companionPokemon.experienceToNext;
+    if (totalForLevel === 0) return 0;
+    return Math.floor((this.companionPokemon.experience / totalForLevel) * 100);
+  }
+
+  getExpDisplay() {
+    const expToNext = this.companionPokemon.experienceToNext || 0;
+    return `${this.formatNumber(expToNext)} to next`;
+  }
+
+  getHealthDisplay() {
+    const health = this.companionPokemon.health || 0;
+    const maxHealth = this.companionPokemon.maxHealth || 100;
+    return `${health}/${maxHealth}`;
+  }
+
+  formatNumber(num) {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'M';
+    } else if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
   }
 
   renderHearts() {
@@ -314,13 +336,18 @@ export class MainScreen {
     if (healthFill) {
       healthFill.style.width = `${this.companionPokemon.health}%`;
       healthFill.className = `stat-fill ${this.getHealthColorClass()}`;
-      healthFill.querySelector('.stat-value').textContent = `${this.companionPokemon.health}%`;
+      const healthOverlay = this.container.querySelector('.health-bar .stat-value-overlay');
+      if (healthOverlay) {
+        healthOverlay.textContent = this.getHealthDisplay();
+      }
     }
 
     if (expFill) {
       expFill.style.width = `${this.getExpPercentage()}%`;
-      expFill.querySelector('.stat-value').textContent = 
-        `${this.companionPokemon.experience}/${this.companionPokemon.experienceToNext}`;
+      const expOverlay = this.container.querySelector('.exp-bar .stat-value-overlay');
+      if (expOverlay) {
+        expOverlay.textContent = this.getExpDisplay();
+      }
     }
 
     if (hearts) {
