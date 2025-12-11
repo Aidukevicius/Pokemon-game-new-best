@@ -373,16 +373,29 @@ export class MainScreen {
   }
 
   async saveCompanion() {
-    await this.storageService.set('companion', this.companionPokemon);
+    try {
+      await fetch('/api/companion', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          health: this.companionPokemon.health,
+          happiness: this.companionPokemon.happiness,
+          last_fed: this.companionPokemon.lastFed ? new Date(this.companionPokemon.lastFed).toISOString() : null,
+          last_interaction: this.companionPokemon.lastInteraction ? new Date(this.companionPokemon.lastInteraction).toISOString() : null
+        })
+      });
+    } catch (error) {
+      console.error('[MainScreen] Error saving companion:', error);
+    }
   }
 
-  show() {
+  async show() {
     console.log('[MainScreen] show() called');
-    console.log('[MainScreen] container:', this.container);
+    await this.loadCompanionData();
+    await this.loadCollection();
     this.container.style.display = 'block';
-    console.log('[MainScreen] display set to block');
-    this.updateDisplay();
-    console.log('[MainScreen] display updated');
+    await this.render();
+    console.log('[MainScreen] display updated with fresh data');
   }
 
   hide() {
