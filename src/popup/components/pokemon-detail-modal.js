@@ -480,17 +480,25 @@ export class PokemonDetailModal {
     if (!confirmed) return;
 
     try {
+      // Calculate experience based on level (Medium Fast growth rate: level^3)
+      // This ensures level is preserved when setting a Pokemon as companion
+      const level = pokemon.level || 1;
+      const experienceForLevel = Math.floor(Math.pow(level, 3));
+      const experienceToNextLevel = Math.floor(Math.pow(level + 1, 3)) - experienceForLevel;
+      
+      console.log('[DetailModal] Setting companion with level:', level, 'experience:', experienceForLevel);
+
       const res = await fetch('/api/companion', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           pokemon_id: pokemon.id,
           name: pokemon.name,
-          level: pokemon.level || 1,
+          level: level,
           health: pokemon.health || 100,
           max_health: pokemon.maxHealth || 100,
-          experience: pokemon.experience || 0,
-          experience_to_next: pokemon.experienceToNext || 100,
+          experience: pokemon.experience || experienceForLevel,
+          experience_to_next: pokemon.experienceToNext || experienceToNextLevel,
           happiness: pokemon.happiness || 100,
           nature: pokemon.nature || 'Hardy',
           item: pokemon.item || null,

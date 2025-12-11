@@ -120,11 +120,22 @@ export class SearchScreen {
     try {
       this.companion = await this.storage.get('companion');
       if (this.companion) {
+        console.log('[SearchScreen] Companion raw data from server:', {
+          name: this.companion.name,
+          level: this.companion.level,
+          experience: this.companion.experience,
+          evs: this.companion.evs,
+          ivs: this.companion.ivs,
+          nature: this.companion.nature
+        });
+        
+        // Always recalculate stats based on level, EVs, IVs
         this.companionStats = this.battleService.calculateCompanionStats(this.companion);
         this.companion.stats = this.companionStats;
         this.companion.types = this.getCompanionTypes();
+        
+        console.log('[SearchScreen] Companion loaded:', this.companion.name, 'Level:', this.companion.level, 'Stats:', this.companionStats);
       }
-      console.log('[SearchScreen] Companion loaded:', this.companion?.name, 'Stats:', this.companionStats);
     } catch (error) {
       console.error('[SearchScreen] Error loading companion:', error);
     }
@@ -1103,12 +1114,12 @@ export class SearchScreen {
     this.companion.level = levelResult.newLevel;
     this.companion.evs = newEVs;
 
-    // Recalculate stats after level up and EV gains
+    // Always recalculate stats after EV gains (EVs affect stats at every point)
+    this.companionStats = this.battleService.calculateCompanionStats(this.companion);
+    this.companion.stats = this.companionStats;
+    
+    // Heal companion to new max HP on level up (optional, like Pokemon games)
     if (levelResult.didLevelUp) {
-      this.companionStats = this.battleService.calculateCompanionStats(this.companion);
-      this.companion.stats = this.companionStats;
-      
-      // Heal companion to new max HP on level up (optional, like Pokemon games)
       const newMaxHp = this.companionStats.hp;
       const hpGain = newMaxHp - (this.companion.maxHealth || 100);
       if (hpGain > 0) {

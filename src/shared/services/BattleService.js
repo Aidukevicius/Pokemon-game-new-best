@@ -329,10 +329,7 @@ export class BattleService {
   }
 
   calculateCompanionStats(companion) {
-    if (companion.stats) {
-      return companion.stats;
-    }
-
+    // Always recalculate stats using level, EVs, IVs, and nature - never use cached stats
     const pokemonBaseStats = this.getBaseStats(companion.id || companion.pokemon?.id);
     const level = companion.level || 1;
     
@@ -340,7 +337,9 @@ export class BattleService {
     const evs = companion.evs || { hp: 0, attack: 0, defense: 0, spAttack: 0, spDefense: 0, speed: 0 };
     const nature = companion.nature || 'Hardy';
 
-    return {
+    console.log('[BattleService] Calculating stats for:', companion.name, 'Level:', level, 'EVs:', evs, 'IVs:', ivs, 'Nature:', nature);
+
+    const calculatedStats = {
       hp: this.calculateHP(pokemonBaseStats.hp, level, evs.hp, ivs.hp),
       attack: this.calculateStat(pokemonBaseStats.attack, level, evs.attack, ivs.attack, this.getNatureModifier(nature, 'attack')),
       defense: this.calculateStat(pokemonBaseStats.defense, level, evs.defense, ivs.defense, this.getNatureModifier(nature, 'defense')),
@@ -348,6 +347,9 @@ export class BattleService {
       spDefense: this.calculateStat(pokemonBaseStats.spDefense, level, evs.spDefense, ivs.spDefense, this.getNatureModifier(nature, 'spDefense')),
       speed: this.calculateStat(pokemonBaseStats.speed, level, evs.speed, ivs.speed, this.getNatureModifier(nature, 'speed'))
     };
+
+    console.log('[BattleService] Calculated stats:', calculatedStats);
+    return calculatedStats;
   }
 
   calculateHP(base, level, ev, iv) {
