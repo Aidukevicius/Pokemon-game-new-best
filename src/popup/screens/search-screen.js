@@ -1179,28 +1179,29 @@ export class SearchScreen {
   getRandomLevel(rarity) {
     const companionLevel = this.companion?.level || 1;
     
-    // Scale opponent level based on companion level (Pokemon game style)
+    // Scale opponent level based on companion level
+    // Higher rarity = higher level = harder to catch
     let minOffset, maxOffset;
     switch (rarity) {
       case 'common':
         minOffset = -2;
-        maxOffset = 3;
+        maxOffset = 2;
         break;
       case 'uncommon':
-        minOffset = -1;
-        maxOffset = 5;
-        break;
-      case 'rare':
-        minOffset = 2;
+        minOffset = 3;
         maxOffset = 8;
         break;
-      case 'legendary':
-        minOffset = 5;
+      case 'rare':
+        minOffset = 8;
         maxOffset = 15;
+        break;
+      case 'legendary':
+        minOffset = 15;
+        maxOffset = 25;
         break;
       default:
         minOffset = -2;
-        maxOffset = 3;
+        maxOffset = 2;
     }
     
     const minLevel = Math.max(1, companionLevel + minOffset);

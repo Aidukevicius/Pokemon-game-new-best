@@ -120,32 +120,32 @@ export class EncounterService {
     const level = Math.max(1, companionLevel);
     
     // Define level variance based on rarity
-    // Common: within -2 to +3 of player level (slightly easier encounters)
-    // Uncommon: within -1 to +5 of player level
-    // Rare: within +2 to +8 of player level (challenging)
-    // Legendary: within +5 to +15 of player level (very challenging)
+    // Common: within -2 to +2 of player level (fair encounters)
+    // Uncommon: within +3 to +8 of player level (challenging)
+    // Rare: within +8 to +15 of player level (hard, harder to catch)
+    // Legendary: within +15 to +25 of player level (very hard, very rare catch)
     let minOffset, maxOffset;
     
     switch (rarity) {
       case 'common':
         minOffset = -2;
-        maxOffset = 3;
+        maxOffset = 2;
         break;
       case 'uncommon':
-        minOffset = -1;
-        maxOffset = 5;
-        break;
-      case 'rare':
-        minOffset = 2;
+        minOffset = 3;
         maxOffset = 8;
         break;
-      case 'legendary':
-        minOffset = 5;
+      case 'rare':
+        minOffset = 8;
         maxOffset = 15;
+        break;
+      case 'legendary':
+        minOffset = 15;
+        maxOffset = 25;
         break;
       default:
         minOffset = -2;
-        maxOffset = 3;
+        maxOffset = 2;
     }
     
     // Calculate level range
@@ -163,11 +163,11 @@ export class EncounterService {
   getMaxLevelForRarity(rarity, companionLevel = 1) {
     const level = Math.max(1, companionLevel);
     switch (rarity) {
-      case 'common': return Math.min(100, level + 3);
-      case 'uncommon': return Math.min(100, level + 5);
-      case 'rare': return Math.min(100, level + 8);
-      case 'legendary': return Math.min(100, level + 15);
-      default: return Math.min(100, level + 3);
+      case 'common': return Math.min(100, level + 2);
+      case 'uncommon': return Math.min(100, level + 8);
+      case 'rare': return Math.min(100, level + 15);
+      case 'legendary': return Math.min(100, level + 25);
+      default: return Math.min(100, level + 2);
     }
   }
 
@@ -175,9 +175,9 @@ export class EncounterService {
     const level = Math.max(1, companionLevel);
     switch (rarity) {
       case 'common': return Math.max(1, level - 2);
-      case 'uncommon': return Math.max(1, level - 1);
-      case 'rare': return Math.max(1, level + 2);
-      case 'legendary': return Math.max(1, level + 5);
+      case 'uncommon': return Math.max(1, level + 3);
+      case 'rare': return Math.max(1, level + 8);
+      case 'legendary': return Math.max(1, level + 15);
       default: return Math.max(1, level - 2);
     }
   }
