@@ -94,8 +94,12 @@ function startTabTracking() {
  * @param {string} siteCategory - Website category for encounter biasing
  */
 async function generateAndQueueEncounter(siteCategory = 'normal') {
-  const encounter = encounterService.generateEncounter(siteCategory);
-  console.log('[Background] Generated encounter:', encounter.pokemon.name, 'Lv', encounter.level, `(Site: ${siteCategory})`);
+  // Get companion level for proper encounter scaling
+  const companionData = await storage.get('companion') || {};
+  const companionLevel = companionData.level || 1;
+  
+  const encounter = encounterService.generateEncounter(siteCategory, companionLevel);
+  console.log('[Background] Generated encounter:', encounter.pokemon.name, 'Lv', encounter.level, `(Site: ${siteCategory}, Companion Lv: ${companionLevel})`);
   
   // Add to encounter queue
   const queue = await storage.get('encounterQueue') || [];

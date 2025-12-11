@@ -9,11 +9,13 @@ export class EncounterService {
   }
 
   /**
-   * Generate a new Pokemon encounter based on rarity weights
+   * Generate a new Pokemon encounter based on rarity weights and companion level
+   * Uses Pokemon game logic for opponent level scaling
    * @param {string} siteCategory - Website category to bias encounters (e.g., 'electric', 'water', 'normal')
+   * @param {number} companionLevel - Current companion Pokemon level (default 1)
    * @returns {Object} Encounter object with Pokemon, level, and IVs
    */
-  generateEncounter(siteCategory = 'normal') {
+  generateEncounter(siteCategory = 'normal', companionLevel = 1) {
     // Select rarity tier based on weights
     const rarities = Object.keys(RARITY_WEIGHTS);
     const weights = Object.values(RARITY_WEIGHTS);
@@ -45,9 +47,8 @@ export class EncounterService {
     
     const pokemon = pokemonOfRarity[selectedIndex];
     
-    const maxLevel = this.getMaxLevelForRarity(selectedRarity);
-    const minLevel = this.getMinLevelForRarity(selectedRarity);
-    const level = getRandomInt(minLevel, maxLevel);
+    // Calculate opponent level based on companion level (Pokemon game style)
+    const level = this.calculateOpponentLevel(companionLevel, selectedRarity);
     
     // Generate random IVs (Individual Values - 0-31 for each stat)
     const ivs = generateRandomIVs();
@@ -107,23 +108,77 @@ export class EncounterService {
     };
   }
 
-  getMaxLevelForRarity(rarity) {
+  /**
+   * Calculate opponent level based on companion level - Pokemon game style scaling
+   * Wild Pokemon levels scale with your Pokemon's level, with variance based on rarity
+   * This mimics how routes in Pokemon games have level ranges relative to game progression
+   * @param {number} companionLevel - Player's companion level
+   * @param {string} rarity - Pokemon rarity tier
+   * @returns {number} Opponent level
+   */
+  calculateOpponentLevel(companionLevel, rarity) {
+    const level = Math.max(1, companionLevel);
+    
+    // Define level variance based on rarity
+    // Common: within -2 to +3 of player level (slightly easier encounters)
+    // Uncommon: within -1 to +5 of player level
+    // Rare: within +2 to +8 of player level (challenging)
+    // Legendary: within +5 to +15 of player level (very challenging)
+    let minOffset, maxOffset;
+    
     switch (rarity) {
-      case 'common': return 25;
-      case 'uncommon': return 40;
-      case 'rare': return 55;
-      case 'legendary': return 70;
-      default: return 25;
+      case 'common':
+        minOffset = -2;
+        maxOffset = 3;
+        break;
+      case 'uncommon':
+        minOffset = -1;
+        maxOffset = 5;
+        break;
+      case 'rare':
+        minOffset = 2;
+        maxOffset = 8;
+        break;
+      case 'legendary':
+        minOffset = 5;
+        maxOffset = 15;
+        break;
+      default:
+        minOffset = -2;
+        maxOffset = 3;
+    }
+    
+    // Calculate level range
+    const minLevel = Math.max(1, level + minOffset);
+    const maxLevel = Math.min(100, level + maxOffset);
+    
+    // Random level within the range
+    const opponentLevel = getRandomInt(minLevel, maxLevel);
+    
+    console.log(`[EncounterService] Generating ${rarity} opponent: companion level ${level}, opponent level ${opponentLevel} (range: ${minLevel}-${maxLevel})`);
+    
+    return opponentLevel;
+  }
+
+  getMaxLevelForRarity(rarity, companionLevel = 1) {
+    const level = Math.max(1, companionLevel);
+    switch (rarity) {
+      case 'common': return Math.min(100, level + 3);
+      case 'uncommon': return Math.min(100, level + 5);
+      case 'rare': return Math.min(100, level + 8);
+      case 'legendary': return Math.min(100, level + 15);
+      default: return Math.min(100, level + 3);
     }
   }
 
-  getMinLevelForRarity(rarity) {
+  getMinLevelForRarity(rarity, companionLevel = 1) {
+    const level = Math.max(1, companionLevel);
     switch (rarity) {
-      case 'common': return 3;
-      case 'uncommon': return 15;
-      case 'rare': return 30;
-      case 'legendary': return 50;
-      default: return 3;
+      case 'common': return Math.max(1, level - 2);
+      case 'uncommon': return Math.max(1, level - 1);
+      case 'rare': return Math.max(1, level + 2);
+      case 'legendary': return Math.max(1, level + 5);
+      default: return Math.max(1, level - 2);
     }
   }
 

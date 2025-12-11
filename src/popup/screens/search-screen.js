@@ -1004,7 +1004,8 @@ export class SearchScreen {
     await this.loadCompanion();
     await this.loadPokeballs();
 
-    const encounter = this.encounterService.generateEncounter('normal');
+    const companionLevel = this.companion?.level || 1;
+    const encounter = this.encounterService.generateEncounter('normal', companionLevel);
 
     if (rarity !== 'common') {
       const targetPokemon = this.getRandomPokemonByRarity(rarity);
@@ -1176,13 +1177,36 @@ export class SearchScreen {
   }
 
   getRandomLevel(rarity) {
+    const companionLevel = this.companion?.level || 1;
+    
+    // Scale opponent level based on companion level (Pokemon game style)
+    let minOffset, maxOffset;
     switch (rarity) {
-      case 'common': return Math.floor(Math.random() * 30) + 1;
-      case 'uncommon': return Math.floor(Math.random() * 35) + 10;
-      case 'rare': return Math.floor(Math.random() * 40) + 20;
-      case 'legendary': return Math.floor(Math.random() * 20) + 50;
-      default: return 10;
+      case 'common':
+        minOffset = -2;
+        maxOffset = 3;
+        break;
+      case 'uncommon':
+        minOffset = -1;
+        maxOffset = 5;
+        break;
+      case 'rare':
+        minOffset = 2;
+        maxOffset = 8;
+        break;
+      case 'legendary':
+        minOffset = 5;
+        maxOffset = 15;
+        break;
+      default:
+        minOffset = -2;
+        maxOffset = 3;
     }
+    
+    const minLevel = Math.max(1, companionLevel + minOffset);
+    const maxLevel = Math.min(100, companionLevel + maxOffset);
+    
+    return Math.floor(Math.random() * (maxLevel - minLevel + 1)) + minLevel;
   }
 
   getPokemonDatabase() {
