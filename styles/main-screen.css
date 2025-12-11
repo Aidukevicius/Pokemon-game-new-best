@@ -170,17 +170,14 @@
   border: 2px solid #475569;
   border-radius: 3px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .stat-fill {
   height: 100%;
   transition: width 0.3s ease;
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 6px;
+  border-radius: 2px;
 }
 
 .stat-value {
@@ -190,20 +187,17 @@
 .stat-value-overlay {
   position: absolute;
   top: 50%;
-  right: 8px;
+  right: 6px;
   transform: translateY(-50%);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: bold;
-  color: #fff;
-  text-shadow: 
-    -1px -1px 0 #1e293b,
-    1px -1px 0 #1e293b,
-    -1px 1px 0 #1e293b,
-    1px 1px 0 #1e293b,
-    0 0 4px rgba(0,0,0,0.8);
+  color: #1e293b;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 1px 4px;
+  border-radius: 2px;
   z-index: 10;
   white-space: nowrap;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
 }
 
 .health-good {
