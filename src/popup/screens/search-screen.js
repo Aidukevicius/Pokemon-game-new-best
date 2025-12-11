@@ -549,10 +549,69 @@ export class SearchScreen {
     
     this.battleInProgress = true;
     const moves = this.getCompanionMoves();
-    const move = moves[moveIndex];
+    const companionMove = moves[moveIndex];
 
     // Disable buttons immediately and keep them disabled
     this.disableButtons(true);
+
+    // Get enemy move for turn order calculation
+    const enemyMove = this.battleService.selectWildPokemonMove(
+      this.currentEncounter.pokemon,
+      this.currentEncounter.level
+    );
+
+    // Build companion and enemy objects for turn order determination
+    const companionData = {
+      level: this.companion?.level || 10,
+      stats: this.companionStats || { attack: 50, spAttack: 50, speed: 50 },
+      types: this.companion?.types || ['Normal'],
+      pokemon: { types: this.companion?.types || ['Normal'] }
+    };
+
+    const enemyData = {
+      level: this.currentEncounter.level,
+      stats: this.currentEncounter.stats || { attack: 50, spAttack: 50, speed: 50 },
+      types: this.currentEncounter.pokemon?.types || ['Normal'],
+      pokemon: this.currentEncounter.pokemon
+    };
+
+    // Determine turn order based on speed and priority (like original Pokemon games)
+    const turnOrder = this.battleService.determineTurnOrder(companionData, enemyData, companionMove, enemyMove);
+    
+    console.log('[SearchScreen] Turn order determined:', turnOrder);
+    
+    if (turnOrder === 'companion') {
+      // Companion goes first
+      const companionFaintedEnemy = await this.executeCompanionAttack(companionMove, power, type, accuracy, isStatus);
+      
+      if (!companionFaintedEnemy && this.currentEncounter) {
+        // Enemy attacks second if not fainted
+        await this.executeEnemyAttack(enemyMove);
+      }
+    } else {
+      // Enemy goes first (faster or higher priority)
+      this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} is faster!`);
+      this.updateBattleLog();
+      await this.delay(800);
+      
+      const companionFainted = await this.executeEnemyAttack(enemyMove);
+      
+      if (!companionFainted && this.companion && (this.companion.health || 100) > 0) {
+        // Companion attacks second if not fainted
+        await this.executeCompanionAttack(companionMove, power, type, accuracy, isStatus);
+      }
+    }
+    
+    this.battleInProgress = false;
+    
+    // Re-enable buttons only after both turns complete
+    if (this.currentEncounter) {
+      this.disableButtons(false);
+    }
+  }
+
+  async executeCompanionAttack(move, power, type, accuracy = 100, isStatus = false) {
+    if (!this.currentEncounter) return true;
 
     const hitRoll = Math.random() * 100;
     const moveHit = hitRoll < accuracy;
@@ -567,10 +626,7 @@ export class SearchScreen {
       this.battleLog.push(`Attack missed! ${this.currentEncounter.pokemon.name} avoided it!`);
       this.updateBattleLog();
       await this.delay(1500);
-      // Enemy turn will handle re-enabling buttons
-      await this.enemyTurn();
-      this.battleInProgress = false;
-      return;
+      return false;
     }
 
     if (isStatus) {
@@ -578,10 +634,7 @@ export class SearchScreen {
       this.battleLog.push(statusEffects);
       this.updateBattleLog();
       await this.delay(1500);
-      // Enemy turn will handle re-enabling buttons
-      await this.enemyTurn();
-      this.battleInProgress = false;
-      return;
+      return false;
     }
 
     const attacker = {
@@ -613,34 +666,10 @@ export class SearchScreen {
       this.battleLog.push(`${this.companion.name}'s attack missed!`);
       this.updateBattleLog();
       await this.delay(300);
-      // Enemy turn will handle re-enabling buttons
-      await this.enemyTurn();
-      this.battleInProgress = false;
-      return;
+      return false;
     }
 
     this.currentEncounter.currentHp = Math.max(0, this.currentEncounter.currentHp - result.damage);
-
-    this.updateBattleLog();
-    this.render();
-
-    if (this.currentEncounter.currentHp === 0) {
-      // Keep buttons disabled during victory sequence
-      await this.delay(2000);
-      this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} fainted!`);
-      this.updateBattleLog();
-      await this.delay(1500);
-      
-      // Award experience and EVs
-      await this.awardBattleRewards(this.currentEncounter);
-      
-      await this.delay(2000);
-      this.currentEncounter = null;
-      this.battleLog = [];
-      this.battleInProgress = false;
-      this.render();
-      return;
-    }
 
     await this.animateDamage('enemy');
 
@@ -653,15 +682,104 @@ export class SearchScreen {
     if (result.stab) damageMsg += ' (STAB)';
     this.battleLog.push(damageMsg);
     this.updateBattleLog();
+    this.render();
+
+    if (this.currentEncounter.currentHp === 0) {
+      await this.delay(1500);
+      this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} fainted!`);
+      this.updateBattleLog();
+      await this.delay(1500);
+      
+      // Award experience and EVs
+      await this.awardBattleRewards(this.currentEncounter);
+      
+      await this.delay(2000);
+      this.currentEncounter = null;
+      this.battleLog = [];
+      this.render();
+      return true; // Enemy fainted
+    }
 
     await this.delay(1500);
-    await this.enemyTurn();
-    this.battleInProgress = false;
-    
-    // Re-enable buttons only after enemy turn fully completes
-    if (this.currentEncounter) {
-      this.disableButtons(false);
+    return false; // Enemy still alive
+  }
+
+  async executeEnemyAttack(enemyMove) {
+    if (!this.currentEncounter || !this.companion) return true;
+
+    console.log('[SearchScreen] Enemy using move:', enemyMove.name, 'Power:', enemyMove.power, 'Type:', enemyMove.type);
+
+    this.battleLog.push(`Wild ${this.currentEncounter.pokemon.name} used ${enemyMove.name}!`);
+    this.updateBattleLog();
+
+    await this.animateAttack('enemy');
+    await this.playMoveAnimation(enemyMove.type, 'ally');
+
+    const attacker = {
+      level: this.currentEncounter.level,
+      stats: this.currentEncounter.stats || { attack: 50, spAttack: 50 },
+      types: this.currentEncounter.pokemon?.types || ['Normal'],
+      pokemon: this.currentEncounter.pokemon
+    };
+
+    const defender = {
+      stats: this.companionStats || { defense: 50, spDefense: 50 },
+      types: this.companion?.types || ['Normal'],
+      pokemon: { types: this.companion?.types || ['Normal'] },
+      currentHp: this.companion.health || 100
+    };
+
+    console.log('[SearchScreen] Attacker stats:', attacker.stats, 'Level:', attacker.level);
+    console.log('[SearchScreen] Defender stats:', defender.stats);
+
+    const result = this.battleService.calculateDamage(attacker, defender, enemyMove);
+
+    console.log('[SearchScreen] Damage result:', result);
+
+    if (result.missed) {
+      this.battleLog.push(`${this.currentEncounter.pokemon.name}'s attack missed!`);
+      this.updateBattleLog();
+      await this.delay(1200);
+      return false;
     }
+
+    await this.animateDamage('ally');
+
+    const maxHp = this.companionStats?.hp || 100;
+    const currentHp = this.companion.health || 100;
+    const actualDamage = Math.max(1, result.damage);
+    let companionHp = Math.max(0, currentHp - actualDamage);
+    await this.storage.set('companionHp', companionHp);
+    this.companion.health = companionHp;
+
+    this.updateHpDisplay('ally', companionHp, maxHp);
+
+    let damageMsg = '';
+    if (result.critical) damageMsg += 'Critical hit! ';
+    if (result.effectiveness > 1) damageMsg += "Super effective! ";
+    else if (result.effectiveness < 1 && result.effectiveness > 0) damageMsg += "Not very effective... ";
+    else if (result.effectiveness === 0) damageMsg += "No effect! ";
+    damageMsg += `${this.companion.name} took ${actualDamage} damage!`;
+    this.battleLog.push(damageMsg);
+    this.updateBattleLog();
+
+    await this.delay(1500);
+
+    if (companionHp === 0) {
+      await this.delay(2000);
+      this.battleLog.push(`${this.companion.name} fainted!`);
+      this.updateBattleLog();
+      await this.delay(2000);
+      this.battleLog.push('You lost the battle...');
+      this.updateBattleLog();
+      await this.delay(2500);
+      this.currentEncounter = null;
+      this.battleLog = [];
+      this.render();
+      return true; // Companion fainted
+    }
+    
+    return false; // Companion still alive
   }
 
   async enemyTurn() {
@@ -715,12 +833,13 @@ export class SearchScreen {
     await this.animateDamage('ally');
 
     const maxHp = this.companionStats?.hp || 100;
-    const damagePercent = Math.floor((result.damage / maxHp) * 100);
-    const actualDamage = Math.max(1, Math.min(damagePercent, this.companion.health || 100));
-    let companionHp = Math.max(0, (this.companion.health || 100) - actualDamage);
+    const currentHp = this.companion.health || 100;
+    const actualDamage = Math.max(1, result.damage);
+    let companionHp = Math.max(0, currentHp - actualDamage);
     await this.storage.set('companionHp', companionHp);
+    this.companion.health = companionHp;
 
-    this.updateHpDisplay('ally', companionHp, 100);
+    this.updateHpDisplay('ally', companionHp, maxHp);
 
     let damageMsg = '';
     if (result.critical) damageMsg += 'Critical hit! ';
@@ -746,7 +865,6 @@ export class SearchScreen {
       this.battleInProgress = false;
       this.render();
     }
-    // Buttons will be re-enabled after this method completes
   }
 
   calculateDamage(power, level, type) {

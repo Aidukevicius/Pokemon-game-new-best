@@ -1,6 +1,95 @@
 export class BattleService {
   constructor() {
     this.typeChart = this.initTypeChart();
+    this.priorityMoves = this.initPriorityMoves();
+  }
+
+  initPriorityMoves() {
+    return {
+      'quick-attack': 1,
+      'Quick Attack': 1,
+      'mach-punch': 1,
+      'Mach Punch': 1,
+      'bullet-punch': 1,
+      'Bullet Punch': 1,
+      'ice-shard': 1,
+      'Ice Shard': 1,
+      'aqua-jet': 1,
+      'Aqua Jet': 1,
+      'shadow-sneak': 1,
+      'Shadow Sneak': 1,
+      'sucker-punch': 1,
+      'Sucker Punch': 1,
+      'vacuum-wave': 1,
+      'Vacuum Wave': 1,
+      'water-shuriken': 1,
+      'Water Shuriken': 1,
+      'accelerock': 1,
+      'Accelerock': 1,
+      'extreme-speed': 2,
+      'Extreme Speed': 2,
+      'fake-out': 3,
+      'Fake Out': 3,
+      'feint': 2,
+      'Feint': 2,
+      'first-impression': 2,
+      'First Impression': 2,
+      'protect': 4,
+      'Protect': 4,
+      'detect': 4,
+      'Detect': 4,
+      'endure': 4,
+      'Endure': 4,
+      'counter': -5,
+      'Counter': -5,
+      'mirror-coat': -5,
+      'Mirror Coat': -5,
+      'avalanche': -4,
+      'Avalanche': -4,
+      'revenge': -4,
+      'Revenge': -4,
+      'vital-throw': -1,
+      'Vital Throw': -1,
+      'focus-punch': -3,
+      'Focus Punch': -3,
+      'roar': -6,
+      'Roar': -6,
+      'whirlwind': -6,
+      'Whirlwind': -6,
+      'dragon-tail': -6,
+      'Dragon Tail': -6,
+      'circle-throw': -6,
+      'Circle Throw': -6,
+      'trick-room': -7,
+      'Trick Room': -7
+    };
+  }
+
+  getMovePriority(move) {
+    const moveName = move.name || move.apiName || '';
+    return this.priorityMoves[moveName] || move.priority || 0;
+  }
+
+  determineTurnOrder(companion, enemy, companionMove, enemyMove) {
+    const companionPriority = this.getMovePriority(companionMove);
+    const enemyPriority = this.getMovePriority(enemyMove);
+    
+    console.log('[BattleService] Turn order - Companion priority:', companionPriority, 'Enemy priority:', enemyPriority);
+    
+    if (companionPriority !== enemyPriority) {
+      return companionPriority > enemyPriority ? 'companion' : 'enemy';
+    }
+    
+    const companionSpeed = companion.stats?.speed || companion.speed || 50;
+    const enemySpeed = enemy.stats?.speed || enemy.speed || 50;
+    
+    console.log('[BattleService] Turn order - Companion speed:', companionSpeed, 'Enemy speed:', enemySpeed);
+    
+    if (companionSpeed !== enemySpeed) {
+      return companionSpeed > enemySpeed ? 'companion' : 'enemy';
+    }
+    
+    return Math.random() < 0.5 ? 'companion' : 'enemy';
   }
 
   initTypeChart() {
