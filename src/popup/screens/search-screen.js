@@ -1516,11 +1516,20 @@ export class SearchScreen {
 
   show() {
     this.container.style.display = 'block';
-    Promise.all([
-      this.loadCompanion(),
-      this.loadPokeballs(),
-      this.loadEncounterQueue()
-    ]).then(() => this.render());
+    
+    const pendingTest = localStorage.getItem('pendingTestBattle');
+    if (pendingTest) {
+      this.loadTestBattle(JSON.parse(pendingTest)).then(() => {
+        localStorage.removeItem('pendingTestBattle');
+        this.loadPokeballs().then(() => this.render());
+      });
+    } else {
+      Promise.all([
+        this.loadCompanion(),
+        this.loadPokeballs(),
+        this.loadEncounterQueue()
+      ]).then(() => this.render());
+    }
   }
 
   hide() {
