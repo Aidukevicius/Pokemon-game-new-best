@@ -1196,6 +1196,179 @@ def start_test_battle():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+DEFAULT_ABILITY = 'Static'
+
+TEST_MOVES = ['Thunderbolt', 'Quick Attack', 'Iron Tail', 'Volt Tackle']
+
+def run_single_battle_simulation(test_type, ability):
+    config = TEST_BATTLE_CONFIGS[test_type]
+    
+    companion_cfg = config['companion']
+    companion = create_pokemon_for_test(
+        companion_cfg['pokemon_id'], 
+        companion_cfg['level'], 
+        companion_cfg['evs'], 
+        companion_cfg['ivs'], 
+        companion_cfg['nature']
+    )
+    companion['ability'] = ability
+    
+    enemy_cfg = config['enemy']
+    enemy = create_pokemon_for_test(
+        enemy_cfg['pokemon_id'], 
+        enemy_cfg['level'], 
+        enemy_cfg['evs'], 
+        enemy_cfg['ivs'], 
+        enemy_cfg['nature']
+    )
+    enemy['ability'] = ability
+    
+    battle_results = []
+    
+    for move_name in TEST_MOVES:
+        try:
+            response = requests.post(
+                f'{BATTLE_CALC_URL}/api/calculate-damage',
+                json={
+                    'attacker': {
+                        'name': companion['name'],
+                        'level': companion['level'],
+                        'nature': companion['nature'],
+                        'evs': companion['evs'],
+                        'ivs': companion['ivs']
+                    },
+                    'defender': {
+                        'name': enemy['name'],
+                        'level': enemy['level'],
+                        'nature': enemy['nature'],
+                        'evs': enemy['evs'],
+                        'ivs': enemy['ivs']
+                    },
+                    'move': {'name': move_name}
+                },
+                timeout=5
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                battle_results.append({
+                    'move': move_name,
+                    'damage': data.get('damage', 0),
+                    'minDamage': data.get('minDamage', 0),
+                    'maxDamage': data.get('maxDamage', 0),
+                    'avgDamage': data.get('avgDamage', 0)
+                })
+            else:
+                battle_results.append({
+                    'move': move_name,
+                    'error': 'Calculation failed'
+                })
+        except Exception as e:
+            battle_results.append({
+                'move': move_name,
+                'error': str(e)
+            })
+    
+    return {
+        'testType': test_type,
+        'description': config['description'],
+        'ability': ability,
+        'companion': {
+            'name': companion['name'],
+            'level': companion['level'],
+            'stats': companion['stats'],
+            'nature': companion['nature']
+        },
+        'enemy': {
+            'name': enemy['name'],
+            'level': enemy['level'],
+            'stats': enemy['stats'],
+            'nature': enemy['nature']
+        },
+        'moveResults': battle_results
+    }
+
+
+@app.route('/api/run-all-tests', methods=['POST'])
+def run_all_tests():
+    try:
+        data = request.get_json() or {}
+        iterations = min(data.get('iterations', 1), 100)
+        ability = data.get('ability', DEFAULT_ABILITY)
+        
+        all_results = []
+        
+        for iteration in range(iterations):
+            iteration_results = {
+                'iteration': iteration + 1,
+                'timestamp': datetime.utcnow().isoformat(),
+                'tests': []
+            }
+            
+            for test_type in TEST_BATTLE_CONFIGS.keys():
+                result = run_single_battle_simulation(test_type, ability)
+                iteration_results['tests'].append(result)
+            
+            all_results.append(iteration_results)
+        
+        results_filename = f'test_results_{datetime.utcnow().strftime("%Y%m%d_%H%M%S")}.json'
+        results_path = os.path.join(os.path.dirname(__file__), 'static', 'test_results')
+        os.makedirs(results_path, exist_ok=True)
+        
+        full_path = os.path.join(results_path, results_filename)
+        with open(full_path, 'w') as f:
+            import json
+            json.dump({
+                'generatedAt': datetime.utcnow().isoformat(),
+                'ability': ability,
+                'totalIterations': iterations,
+                'totalTests': len(TEST_BATTLE_CONFIGS) * iterations,
+                'results': all_results
+            }, f, indent=2)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Completed {iterations} iteration(s) of all tests',
+            'resultsFile': f'/static/test_results/{results_filename}',
+            'summary': {
+                'totalIterations': iterations,
+                'testsPerIteration': len(TEST_BATTLE_CONFIGS),
+                'totalTests': len(TEST_BATTLE_CONFIGS) * iterations,
+                'ability': ability
+            }
+        })
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/test-results', methods=['GET'])
+def list_test_results():
+    try:
+        results_path = os.path.join(os.path.dirname(__file__), 'static', 'test_results')
+        if not os.path.exists(results_path):
+            return jsonify({'success': True, 'files': []})
+        
+        files = []
+        for filename in os.listdir(results_path):
+            if filename.endswith('.json'):
+                file_path = os.path.join(results_path, filename)
+                files.append({
+                    'filename': filename,
+                    'url': f'/static/test_results/{filename}',
+                    'size': os.path.getsize(file_path),
+                    'modified': datetime.fromtimestamp(os.path.getmtime(file_path)).isoformat()
+                })
+        
+        files.sort(key=lambda x: x['modified'], reverse=True)
+        return jsonify({'success': True, 'files': files})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 if __name__ == '__main__':
     print("Starting PokeBrowse server on port 5000...")
     print("Open http://0.0.0.0:5000/preview.html to view the extension")

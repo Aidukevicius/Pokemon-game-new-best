@@ -139,6 +139,23 @@ export class SettingsScreen {
               </div>
             </div>
 
+            <div class="test-category batch-test-section">
+              <h4 class="test-category-title">Batch Testing</h4>
+              <p class="section-desc">Run all tests in background with same ability for both Pokemon</p>
+              <div class="test-buttons">
+                <button class="test-btn batch-test-btn" id="runAllTests10x" onclick="window.settingsScreen.runAllTests(10)">
+                  <span class="test-name">Run All Tests 10x</span>
+                  <span class="test-desc">Run all battle tests 10 times, both Pokemon use Static ability</span>
+                </button>
+                <button class="test-btn batch-test-btn" id="runAllTests1x" onclick="window.settingsScreen.runAllTests(1)">
+                  <span class="test-name">Run All Tests 1x</span>
+                  <span class="test-desc">Run all battle tests once, generates results file</span>
+                </button>
+              </div>
+              <div id="batchTestResult" class="batch-test-result"></div>
+              <div id="testResultsList" class="test-results-list"></div>
+            </div>
+
             <div id="battleTestResult" class="battle-test-result"></div>
           </div>
 
@@ -285,6 +302,78 @@ export class SettingsScreen {
     } finally {
       btn.disabled = false;
       btn.textContent = 'Add Test Pokemon';
+    }
+  }
+
+  async runAllTests(iterations = 10) {
+    const resultDiv = this.container.querySelector('#batchTestResult');
+    const btn10x = this.container.querySelector('#runAllTests10x');
+    const btn1x = this.container.querySelector('#runAllTests1x');
+    
+    try {
+      if (btn10x) btn10x.disabled = true;
+      if (btn1x) btn1x.disabled = true;
+      resultDiv.innerHTML = `<span class="loading-msg">Running ${iterations}x batch tests in background...</span>`;
+      resultDiv.className = 'batch-test-result loading';
+      
+      const res = await fetch('/api/run-all-tests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ iterations, ability: 'Static' })
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        resultDiv.innerHTML = `
+          <div class="batch-success">
+            <span class="success-msg">Batch tests completed!</span>
+            <div class="batch-summary">
+              <p>Total Iterations: ${data.summary.totalIterations}</p>
+              <p>Tests per Iteration: ${data.summary.testsPerIteration}</p>
+              <p>Total Tests: ${data.summary.totalTests}</p>
+              <p>Ability Used: ${data.summary.ability}</p>
+            </div>
+            <a href="${data.resultsFile}" target="_blank" class="results-link">Download Results File</a>
+          </div>
+        `;
+        resultDiv.className = 'batch-test-result success';
+        
+        this.loadTestResults();
+      } else {
+        resultDiv.innerHTML = `<span class="error-msg">${data.error || 'Failed to run batch tests'}</span>`;
+        resultDiv.className = 'batch-test-result error';
+      }
+    } catch (error) {
+      console.error('[SettingsScreen] Error running batch tests:', error);
+      resultDiv.innerHTML = `<span class="error-msg">Error: ${error.message}</span>`;
+      resultDiv.className = 'batch-test-result error';
+    } finally {
+      if (btn10x) btn10x.disabled = false;
+      if (btn1x) btn1x.disabled = false;
+    }
+  }
+
+  async loadTestResults() {
+    const listDiv = this.container.querySelector('#testResultsList');
+    if (!listDiv) return;
+    
+    try {
+      const res = await fetch('/api/test-results');
+      const data = await res.json();
+      
+      if (res.ok && data.files && data.files.length > 0) {
+        listDiv.innerHTML = `
+          <h5 class="results-title">Previous Test Results:</h5>
+          <ul class="results-files">
+            ${data.files.slice(0, 5).map(f => `
+              <li><a href="${f.url}" target="_blank">${f.filename}</a> <small>(${(f.size / 1024).toFixed(1)} KB)</small></li>
+            `).join('')}
+          </ul>
+        `;
+      }
+    } catch (error) {
+      console.error('[SettingsScreen] Error loading test results:', error);
     }
   }
 

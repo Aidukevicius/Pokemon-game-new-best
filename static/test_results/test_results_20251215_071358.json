@@ -1,0 +1,847 @@
+{
+  "generatedAt": "2025-12-15T07:13:58.172677",
+  "ability": "Static",
+  "totalIterations": 1,
+  "totalTests": 17,
+  "results": [
+    {
+      "iteration": 1,
+      "timestamp": "2025-12-15T07:13:57.728624",
+      "tests": [
+        {
+          "testType": "ev_comparison",
+          "description": "EV Comparison - Pikachu with 252 Atk/Spe EVs vs No EVs",
+          "ability": "Static",
+          "companion": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 107,
+              "defense": 60,
+              "spAttack": 70,
+              "spDefense": 70,
+              "speed": 142
+            },
+            "nature": "Hardy"
+          },
+          "enemy": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 75,
+              "defense": 60,
+              "spAttack": 70,
+              "spDefense": 70,
+              "speed": 110
+            },
+            "nature": "Hardy"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        },
+        {
+          "testType": "ev_hp_defense",
+          "description": "Defensive EVs - Pikachu with 252 HP/Def EVs vs No EVs",
+          "ability": "Static",
+          "companion": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 142,
+              "attack": 75,
+              "defense": 92,
+              "spAttack": 70,
+              "spDefense": 70,
+              "speed": 110
+            },
+            "nature": "Hardy"
+          },
+          "enemy": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 75,
+              "defense": 60,
+              "spAttack": 70,
+              "spDefense": 70,
+              "speed": 110
+            },
+            "nature": "Hardy"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        },
+        {
+          "testType": "ev_special",
+          "description": "Special Attack EVs - Pikachu with 252 SpAtk EVs vs No EVs",
+          "ability": "Static",
+          "companion": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 75,
+              "defense": 60,
+              "spAttack": 102,
+              "spDefense": 70,
+              "speed": 110
+            },
+            "nature": "Hardy"
+          },
+          "enemy": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 75,
+              "defense": 60,
+              "spAttack": 70,
+              "spDefense": 70,
+              "speed": 110
+            },
+            "nature": "Hardy"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        },
+        {
+          "testType": "iv_comparison",
+          "description": "IV Comparison - Pikachu with Perfect 31 IVs vs 0 IVs",
+          "ability": "Static",
+          "companion": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 75,
+              "defense": 60,
+              "spAttack": 70,
+              "spDefense": 70,
+              "speed": 110
+            },
+            "nature": "Hardy"
+          },
+          "enemy": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 95,
+              "attack": 60,
+              "defense": 45,
+              "spAttack": 55,
+              "spDefense": 55,
+              "speed": 95
+            },
+            "nature": "Hardy"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        },
+        {
+          "testType": "iv_speed",
+          "description": "Speed IV Test - Pikachu with 31 Speed IV vs 0 Speed IV",
+          "ability": "Static",
+          "companion": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 102,
+              "attack": 67,
+              "defense": 52,
+              "spAttack": 62,
+              "spDefense": 62,
+              "speed": 110
+            },
+            "nature": "Hardy"
+          },
+          "enemy": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 102,
+              "attack": 67,
+              "defense": 52,
+              "spAttack": 62,
+              "spDefense": 62,
+              "speed": 95
+            },
+            "nature": "Hardy"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        },
+        {
+          "testType": "nature_attack",
+          "description": "Adamant vs Modest - Physical vs Special nature",
+          "ability": "Static",
+          "companion": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 82,
+              "defense": 60,
+              "spAttack": 63,
+              "spDefense": 70,
+              "speed": 110
+            },
+            "nature": "Adamant"
+          },
+          "enemy": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 67,
+              "defense": 60,
+              "spAttack": 77,
+              "spDefense": 70,
+              "speed": 110
+            },
+            "nature": "Modest"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        },
+        {
+          "testType": "nature_speed",
+          "description": "Jolly vs Brave - Speed nature difference",
+          "ability": "Static",
+          "companion": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 75,
+              "defense": 60,
+              "spAttack": 63,
+              "spDefense": 70,
+              "speed": 121
+            },
+            "nature": "Jolly"
+          },
+          "enemy": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 82,
+              "defense": 60,
+              "spAttack": 70,
+              "spDefense": 70,
+              "speed": 99
+            },
+            "nature": "Brave"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        },
+        {
+          "testType": "level_difference",
+          "description": "Level Gap - Lv100 vs Lv50 Pikachu",
+          "ability": "Static",
+          "companion": {
+            "name": "Pikachu",
+            "level": 100,
+            "stats": {
+              "hp": 211,
+              "attack": 146,
+              "defense": 116,
+              "spAttack": 136,
+              "spDefense": 136,
+              "speed": 216
+            },
+            "nature": "Hardy"
+          },
+          "enemy": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 75,
+              "defense": 60,
+              "spAttack": 70,
+              "spDefense": 70,
+              "speed": 110
+            },
+            "nature": "Hardy"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        },
+        {
+          "testType": "level_low",
+          "description": "Low Level Battle - Two Lv5 Pikachu",
+          "ability": "Static",
+          "companion": {
+            "name": "Pikachu",
+            "level": 5,
+            "stats": {
+              "hp": 19,
+              "attack": 11,
+              "defense": 9,
+              "spAttack": 10,
+              "spDefense": 10,
+              "speed": 14
+            },
+            "nature": "Hardy"
+          },
+          "enemy": {
+            "name": "Pikachu",
+            "level": 5,
+            "stats": {
+              "hp": 19,
+              "attack": 11,
+              "defense": 9,
+              "spAttack": 10,
+              "spDefense": 10,
+              "speed": 14
+            },
+            "nature": "Hardy"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        },
+        {
+          "testType": "type_super_effective",
+          "description": "Super Effective - Pikachu vs Squirtle",
+          "ability": "Static",
+          "companion": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 75,
+              "defense": 60,
+              "spAttack": 70,
+              "spDefense": 70,
+              "speed": 110
+            },
+            "nature": "Hardy"
+          },
+          "enemy": {
+            "name": "Squirtle",
+            "level": 50,
+            "stats": {
+              "hp": 119,
+              "attack": 68,
+              "defense": 85,
+              "spAttack": 70,
+              "spDefense": 84,
+              "speed": 63
+            },
+            "nature": "Hardy"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        },
+        {
+          "testType": "type_not_effective",
+          "description": "Not Very Effective - Pikachu vs Bulbasaur",
+          "ability": "Static",
+          "companion": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 75,
+              "defense": 60,
+              "spAttack": 70,
+              "spDefense": 70,
+              "speed": 110
+            },
+            "nature": "Hardy"
+          },
+          "enemy": {
+            "name": "Bulbasaur",
+            "level": 50,
+            "stats": {
+              "hp": 120,
+              "attack": 69,
+              "defense": 69,
+              "spAttack": 85,
+              "spDefense": 85,
+              "speed": 65
+            },
+            "nature": "Hardy"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        },
+        {
+          "testType": "type_immune",
+          "description": "Immune Type - Pikachu vs Sandshrew",
+          "ability": "Static",
+          "companion": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 75,
+              "defense": 60,
+              "spAttack": 70,
+              "spDefense": 70,
+              "speed": 110
+            },
+            "nature": "Hardy"
+          },
+          "enemy": {
+            "name": "Sandshrew",
+            "level": 50,
+            "stats": {
+              "hp": 125,
+              "attack": 95,
+              "defense": 105,
+              "spAttack": 40,
+              "spDefense": 50,
+              "speed": 60
+            },
+            "nature": "Hardy"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        },
+        {
+          "testType": "speed_equal",
+          "description": "Equal Speed - Two identical Pikachu",
+          "ability": "Static",
+          "companion": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 75,
+              "defense": 60,
+              "spAttack": 70,
+              "spDefense": 70,
+              "speed": 110
+            },
+            "nature": "Hardy"
+          },
+          "enemy": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 75,
+              "defense": 60,
+              "spAttack": 70,
+              "spDefense": 70,
+              "speed": 110
+            },
+            "nature": "Hardy"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        },
+        {
+          "testType": "speed_faster",
+          "description": "Faster Pokemon - Jolteon vs Pikachu",
+          "ability": "Static",
+          "companion": {
+            "name": "Jolteon",
+            "level": 50,
+            "stats": {
+              "hp": 140,
+              "attack": 85,
+              "defense": 80,
+              "spAttack": 130,
+              "spDefense": 115,
+              "speed": 150
+            },
+            "nature": "Hardy"
+          },
+          "enemy": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 75,
+              "defense": 60,
+              "spAttack": 70,
+              "spDefense": 70,
+              "speed": 110
+            },
+            "nature": "Hardy"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        },
+        {
+          "testType": "speed_slower",
+          "description": "Slower Pokemon - Snorlax vs Pikachu",
+          "ability": "Static",
+          "companion": {
+            "name": "Snorlax",
+            "level": 50,
+            "stats": {
+              "hp": 235,
+              "attack": 130,
+              "defense": 85,
+              "spAttack": 85,
+              "spDefense": 130,
+              "speed": 50
+            },
+            "nature": "Hardy"
+          },
+          "enemy": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 75,
+              "defense": 60,
+              "spAttack": 70,
+              "spDefense": 70,
+              "speed": 110
+            },
+            "nature": "Hardy"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        },
+        {
+          "testType": "fully_trained",
+          "description": "Fully Trained - Lv100 max EVs vs untrained",
+          "ability": "Static",
+          "companion": {
+            "name": "Pikachu",
+            "level": 100,
+            "stats": {
+              "hp": 211,
+              "attack": 209,
+              "defense": 116,
+              "spAttack": 123,
+              "spDefense": 136,
+              "speed": 306
+            },
+            "nature": "Jolly"
+          },
+          "enemy": {
+            "name": "Pikachu",
+            "level": 100,
+            "stats": {
+              "hp": 195,
+              "attack": 130,
+              "defense": 100,
+              "spAttack": 120,
+              "spDefense": 120,
+              "speed": 200
+            },
+            "nature": "Hardy"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        },
+        {
+          "testType": "tank_vs_sweeper",
+          "description": "Tank vs Sweeper - Defensive vs Offensive build",
+          "ability": "Static",
+          "companion": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 142,
+              "attack": 67,
+              "defense": 83,
+              "spAttack": 70,
+              "spDefense": 86,
+              "speed": 110
+            },
+            "nature": "Bold"
+          },
+          "enemy": {
+            "name": "Pikachu",
+            "level": 50,
+            "stats": {
+              "hp": 110,
+              "attack": 107,
+              "defense": 60,
+              "spAttack": 63,
+              "spDefense": 70,
+              "speed": 156
+            },
+            "nature": "Jolly"
+          },
+          "moveResults": [
+            {
+              "move": "Thunderbolt",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Quick Attack",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Iron Tail",
+              "error": "Calculation failed"
+            },
+            {
+              "move": "Volt Tackle",
+              "error": "Calculation failed"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
