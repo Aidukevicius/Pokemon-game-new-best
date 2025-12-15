@@ -108,9 +108,6 @@ export class CollectionScreen {
               ${isInParty ? '<span class="party-tag">PARTY</span>' : ''}
             </div>
           </div>
-          <button class="party-toggle-btn ${isInParty ? 'remove' : 'add'}" data-db-id="${pokemon.db_id}" title="${isInParty ? 'Remove from party' : 'Add to party'}">
-            ${isInParty ? '−' : '+'}
-          </button>
         </div>
       `;
     }).join('');
@@ -184,14 +181,6 @@ export class CollectionScreen {
       });
     });
 
-    const partyBtns = this.container.querySelectorAll('.party-toggle-btn');
-    partyBtns.forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const dbId = parseInt(btn.dataset.dbId);
-        await this.toggleParty(dbId);
-      });
-    });
   }
 
   async toggleParty(dbId) {
