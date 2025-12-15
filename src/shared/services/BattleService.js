@@ -201,7 +201,7 @@ export class BattleService {
     const defenderTypes = defender.pokemon?.types || defender.types || ['Normal'];
     const typeEffectiveness = this.getTypeEffectiveness(move.type, defenderTypes);
 
-    const critical = Math.random() < 0.0625 ? 2.0 : 1;
+    const critical = Math.random() < 0.0625 ? 1.5 : 1;
 
     const randomFactor = 0.85 + (Math.random() * 0.15);
 
@@ -564,5 +564,287 @@ export class BattleService {
     };
 
     return baseStatsMap[pokemonId] || { hp: 50, attack: 50, defense: 50, spAttack: 50, spDefense: 50, speed: 50 };
+  }
+
+  // ============================================
+  // STAT STAGE MODIFIERS (Pokemon style -6 to +6)
+  // ============================================
+  
+  initStatStages() {
+    return { attack: 0, defense: 0, spAttack: 0, spDefense: 0, speed: 0, accuracy: 0, evasion: 0 };
+  }
+
+  getStatStageMultiplier(stage) {
+    // Pokemon formula: stage >= 0: (2 + stage) / 2, stage < 0: 2 / (2 - stage)
+    const clampedStage = Math.max(-6, Math.min(6, stage));
+    if (clampedStage >= 0) {
+      return (2 + clampedStage) / 2;
+    }
+    return 2 / (2 - clampedStage);
+  }
+
+  getAccuracyEvasionMultiplier(stage) {
+    // Pokemon formula: stage >= 0: (3 + stage) / 3, stage < 0: 3 / (3 - stage)
+    const clampedStage = Math.max(-6, Math.min(6, stage));
+    if (clampedStage >= 0) {
+      return (3 + clampedStage) / 3;
+    }
+    return 3 / (3 - clampedStage);
+  }
+
+  applyStatStageChange(currentStages, stat, change) {
+    const newStage = Math.max(-6, Math.min(6, (currentStages[stat] || 0) + change));
+    const oldStage = currentStages[stat] || 0;
+    currentStages[stat] = newStage;
+    
+    let message = '';
+    const actualChange = newStage - oldStage;
+    
+    if (actualChange === 0) {
+      message = stat === 'attack' || stat === 'defense' || stat === 'speed' 
+        ? `${stat.charAt(0).toUpperCase() + stat.slice(1)} won't go any ${change > 0 ? 'higher' : 'lower'}!`
+        : `Stat won't go any ${change > 0 ? 'higher' : 'lower'}!`;
+    } else if (Math.abs(actualChange) >= 3) {
+      message = `${stat.charAt(0).toUpperCase() + stat.slice(1)} ${actualChange > 0 ? 'rose drastically' : 'severely fell'}!`;
+    } else if (Math.abs(actualChange) >= 2) {
+      message = `${stat.charAt(0).toUpperCase() + stat.slice(1)} ${actualChange > 0 ? 'sharply rose' : 'harshly fell'}!`;
+    } else {
+      message = `${stat.charAt(0).toUpperCase() + stat.slice(1)} ${actualChange > 0 ? 'rose' : 'fell'}!`;
+    }
+    
+    return { stages: currentStages, message, changed: actualChange !== 0 };
+  }
+
+  getStatMoveEffects(moveName) {
+    const statMoves = {
+      'swords-dance': { target: 'self', stat: 'attack', change: 2 },
+      'Swords Dance': { target: 'self', stat: 'attack', change: 2 },
+      'dragon-dance': { target: 'self', stats: [{ stat: 'attack', change: 1 }, { stat: 'speed', change: 1 }] },
+      'Dragon Dance': { target: 'self', stats: [{ stat: 'attack', change: 1 }, { stat: 'speed', change: 1 }] },
+      'calm-mind': { target: 'self', stats: [{ stat: 'spAttack', change: 1 }, { stat: 'spDefense', change: 1 }] },
+      'Calm Mind': { target: 'self', stats: [{ stat: 'spAttack', change: 1 }, { stat: 'spDefense', change: 1 }] },
+      'nasty-plot': { target: 'self', stat: 'spAttack', change: 2 },
+      'Nasty Plot': { target: 'self', stat: 'spAttack', change: 2 },
+      'agility': { target: 'self', stat: 'speed', change: 2 },
+      'Agility': { target: 'self', stat: 'speed', change: 2 },
+      'iron-defense': { target: 'self', stat: 'defense', change: 2 },
+      'Iron Defense': { target: 'self', stat: 'defense', change: 2 },
+      'amnesia': { target: 'self', stat: 'spDefense', change: 2 },
+      'Amnesia': { target: 'self', stat: 'spDefense', change: 2 },
+      'bulk-up': { target: 'self', stats: [{ stat: 'attack', change: 1 }, { stat: 'defense', change: 1 }] },
+      'Bulk Up': { target: 'self', stats: [{ stat: 'attack', change: 1 }, { stat: 'defense', change: 1 }] },
+      'growl': { target: 'enemy', stat: 'attack', change: -1 },
+      'Growl': { target: 'enemy', stat: 'attack', change: -1 },
+      'leer': { target: 'enemy', stat: 'defense', change: -1 },
+      'Leer': { target: 'enemy', stat: 'defense', change: -1 },
+      'tail-whip': { target: 'enemy', stat: 'defense', change: -1 },
+      'Tail Whip': { target: 'enemy', stat: 'defense', change: -1 },
+      'screech': { target: 'enemy', stat: 'defense', change: -2 },
+      'Screech': { target: 'enemy', stat: 'defense', change: -2 },
+      'sand-attack': { target: 'enemy', stat: 'accuracy', change: -1 },
+      'Sand Attack': { target: 'enemy', stat: 'accuracy', change: -1 },
+      'flash': { target: 'enemy', stat: 'accuracy', change: -1 },
+      'Flash': { target: 'enemy', stat: 'accuracy', change: -1 },
+      'smokescreen': { target: 'enemy', stat: 'accuracy', change: -1 },
+      'Smokescreen': { target: 'enemy', stat: 'accuracy', change: -1 },
+      'double-team': { target: 'self', stat: 'evasion', change: 1 },
+      'Double Team': { target: 'self', stat: 'evasion', change: 1 },
+      'minimize': { target: 'self', stat: 'evasion', change: 2 },
+      'Minimize': { target: 'self', stat: 'evasion', change: 2 },
+      'charm': { target: 'enemy', stat: 'attack', change: -2 },
+      'Charm': { target: 'enemy', stat: 'attack', change: -2 },
+      'fake-tears': { target: 'enemy', stat: 'spDefense', change: -2 },
+      'Fake Tears': { target: 'enemy', stat: 'spDefense', change: -2 },
+      'metal-sound': { target: 'enemy', stat: 'spDefense', change: -2 },
+      'Metal Sound': { target: 'enemy', stat: 'spDefense', change: -2 },
+      'shell-smash': { target: 'self', stats: [
+        { stat: 'attack', change: 2 }, { stat: 'spAttack', change: 2 }, { stat: 'speed', change: 2 },
+        { stat: 'defense', change: -1 }, { stat: 'spDefense', change: -1 }
+      ]},
+      'Shell Smash': { target: 'self', stats: [
+        { stat: 'attack', change: 2 }, { stat: 'spAttack', change: 2 }, { stat: 'speed', change: 2 },
+        { stat: 'defense', change: -1 }, { stat: 'spDefense', change: -1 }
+      ]}
+    };
+    return statMoves[moveName] || statMoves[moveName.toLowerCase().replace(/\s+/g, '-')] || null;
+  }
+
+  // ============================================
+  // STATUS EFFECTS SYSTEM
+  // ============================================
+
+  applyStatusEffect(target, status) {
+    const statusEffects = {
+      'paralysis': {
+        name: 'paralysis',
+        speedMultiplier: 0.5,
+        skipTurnChance: 0.25,
+        message: 'is paralyzed! It may not be able to move!'
+      },
+      'burn': {
+        name: 'burn',
+        attackMultiplier: 0.5,
+        endTurnDamagePercent: 0.0625,
+        message: 'was burned!'
+      },
+      'poison': {
+        name: 'poison',
+        endTurnDamagePercent: 0.125,
+        message: 'was poisoned!'
+      },
+      'badly-poisoned': {
+        name: 'badly-poisoned',
+        endTurnDamageMultiplier: true,
+        baseDamagePercent: 0.0625,
+        message: 'was badly poisoned!'
+      },
+      'sleep': {
+        name: 'sleep',
+        skipTurn: true,
+        turnsRemaining: Math.floor(Math.random() * 3) + 1,
+        message: 'fell asleep!'
+      },
+      'freeze': {
+        name: 'freeze',
+        skipTurn: true,
+        thawChance: 0.2,
+        message: 'was frozen solid!'
+      },
+      'confusion': {
+        name: 'confusion',
+        hitSelfChance: 0.33,
+        turnsRemaining: Math.floor(Math.random() * 4) + 1,
+        message: 'became confused!'
+      }
+    };
+    
+    return statusEffects[status] || null;
+  }
+
+  getStatusMoveEffects(moveName) {
+    const statusMoves = {
+      'thunder-wave': { status: 'paralysis', accuracy: 90 },
+      'Thunder Wave': { status: 'paralysis', accuracy: 90 },
+      'stun-spore': { status: 'paralysis', accuracy: 75 },
+      'Stun Spore': { status: 'paralysis', accuracy: 75 },
+      'glare': { status: 'paralysis', accuracy: 100 },
+      'Glare': { status: 'paralysis', accuracy: 100 },
+      'will-o-wisp': { status: 'burn', accuracy: 85 },
+      'Will-O-Wisp': { status: 'burn', accuracy: 85 },
+      'poison-powder': { status: 'poison', accuracy: 75 },
+      'Poison Powder': { status: 'poison', accuracy: 75 },
+      'toxic': { status: 'badly-poisoned', accuracy: 90 },
+      'Toxic': { status: 'badly-poisoned', accuracy: 90 },
+      'sleep-powder': { status: 'sleep', accuracy: 75 },
+      'Sleep Powder': { status: 'sleep', accuracy: 75 },
+      'hypnosis': { status: 'sleep', accuracy: 60 },
+      'Hypnosis': { status: 'sleep', accuracy: 60 },
+      'sing': { status: 'sleep', accuracy: 55 },
+      'Sing': { status: 'sleep', accuracy: 55 },
+      'spore': { status: 'sleep', accuracy: 100 },
+      'Spore': { status: 'sleep', accuracy: 100 },
+      'lovely-kiss': { status: 'sleep', accuracy: 75 },
+      'Lovely Kiss': { status: 'sleep', accuracy: 75 },
+      'confuse-ray': { status: 'confusion', accuracy: 100 },
+      'Confuse Ray': { status: 'confusion', accuracy: 100 },
+      'supersonic': { status: 'confusion', accuracy: 55 },
+      'Supersonic': { status: 'confusion', accuracy: 55 },
+      'sweet-kiss': { status: 'confusion', accuracy: 75 },
+      'Sweet Kiss': { status: 'confusion', accuracy: 75 }
+    };
+    return statusMoves[moveName] || statusMoves[moveName.toLowerCase().replace(/\s+/g, '-')] || null;
+  }
+
+  processStatusEffectOnTurn(status, maxHp, turnCount = 1) {
+    const result = { canMove: true, damage: 0, message: '', cured: false };
+    
+    if (!status) return result;
+    
+    switch (status.name) {
+      case 'paralysis':
+        if (Math.random() < status.skipTurnChance) {
+          result.canMove = false;
+          result.message = 'is paralyzed! It can\'t move!';
+        }
+        break;
+        
+      case 'burn':
+        result.damage = Math.floor(maxHp * status.endTurnDamagePercent);
+        result.message = 'is hurt by its burn!';
+        break;
+        
+      case 'poison':
+        result.damage = Math.floor(maxHp * status.endTurnDamagePercent);
+        result.message = 'is hurt by poison!';
+        break;
+        
+      case 'badly-poisoned':
+        result.damage = Math.floor(maxHp * status.baseDamagePercent * turnCount);
+        result.message = 'is hurt by poison!';
+        break;
+        
+      case 'sleep':
+        if (status.turnsRemaining <= 0) {
+          result.cured = true;
+          result.message = 'woke up!';
+        } else {
+          result.canMove = false;
+          result.message = 'is fast asleep.';
+          status.turnsRemaining--;
+        }
+        break;
+        
+      case 'freeze':
+        if (Math.random() < status.thawChance) {
+          result.cured = true;
+          result.message = 'thawed out!';
+        } else {
+          result.canMove = false;
+          result.message = 'is frozen solid!';
+        }
+        break;
+        
+      case 'confusion':
+        if (status.turnsRemaining <= 0) {
+          result.cured = true;
+          result.message = 'snapped out of confusion!';
+        } else {
+          status.turnsRemaining--;
+          if (Math.random() < status.hitSelfChance) {
+            result.canMove = false;
+            result.damage = Math.floor(maxHp * 0.1);
+            result.message = 'hurt itself in its confusion!';
+          }
+        }
+        break;
+    }
+    
+    return result;
+  }
+
+  applyStatusModifiersToDamage(damage, attacker, move, status) {
+    let modifiedDamage = damage;
+    
+    // Burn halves physical attack damage
+    if (status?.name === 'burn' && move.damageClass === 'physical') {
+      modifiedDamage = Math.floor(modifiedDamage * 0.5);
+    }
+    
+    return modifiedDamage;
+  }
+
+  applyStatusModifiersToSpeed(speed, status) {
+    if (status?.name === 'paralysis') {
+      return Math.floor(speed * 0.5);
+    }
+    return speed;
+  }
+
+  calculateAccuracyWithStages(baseAccuracy, attackerAccuracyStage, defenderEvasionStage) {
+    const accuracyMultiplier = this.getAccuracyEvasionMultiplier(attackerAccuracyStage);
+    const evasionMultiplier = this.getAccuracyEvasionMultiplier(defenderEvasionStage);
+    
+    const finalAccuracy = baseAccuracy * (accuracyMultiplier / evasionMultiplier);
+    return Math.min(100, Math.max(0, finalAccuracy));
   }
 }
