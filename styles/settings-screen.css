@@ -19,6 +19,8 @@
 
 .settings-content {
   min-height: 200px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .settings-section {
@@ -79,4 +81,156 @@
   font-size: 10px;
   color: #666;
   margin: 4px 0;
+}
+
+.battle-test-section {
+  max-height: none;
+}
+
+.test-category {
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.test-category:last-of-type {
+  border-bottom: none;
+  margin-bottom: 8px;
+}
+
+.test-category-title {
+  font-size: 11px;
+  color: #555;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.test-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.test-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  padding: 8px 10px;
+  font-size: 9px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: all 0.2s ease;
+}
+
+.test-btn:hover {
+  background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%) !important;
+  transform: translateX(2px);
+}
+
+.test-btn:disabled {
+  background: #999 !important;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.test-name {
+  font-weight: 600;
+  font-size: 10px;
+}
+
+.test-desc {
+  font-size: 8px;
+  opacity: 0.9;
+  line-height: 1.3;
+}
+
+.battle-test-result {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 10px;
+}
+
+.battle-test-result.loading {
+  background: #f0f4ff;
+  color: #667eea;
+  text-align: center;
+}
+
+.battle-test-result.success {
+  background: #e8f5e9;
+  border: 1px solid #4caf50;
+}
+
+.battle-test-result.error {
+  background: #ffebee;
+  border: 1px solid #f44336;
+}
+
+.battle-test-result .success-msg {
+  color: #2e7d32;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.battle-test-result .error-msg {
+  color: #c62828;
+}
+
+.test-setup-info .battle-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.test-setup-info .pokemon-info {
+  background: rgba(255,255,255,0.8);
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.test-setup-info .pokemon-info strong {
+  color: #333;
+}
+
+.test-setup-info .pokemon-info small {
+  color: #666;
+  display: block;
+  margin-top: 4px;
+}
+
+.test-setup-info .vs-text {
+  text-align: center;
+  font-weight: bold;
+  color: #667eea;
+  font-size: 11px;
+}
+
+.test-setup-info .instruction {
+  margin-top: 10px;
+  padding: 8px;
+  background: #fff3cd;
+  border-radius: 4px;
+  color: #856404;
+  font-weight: 500;
+  text-align: center;
+}
+
+.loading-msg {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }

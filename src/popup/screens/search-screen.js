@@ -30,11 +30,61 @@ export class SearchScreen {
 
   async initialize() {
     console.log('[SearchScreen] Initializing...');
-    await this.loadCompanion();
-    await this.loadCompanionMoves();
-    await this.loadEncounterQueue();
+    
+    const pendingTest = localStorage.getItem('pendingTestBattle');
+    if (pendingTest) {
+      await this.loadTestBattle(JSON.parse(pendingTest));
+      localStorage.removeItem('pendingTestBattle');
+    } else {
+      await this.loadCompanion();
+      await this.loadCompanionMoves();
+      await this.loadEncounterQueue();
+    }
+    
     await this.loadPokeballs();
     this.render();
+  }
+  
+  async loadTestBattle(testData) {
+    console.log('[SearchScreen] Loading test battle:', testData.description);
+    
+    this.companion = {
+      id: testData.companion.id,
+      name: testData.companion.name,
+      types: testData.companion.types,
+      level: testData.companion.level,
+      nature: testData.companion.nature,
+      evs: testData.companion.evs,
+      ivs: testData.companion.ivs,
+      health: testData.companion.health || testData.companion.stats.hp,
+      maxHealth: testData.companion.maxHealth || testData.companion.stats.hp,
+      experience: testData.companion.experience || 0,
+      experienceToNext: testData.companion.experienceToNext || 100
+    };
+    
+    this.companionStats = testData.companion.stats;
+    
+    this.companionMoves = await this.moveService.getPokemonMoves(testData.companion.id);
+    if (!this.companionMoves || this.companionMoves.length === 0) {
+      this.companionMoves = [
+        { name: 'Tackle', power: 40, type: 'Normal', accuracy: 100, damageClass: 'physical' },
+        { name: 'Thunder Shock', power: 40, type: 'Electric', accuracy: 100, damageClass: 'special' }
+      ];
+    }
+    
+    this.currentEncounter = {
+      ...testData.encounter,
+      currentHp: testData.encounter.currentHp || testData.encounter.stats.hp,
+      maxHp: testData.encounter.maxHp || testData.encounter.stats.hp,
+      status: testData.encounter.status || null
+    };
+    
+    this.battleLog = [`TEST BATTLE: ${testData.description}`];
+    
+    console.log('[SearchScreen] Test battle loaded - Companion:', this.companion.name, 'Lv', this.companion.level);
+    console.log('[SearchScreen] Test battle loaded - Enemy:', this.currentEncounter.pokemon.name, 'Lv', this.currentEncounter.level);
+    console.log('[SearchScreen] Companion stats:', this.companionStats);
+    console.log('[SearchScreen] Enemy stats:', this.currentEncounter.stats);
   }
 
   async loadPokeballs() {

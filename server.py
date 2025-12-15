@@ -959,6 +959,243 @@ def battle_health():
         return jsonify({'success': False, 'error': f'Battle calculator unavailable: {str(e)}'}), 503
 
 
+POKEMON_BASE_STATS = {
+    25: {'name': 'Pikachu', 'types': ['Electric'], 'hp': 35, 'attack': 55, 'defense': 40, 'spAttack': 50, 'spDefense': 50, 'speed': 90, 'catchRate': 190},
+    7: {'name': 'Squirtle', 'types': ['Water'], 'hp': 44, 'attack': 48, 'defense': 65, 'spAttack': 50, 'spDefense': 64, 'speed': 43, 'catchRate': 45},
+    1: {'name': 'Bulbasaur', 'types': ['Grass', 'Poison'], 'hp': 45, 'attack': 49, 'defense': 49, 'spAttack': 65, 'spDefense': 65, 'speed': 45, 'catchRate': 45},
+    27: {'name': 'Sandshrew', 'types': ['Ground'], 'hp': 50, 'attack': 75, 'defense': 85, 'spAttack': 20, 'spDefense': 30, 'speed': 40, 'catchRate': 255},
+    135: {'name': 'Jolteon', 'types': ['Electric'], 'hp': 65, 'attack': 65, 'defense': 60, 'spAttack': 110, 'spDefense': 95, 'speed': 130, 'catchRate': 45},
+    143: {'name': 'Snorlax', 'types': ['Normal'], 'hp': 160, 'attack': 110, 'defense': 65, 'spAttack': 65, 'spDefense': 110, 'speed': 30, 'catchRate': 25},
+}
+
+def calculate_stat(base, iv, ev, level, nature_mod=1.0):
+    return int(((2 * base + iv + ev // 4) * level // 100 + 5) * nature_mod)
+
+def calculate_hp(base, iv, ev, level):
+    return int((2 * base + iv + ev // 4) * level // 100 + level + 10)
+
+def get_nature_mod(nature, stat):
+    mods = NATURE_MODIFIERS.get(nature, {'increase': None, 'decrease': None})
+    if mods['increase'] == stat:
+        return 1.1
+    elif mods['decrease'] == stat:
+        return 0.9
+    return 1.0
+
+def create_pokemon_for_test(pokemon_id, level, evs, ivs, nature):
+    base = POKEMON_BASE_STATS.get(pokemon_id, POKEMON_BASE_STATS[25])
+    stats = {
+        'hp': calculate_hp(base['hp'], ivs['hp'], evs['hp'], level),
+        'attack': calculate_stat(base['attack'], ivs['attack'], evs['attack'], level, get_nature_mod(nature, 'attack')),
+        'defense': calculate_stat(base['defense'], ivs['defense'], evs['defense'], level, get_nature_mod(nature, 'defense')),
+        'spAttack': calculate_stat(base['spAttack'], ivs['spAttack'], evs['spAttack'], level, get_nature_mod(nature, 'spAttack')),
+        'spDefense': calculate_stat(base['spDefense'], ivs['spDefense'], evs['spDefense'], level, get_nature_mod(nature, 'spDefense')),
+        'speed': calculate_stat(base['speed'], ivs['speed'], evs['speed'], level, get_nature_mod(nature, 'speed'))
+    }
+    return {
+        'id': pokemon_id,
+        'name': base['name'],
+        'types': base['types'],
+        'level': level,
+        'evs': evs,
+        'ivs': ivs,
+        'nature': nature,
+        'stats': stats,
+        'baseStats': {'hp': base['hp'], 'attack': base['attack'], 'defense': base['defense'], 
+                      'spAttack': base['spAttack'], 'spDefense': base['spDefense'], 'speed': base['speed']},
+        'catchRate': base['catchRate']
+    }
+
+TEST_BATTLE_CONFIGS = {
+    'ev_comparison': {
+        'description': 'EV Comparison - Pikachu with 252 Atk/Spe EVs vs No EVs',
+        'companion': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 252, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 252}, 
+                      'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'},
+        'enemy': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                  'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'}
+    },
+    'ev_hp_defense': {
+        'description': 'Defensive EVs - Pikachu with 252 HP/Def EVs vs No EVs',
+        'companion': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 252, 'attack': 0, 'defense': 252, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                      'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'},
+        'enemy': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                  'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'}
+    },
+    'ev_special': {
+        'description': 'Special Attack EVs - Pikachu with 252 SpAtk EVs vs No EVs',
+        'companion': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 252, 'spDefense': 0, 'speed': 0}, 
+                      'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'},
+        'enemy': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                  'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'}
+    },
+    'iv_comparison': {
+        'description': 'IV Comparison - Pikachu with Perfect 31 IVs vs 0 IVs',
+        'companion': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                      'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'},
+        'enemy': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                  'ivs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 'nature': 'Hardy'}
+    },
+    'iv_speed': {
+        'description': 'Speed IV Test - Pikachu with 31 Speed IV vs 0 Speed IV',
+        'companion': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                      'ivs': {'hp': 15, 'attack': 15, 'defense': 15, 'spAttack': 15, 'spDefense': 15, 'speed': 31}, 'nature': 'Hardy'},
+        'enemy': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                  'ivs': {'hp': 15, 'attack': 15, 'defense': 15, 'spAttack': 15, 'spDefense': 15, 'speed': 0}, 'nature': 'Hardy'}
+    },
+    'nature_attack': {
+        'description': 'Adamant vs Modest - Physical vs Special nature',
+        'companion': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                      'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Adamant'},
+        'enemy': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                  'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Modest'}
+    },
+    'nature_speed': {
+        'description': 'Jolly vs Brave - Speed nature difference',
+        'companion': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                      'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Jolly'},
+        'enemy': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                  'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Brave'}
+    },
+    'level_difference': {
+        'description': 'Level Gap - Lv100 vs Lv50 Pikachu',
+        'companion': {'pokemon_id': 25, 'level': 100, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                      'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'},
+        'enemy': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                  'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'}
+    },
+    'level_low': {
+        'description': 'Low Level Battle - Two Lv5 Pikachu',
+        'companion': {'pokemon_id': 25, 'level': 5, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                      'ivs': {'hp': 15, 'attack': 15, 'defense': 15, 'spAttack': 15, 'spDefense': 15, 'speed': 15}, 'nature': 'Hardy'},
+        'enemy': {'pokemon_id': 25, 'level': 5, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                  'ivs': {'hp': 15, 'attack': 15, 'defense': 15, 'spAttack': 15, 'spDefense': 15, 'speed': 15}, 'nature': 'Hardy'}
+    },
+    'type_super_effective': {
+        'description': 'Super Effective - Pikachu vs Squirtle',
+        'companion': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                      'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'},
+        'enemy': {'pokemon_id': 7, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                  'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'}
+    },
+    'type_not_effective': {
+        'description': 'Not Very Effective - Pikachu vs Bulbasaur',
+        'companion': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                      'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'},
+        'enemy': {'pokemon_id': 1, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                  'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'}
+    },
+    'type_immune': {
+        'description': 'Immune Type - Pikachu vs Sandshrew',
+        'companion': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                      'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'},
+        'enemy': {'pokemon_id': 27, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                  'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'}
+    },
+    'speed_equal': {
+        'description': 'Equal Speed - Two identical Pikachu',
+        'companion': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                      'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'},
+        'enemy': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                  'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'}
+    },
+    'speed_faster': {
+        'description': 'Faster Pokemon - Jolteon vs Pikachu',
+        'companion': {'pokemon_id': 135, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                      'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'},
+        'enemy': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                  'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'}
+    },
+    'speed_slower': {
+        'description': 'Slower Pokemon - Snorlax vs Pikachu',
+        'companion': {'pokemon_id': 143, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                      'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'},
+        'enemy': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                  'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Hardy'}
+    },
+    'fully_trained': {
+        'description': 'Fully Trained - Lv100 max EVs vs untrained',
+        'companion': {'pokemon_id': 25, 'level': 100, 'evs': {'hp': 0, 'attack': 252, 'defense': 0, 'spAttack': 4, 'spDefense': 0, 'speed': 252}, 
+                      'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Jolly'},
+        'enemy': {'pokemon_id': 25, 'level': 100, 'evs': {'hp': 0, 'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0}, 
+                  'ivs': {'hp': 15, 'attack': 15, 'defense': 15, 'spAttack': 15, 'spDefense': 15, 'speed': 15}, 'nature': 'Hardy'}
+    },
+    'tank_vs_sweeper': {
+        'description': 'Tank vs Sweeper - Defensive vs Offensive build',
+        'companion': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 252, 'attack': 0, 'defense': 128, 'spAttack': 0, 'spDefense': 128, 'speed': 0}, 
+                      'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Bold'},
+        'enemy': {'pokemon_id': 25, 'level': 50, 'evs': {'hp': 0, 'attack': 252, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 252}, 
+                  'ivs': {'hp': 31, 'attack': 31, 'defense': 31, 'spAttack': 31, 'spDefense': 31, 'speed': 31}, 'nature': 'Jolly'}
+    }
+}
+
+@app.route('/api/test-battle', methods=['POST'])
+def start_test_battle():
+    try:
+        data = request.get_json()
+        test_type = data.get('testType')
+        
+        if test_type not in TEST_BATTLE_CONFIGS:
+            return jsonify({'success': False, 'error': f'Unknown test type: {test_type}'}), 400
+        
+        config = TEST_BATTLE_CONFIGS[test_type]
+        
+        companion_cfg = config['companion']
+        companion = create_pokemon_for_test(
+            companion_cfg['pokemon_id'], 
+            companion_cfg['level'], 
+            companion_cfg['evs'], 
+            companion_cfg['ivs'], 
+            companion_cfg['nature']
+        )
+        companion['health'] = companion['stats']['hp']
+        
+        enemy_cfg = config['enemy']
+        enemy = create_pokemon_for_test(
+            enemy_cfg['pokemon_id'], 
+            enemy_cfg['level'], 
+            enemy_cfg['evs'], 
+            enemy_cfg['ivs'], 
+            enemy_cfg['nature']
+        )
+        
+        encounter = {
+            'pokemon': {
+                'id': enemy['id'],
+                'name': enemy['name'],
+                'types': enemy['types'],
+                'baseStats': enemy['baseStats'],
+                'catchRate': enemy['catchRate'],
+                'rarity': 'test'
+            },
+            'level': enemy['level'],
+            'ivs': enemy['ivs'],
+            'evs': enemy['evs'],
+            'nature': enemy['nature'],
+            'stats': enemy['stats'],
+            'currentHp': enemy['stats']['hp'],
+            'maxHp': enemy['stats']['hp'],
+            'status': None,
+            'isTest': True,
+            'testDescription': config['description'],
+            'timestamp': int(datetime.utcnow().timestamp() * 1000)
+        }
+        
+        companion['health'] = companion['stats']['hp']
+        companion['maxHealth'] = companion['stats']['hp']
+        companion['experience'] = 0
+        companion['experienceToNext'] = 100
+        
+        return jsonify({
+            'success': True,
+            'companion': companion,
+            'encounter': encounter,
+            'description': config['description']
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 if __name__ == '__main__':
     print("Starting PokeBrowse server on port 5000...")
     print("Open http://0.0.0.0:5000/preview.html to view the extension")
