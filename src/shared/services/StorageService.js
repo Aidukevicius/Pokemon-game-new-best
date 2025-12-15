@@ -32,6 +32,9 @@ export class StorageService {
         const response = await fetch(`${this.apiBase}/api/party`);
         if (response.ok) {
           const data = await response.json();
+          if (data.auto_selected) {
+            return [];
+          }
           return data.party || [];
         }
       } catch (e) {
