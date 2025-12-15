@@ -29,9 +29,10 @@ export class StorageService {
 
     if (key === 'favorite_pokemon') {
       try {
-        const response = await fetch(`${this.apiBase}/api/favorites`);
+        const response = await fetch(`${this.apiBase}/api/party`);
         if (response.ok) {
-          return await response.json();
+          const data = await response.json();
+          return data.party || [];
         }
       } catch (e) {
         console.log('[StorageService] API not available, using local storage');
