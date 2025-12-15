@@ -1,6 +1,8 @@
 export class SettingsScreen {
   constructor(containerElement) {
     this.container = containerElement;
+    // Make this instance accessible globally for onclick handlers
+    window.settingsScreen = this;
   }
 
   async initialize() {
@@ -19,7 +21,7 @@ export class SettingsScreen {
           <div class="settings-section">
             <h3 class="section-title">Testing</h3>
             <p class="section-desc">Use these options for testing the app</p>
-            <button class="snes-btn seed-pokemon-btn" id="seedPokemonBtn">Add Test Pokemon</button>
+            <button class="test-btn seed-pokemon-btn" id="seedPokemonBtn" onclick="window.settingsScreen.seedPokemon()">Add Test Pokemon</button>
             <div id="seedResult" class="seed-result"></div>
           </div>
 
@@ -30,15 +32,15 @@ export class SettingsScreen {
             <div class="test-category">
               <h4 class="test-category-title">EV Testing</h4>
               <div class="test-buttons">
-                <button class="snes-btn test-btn" data-test="ev_comparison">
+                <button class="test-btn" data-test="ev_comparison" onclick="window.settingsScreen.startTestBattle('ev_comparison')">
                   <span class="test-name">EV Comparison</span>
                   <span class="test-desc">2x Pikachu Lv50 - One with 252 Atk/252 Spe EVs vs No EVs (same IVs)</span>
                 </button>
-                <button class="snes-btn test-btn" data-test="ev_hp_defense">
+                <button class="test-btn" data-test="ev_hp_defense" onclick="window.settingsScreen.startTestBattle('ev_hp_defense')">
                   <span class="test-name">Defensive EVs</span>
                   <span class="test-desc">2x Pikachu Lv50 - One with 252 HP/252 Def EVs vs No EVs</span>
                 </button>
-                <button class="snes-btn test-btn" data-test="ev_special">
+                <button class="test-btn" data-test="ev_special" onclick="window.settingsScreen.startTestBattle('ev_special')">
                   <span class="test-name">Special Attack EVs</span>
                   <span class="test-desc">2x Pikachu Lv50 - One with 252 SpAtk EVs vs No EVs</span>
                 </button>
@@ -48,11 +50,11 @@ export class SettingsScreen {
             <div class="test-category">
               <h4 class="test-category-title">IV Testing</h4>
               <div class="test-buttons">
-                <button class="snes-btn test-btn" data-test="iv_comparison">
+                <button class="test-btn" data-test="iv_comparison" onclick="window.settingsScreen.startTestBattle('iv_comparison')">
                   <span class="test-name">IV Comparison</span>
                   <span class="test-desc">2x Pikachu Lv50 - Perfect 31 IVs vs 0 IVs (same EVs)</span>
                 </button>
-                <button class="snes-btn test-btn" data-test="iv_speed">
+                <button class="test-btn" data-test="iv_speed" onclick="window.settingsScreen.startTestBattle('iv_speed')">
                   <span class="test-name">Speed IV Test</span>
                   <span class="test-desc">2x Pikachu Lv50 - 31 Speed IV vs 0 Speed IV (who goes first?)</span>
                 </button>
@@ -62,11 +64,11 @@ export class SettingsScreen {
             <div class="test-category">
               <h4 class="test-category-title">Nature Testing</h4>
               <div class="test-buttons">
-                <button class="snes-btn test-btn" data-test="nature_attack">
+                <button class="test-btn" data-test="nature_attack" onclick="window.settingsScreen.startTestBattle('nature_attack')">
                   <span class="test-name">Adamant vs Modest</span>
                   <span class="test-desc">2x Pikachu Lv50 - Adamant (+Atk) vs Modest (+SpAtk)</span>
                 </button>
-                <button class="snes-btn test-btn" data-test="nature_speed">
+                <button class="test-btn" data-test="nature_speed" onclick="window.settingsScreen.startTestBattle('nature_speed')">
                   <span class="test-name">Jolly vs Brave</span>
                   <span class="test-desc">2x Pikachu Lv50 - Jolly (+Spe) vs Brave (-Spe) - Speed difference</span>
                 </button>
@@ -76,11 +78,11 @@ export class SettingsScreen {
             <div class="test-category">
               <h4 class="test-category-title">Level Testing</h4>
               <div class="test-buttons">
-                <button class="snes-btn test-btn" data-test="level_difference">
+                <button class="test-btn" data-test="level_difference" onclick="window.settingsScreen.startTestBattle('level_difference')">
                   <span class="test-name">Level Gap</span>
                   <span class="test-desc">Pikachu Lv100 vs Pikachu Lv50 - Damage difference</span>
                 </button>
-                <button class="snes-btn test-btn" data-test="level_low">
+                <button class="test-btn" data-test="level_low" onclick="window.settingsScreen.startTestBattle('level_low')">
                   <span class="test-name">Low Level Battle</span>
                   <span class="test-desc">2x Pikachu Lv5 - Early game simulation</span>
                 </button>
@@ -90,15 +92,15 @@ export class SettingsScreen {
             <div class="test-category">
               <h4 class="test-category-title">Type Effectiveness</h4>
               <div class="test-buttons">
-                <button class="snes-btn test-btn" data-test="type_super_effective">
+                <button class="test-btn" data-test="type_super_effective" onclick="window.settingsScreen.startTestBattle('type_super_effective')">
                   <span class="test-name">Super Effective</span>
                   <span class="test-desc">Pikachu (Electric) vs Squirtle (Water) Lv50</span>
                 </button>
-                <button class="snes-btn test-btn" data-test="type_not_effective">
+                <button class="test-btn" data-test="type_not_effective" onclick="window.settingsScreen.startTestBattle('type_not_effective')">
                   <span class="test-name">Not Very Effective</span>
                   <span class="test-desc">Pikachu (Electric) vs Bulbasaur (Grass) Lv50</span>
                 </button>
-                <button class="snes-btn test-btn" data-test="type_immune">
+                <button class="test-btn" data-test="type_immune" onclick="window.settingsScreen.startTestBattle('type_immune')">
                   <span class="test-name">Immune Type</span>
                   <span class="test-desc">Pikachu (Electric) vs Sandshrew (Ground) Lv50</span>
                 </button>
@@ -108,15 +110,15 @@ export class SettingsScreen {
             <div class="test-category">
               <h4 class="test-category-title">Speed Priority</h4>
               <div class="test-buttons">
-                <button class="snes-btn test-btn" data-test="speed_equal">
+                <button class="test-btn" data-test="speed_equal" onclick="window.settingsScreen.startTestBattle('speed_equal')">
                   <span class="test-name">Equal Speed</span>
                   <span class="test-desc">2x Pikachu Lv50 - Identical stats, random first move</span>
                 </button>
-                <button class="snes-btn test-btn" data-test="speed_faster">
+                <button class="test-btn" data-test="speed_faster" onclick="window.settingsScreen.startTestBattle('speed_faster')">
                   <span class="test-name">Faster Pokemon</span>
                   <span class="test-desc">Jolteon (130 Spe) vs Pikachu (90 Spe) Lv50</span>
                 </button>
-                <button class="snes-btn test-btn" data-test="speed_slower">
+                <button class="test-btn" data-test="speed_slower" onclick="window.settingsScreen.startTestBattle('speed_slower')">
                   <span class="test-name">Slower Pokemon</span>
                   <span class="test-desc">Snorlax (30 Spe) vs Pikachu (90 Spe) Lv50</span>
                 </button>
@@ -126,11 +128,11 @@ export class SettingsScreen {
             <div class="test-category">
               <h4 class="test-category-title">Combined Stats</h4>
               <div class="test-buttons">
-                <button class="snes-btn test-btn" data-test="fully_trained">
+                <button class="test-btn" data-test="fully_trained" onclick="window.settingsScreen.startTestBattle('fully_trained')">
                   <span class="test-name">Fully Trained</span>
                   <span class="test-desc">Pikachu Lv100 with 252 Atk/252 Spe EVs, 31 IVs, Jolly vs Untrained</span>
                 </button>
-                <button class="snes-btn test-btn" data-test="tank_vs_sweeper">
+                <button class="test-btn" data-test="tank_vs_sweeper" onclick="window.settingsScreen.startTestBattle('tank_vs_sweeper')">
                   <span class="test-name">Tank vs Sweeper</span>
                   <span class="test-desc">Pikachu (Def/SpDef EVs, Bold) vs Pikachu (Atk/Spe EVs, Jolly)</span>
                 </button>
