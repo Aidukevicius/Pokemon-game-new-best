@@ -292,8 +292,11 @@ export class MainScreen {
     await collectionScreen.initialize();
     collectionScreen.show();
 
-    overlay.querySelector('.close-modal').addEventListener('click', () => {
+    overlay.querySelector('.close-modal').addEventListener('click', async () => {
       overlay.remove();
+      // Refresh main screen to show updated party
+      await this.loadCollection();
+      await this.render();
     });
   }
 
