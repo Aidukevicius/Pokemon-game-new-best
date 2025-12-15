@@ -18,6 +18,7 @@ function createPokemon(data) {
   const options = {
     level: data.level || 50,
     nature: NATURE_MAP[data.nature] || 'Hardy',
+    ability: data.ability || 'Static',
     evs: {
       hp: data.evs?.hp || 0,
       atk: data.evs?.attack || 0,
@@ -62,7 +63,7 @@ app.post('/api/calculate-damage', (req, res) => {
       moveObj = new Move(gen, 'Tackle');
     }
 
-    const result = calculate(gen, attackerPokemon, moveObj, defenderPokemon);
+    const result = calculate(gen, attackerPokemon, defenderPokemon, moveObj);
 
     const damageRange = result.damage;
     let minDamage, maxDamage;
