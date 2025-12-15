@@ -175,7 +175,6 @@ export class CollectionScreen {
     cards.forEach(card => {
       card.style.cursor = 'pointer';
       card.addEventListener('click', (e) => {
-        if (e.target.closest('.party-toggle-btn')) return;
         const dbId = parseInt(card.dataset.dbId);
         this.showPokemonDetail(dbId);
       });
