@@ -3,8 +3,9 @@
 ## Project Overview
 A lofi SNES-style Pokemon catching game implemented as a Chrome extension. Users can encounter and catch Pokemon while browsing the web. Features a mobile-shaped popup (360x640px) with tab-based navigation for different screens.
 
-## Current State (December 10, 2025)
-**Phase**: Leveling & EV System Complete
+## Current State (December 15, 2025)
+**Phase**: Party System Complete
+- **NEW: Party Selection System** - Pick 6 Pokemon for your party or auto-select top 6 by level
 - Full experience/leveling system with Gen 5+ experience formula
 - EV (Effort Value) rewards from defeating wild Pokemon
 - All 151 Gen 1 Pokemon have proper EV yields and base experience values
