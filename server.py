@@ -93,6 +93,7 @@ class Pokemon(db.Model):
     level = db.Column(db.Integer, default=1)
     caught_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_favorite = db.Column(db.Boolean, default=False)
+    in_party = db.Column(db.Boolean, default=False)
     nature = db.Column(db.String(20), default='Hardy')
     item = db.Column(db.String(100), nullable=True)
     hp_ev = db.Column(db.Integer, default=0)
@@ -116,6 +117,7 @@ class Pokemon(db.Model):
             'caught_at': self.caught_at.isoformat() if self.caught_at else None,
             'caughtAt': int(self.caught_at.timestamp() * 1000) if self.caught_at else None,
             'is_favorite': self.is_favorite,
+            'in_party': self.in_party,
             'db_id': self.id,
             'catchId': self.id,
             'nature': self.nature,
@@ -517,6 +519,43 @@ def delete_pokemon(db_id):
     db.session.delete(pokemon)
     db.session.commit()
     return jsonify({'message': 'Pokemon released'}), 200
+
+
+@app.route('/api/party', methods=['GET'])
+def get_party():
+    party_pokemon = Pokemon.query.filter_by(in_party=True).order_by(Pokemon.level.desc()).limit(6).all()
+    
+    if len(party_pokemon) == 0:
+        top_level = Pokemon.query.order_by(Pokemon.level.desc()).limit(6).all()
+        return jsonify({
+            'party': [p.to_dict() for p in top_level],
+            'auto_selected': True,
+            'party_db_ids': [p.id for p in top_level]
+        })
+    
+    return jsonify({
+        'party': [p.to_dict() for p in party_pokemon],
+        'auto_selected': False,
+        'party_db_ids': [p.id for p in party_pokemon]
+    })
+
+
+@app.route('/api/pokemon/<int:db_id>/party', methods=['POST'])
+def toggle_party(db_id):
+    pokemon = Pokemon.query.get_or_404(db_id)
+    
+    if pokemon.in_party:
+        pokemon.in_party = False
+        db.session.commit()
+        return jsonify({'in_party': False, 'message': 'Removed from party', 'pokemon': pokemon.to_dict()})
+    
+    current_party_count = Pokemon.query.filter_by(in_party=True).count()
+    if current_party_count >= 6:
+        return jsonify({'error': 'Party is full. Remove a Pokemon first.'}), 400
+    
+    pokemon.in_party = True
+    db.session.commit()
+    return jsonify({'in_party': True, 'message': 'Added to party', 'pokemon': pokemon.to_dict()})
 
 
 @app.route('/api/companion', methods=['GET'])
