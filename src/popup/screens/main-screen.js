@@ -52,9 +52,15 @@ export class MainScreen {
     const collection = await this.storageService.get('pokemon_collection');
     this.pokemonCollection = collection || [];
     
-    // Load favorites separately
-    const favorites = await this.storageService.get('favorite_pokemon');
-    this.favoritePokemon = favorites || [];
+    // Load party from API (the system with green borders and +/- buttons)
+    try {
+      const res = await fetch('/api/party');
+      const data = await res.json();
+      this.favoritePokemon = data.party || [];
+    } catch (error) {
+      console.error('[MainScreen] Error loading party:', error);
+      this.favoritePokemon = [];
+    }
   }
 
   async render() {
