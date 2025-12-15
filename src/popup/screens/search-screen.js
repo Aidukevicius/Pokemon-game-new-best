@@ -48,6 +48,10 @@ export class SearchScreen {
   async loadTestBattle(testData) {
     console.log('[SearchScreen] Loading test battle:', testData.description);
     
+    this.companionStats = testData.companion.stats;
+    const maxHp = this.companionStats?.hp || 100;
+    const initialHp = testData.companion.health || testData.companion.stats.hp;
+    
     this.companion = {
       id: testData.companion.id,
       name: testData.companion.name,
@@ -56,13 +60,12 @@ export class SearchScreen {
       nature: testData.companion.nature,
       evs: testData.companion.evs,
       ivs: testData.companion.ivs,
-      health: testData.companion.health || testData.companion.stats.hp,
-      maxHealth: testData.companion.maxHealth || testData.companion.stats.hp,
+      health: initialHp <= 100 ? initialHp : Math.round((initialHp / maxHp) * 100),
+      currentHp: initialHp <= 100 ? Math.round((initialHp / 100) * maxHp) : initialHp,
+      maxHealth: maxHp,
       experience: testData.companion.experience || 0,
       experienceToNext: testData.companion.experienceToNext || 100
     };
-    
-    this.companionStats = testData.companion.stats;
     
     this.companionMoves = await this.moveService.getPokemonMoves(testData.companion.id);
     if (!this.companionMoves || this.companionMoves.length === 0) {
@@ -176,7 +179,8 @@ export class SearchScreen {
           experience: this.companion.experience,
           evs: this.companion.evs,
           ivs: this.companion.ivs,
-          nature: this.companion.nature
+          nature: this.companion.nature,
+          health: this.companion.health
         });
         
         // Always recalculate stats based on level, EVs, IVs
@@ -184,7 +188,20 @@ export class SearchScreen {
         this.companion.stats = this.companionStats;
         this.companion.types = this.getCompanionTypes();
         
-        console.log('[SearchScreen] Companion loaded:', this.companion.name, 'Level:', this.companion.level, 'Stats:', this.companionStats);
+        // Convert health percentage (0-100) to actual HP for battle
+        // If health is stored as percentage, convert to actual HP
+        const maxHp = this.companionStats.hp;
+        const healthPercent = this.companion.health ?? 100;
+        // If health is already actual HP (greater than 100 and close to maxHp), use it
+        // Otherwise treat it as percentage and convert
+        if (healthPercent <= 100) {
+          this.companion.currentHp = Math.round((healthPercent / 100) * maxHp);
+        } else {
+          // Health might already be actual HP
+          this.companion.currentHp = Math.min(healthPercent, maxHp);
+        }
+        
+        console.log('[SearchScreen] Companion loaded:', this.companion.name, 'Level:', this.companion.level, 'Stats:', this.companionStats, 'CurrentHP:', this.companion.currentHp);
       }
     } catch (error) {
       console.error('[SearchScreen] Error loading companion:', error);
@@ -267,10 +284,22 @@ export class SearchScreen {
     this.attachSearchListeners();
   }
 
+  getCompanionCurrentHp() {
+    // Use currentHp if set (actual HP value), otherwise calculate from health percentage
+    if (this.companion?.currentHp !== undefined) {
+      return this.companion.currentHp;
+    }
+    const maxHp = this.companionStats?.hp || 100;
+    const healthPercent = this.companion?.health ?? 100;
+    return Math.round((healthPercent / 100) * maxHp);
+  }
+
   renderBattleEncounter(encounter) {
     const spriteUrl = this.spriteService.getSpriteUrl(encounter.pokemon.id);
     const hpPercent = (encounter.currentHp / encounter.maxHp) * 100;
-    const companionHpPercent = this.companion ? (this.companion.health / 100) * 100 : 100;
+    const maxHp = this.companionStats?.hp || 100;
+    const currentHp = this.getCompanionCurrentHp();
+    const companionHpPercent = (currentHp / maxHp) * 100;
 
     const moves = this.getCompanionMoves();
     const enemyTypes = encounter.pokemon.types || ['Normal'];
@@ -323,7 +352,7 @@ export class SearchScreen {
                   <div class="hp-fill ${companionHpPercent < 20 ? 'critical' : companionHpPercent < 50 ? 'warning' : ''}" 
                        style="width: ${companionHpPercent}%"></div>
                 </div>
-                <span class="hp-text">${Math.round(this.companion?.health || 100)}/${this.companionStats?.hp || 100}</span>
+                <span class="hp-text">${this.getCompanionCurrentHp()}/${this.companionStats?.hp || 100}</span>
               </div>
             </div>
           </div>
@@ -333,7 +362,7 @@ export class SearchScreen {
         <div class="effectiveness-overlay" id="effectivenessOverlay"></div>
 
         <div class="battle-log-box" id="battleLog">
-          <p class="log-text"></p>
+          <p class="log-text">${this.battleLog.length > 0 ? this.battleLog[this.battleLog.length - 1] : ''}</p>
         </div>
 
         <div class="battle-menu-pokemon">
@@ -796,11 +825,12 @@ export class SearchScreen {
     await this.animateDamage('ally');
 
     const maxHp = this.companionStats?.hp || 100;
-    const currentHp = this.companion.health || 100;
+    const currentHp = this.companion.currentHp ?? this.getCompanionCurrentHp();
     const actualDamage = Math.max(1, result.damage);
     let companionHp = Math.max(0, currentHp - actualDamage);
-    await this.storage.set('companionHp', companionHp);
-    this.companion.health = companionHp;
+    this.companion.currentHp = companionHp;
+    this.companion.health = Math.round((companionHp / maxHp) * 100);
+    await this.storage.set('companionHp', this.companion.health);
 
     this.updateHpDisplay('ally', companionHp, maxHp);
 
@@ -883,11 +913,12 @@ export class SearchScreen {
     await this.animateDamage('ally');
 
     const maxHp = this.companionStats?.hp || 100;
-    const currentHp = this.companion.health || 100;
+    const currentHp = this.companion.currentHp ?? this.getCompanionCurrentHp();
     const actualDamage = Math.max(1, result.damage);
     let companionHp = Math.max(0, currentHp - actualDamage);
-    await this.storage.set('companionHp', companionHp);
-    this.companion.health = companionHp;
+    this.companion.currentHp = companionHp;
+    this.companion.health = Math.round((companionHp / maxHp) * 100);
+    await this.storage.set('companionHp', this.companion.health);
 
     this.updateHpDisplay('ally', companionHp, maxHp);
 
