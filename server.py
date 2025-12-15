@@ -531,14 +531,6 @@ def get_favorites():
 def get_party():
     party_pokemon = Pokemon.query.filter_by(in_party=True).order_by(Pokemon.level.desc()).limit(6).all()
     
-    if len(party_pokemon) == 0:
-        top_level = Pokemon.query.order_by(Pokemon.level.desc()).limit(6).all()
-        return jsonify({
-            'party': [p.to_dict() for p in top_level],
-            'auto_selected': True,
-            'party_db_ids': [p.id for p in top_level]
-        })
-    
     return jsonify({
         'party': [p.to_dict() for p in party_pokemon],
         'auto_selected': False,
