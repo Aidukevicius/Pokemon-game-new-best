@@ -1,0 +1,165 @@
+{
+  "generatedAt": "2025-12-15T07:30:24.955020",
+  "iterations": 1,
+  "summary": {
+    "companionWins": 15,
+    "enemyWins": 2,
+    "ties": 0,
+    "totalBattles": 17
+  },
+  "battles": [
+    {
+      "testType": "ev_comparison",
+      "description": "EV Comparison - Pikachu with 252 Atk/Spe EVs vs No EVs",
+      "winner": "companion",
+      "winnerName": "Pikachu",
+      "turns": 2,
+      "companion": "Pikachu (Lv50, Hardy)",
+      "enemy": "Pikachu (Lv50, Hardy)"
+    },
+    {
+      "testType": "ev_hp_defense",
+      "description": "Defensive EVs - Pikachu with 252 HP/Def EVs vs No EVs",
+      "winner": "companion",
+      "winnerName": "Pikachu",
+      "turns": 2,
+      "companion": "Pikachu (Lv50, Hardy)",
+      "enemy": "Pikachu (Lv50, Hardy)"
+    },
+    {
+      "testType": "ev_special",
+      "description": "Special Attack EVs - Pikachu with 252 SpAtk EVs vs No EVs",
+      "winner": "companion",
+      "winnerName": "Pikachu",
+      "turns": 2,
+      "companion": "Pikachu (Lv50, Hardy)",
+      "enemy": "Pikachu (Lv50, Hardy)"
+    },
+    {
+      "testType": "iv_comparison",
+      "description": "IV Comparison - Pikachu with Perfect 31 IVs vs 0 IVs",
+      "winner": "companion",
+      "winnerName": "Pikachu",
+      "turns": 2,
+      "companion": "Pikachu (Lv50, Hardy)",
+      "enemy": "Pikachu (Lv50, Hardy)"
+    },
+    {
+      "testType": "iv_speed",
+      "description": "Speed IV Test - Pikachu with 31 Speed IV vs 0 Speed IV",
+      "winner": "companion",
+      "winnerName": "Pikachu",
+      "turns": 2,
+      "companion": "Pikachu (Lv50, Hardy)",
+      "enemy": "Pikachu (Lv50, Hardy)"
+    },
+    {
+      "testType": "nature_attack",
+      "description": "Adamant vs Modest - Physical vs Special nature",
+      "winner": "companion",
+      "winnerName": "Pikachu",
+      "turns": 2,
+      "companion": "Pikachu (Lv50, Adamant)",
+      "enemy": "Pikachu (Lv50, Modest)"
+    },
+    {
+      "testType": "nature_speed",
+      "description": "Jolly vs Brave - Speed nature difference",
+      "winner": "companion",
+      "winnerName": "Pikachu",
+      "turns": 2,
+      "companion": "Pikachu (Lv50, Jolly)",
+      "enemy": "Pikachu (Lv50, Brave)"
+    },
+    {
+      "testType": "level_difference",
+      "description": "Level Gap - Lv100 vs Lv50 Pikachu",
+      "winner": "companion",
+      "winnerName": "Pikachu",
+      "turns": 1,
+      "companion": "Pikachu (Lv100, Hardy)",
+      "enemy": "Pikachu (Lv50, Hardy)"
+    },
+    {
+      "testType": "level_low",
+      "description": "Low Level Battle - Two Lv5 Pikachu",
+      "winner": "companion",
+      "winnerName": "Pikachu",
+      "turns": 4,
+      "companion": "Pikachu (Lv5, Hardy)",
+      "enemy": "Pikachu (Lv5, Hardy)"
+    },
+    {
+      "testType": "type_super_effective",
+      "description": "Super Effective - Pikachu vs Squirtle",
+      "winner": "enemy",
+      "winnerName": "Squirtle",
+      "turns": 2,
+      "companion": "Pikachu (Lv50, Hardy)",
+      "enemy": "Squirtle (Lv50, Hardy)"
+    },
+    {
+      "testType": "type_not_effective",
+      "description": "Not Very Effective - Pikachu vs Bulbasaur",
+      "winner": "companion",
+      "winnerName": "Pikachu",
+      "turns": 2,
+      "companion": "Pikachu (Lv50, Hardy)",
+      "enemy": "Bulbasaur (Lv50, Hardy)"
+    },
+    {
+      "testType": "type_immune",
+      "description": "Immune Type - Pikachu vs Sandshrew",
+      "winner": "companion",
+      "winnerName": "Pikachu",
+      "turns": 2,
+      "companion": "Pikachu (Lv50, Hardy)",
+      "enemy": "Sandshrew (Lv50, Hardy)"
+    },
+    {
+      "testType": "speed_equal",
+      "description": "Equal Speed - Two identical Pikachu",
+      "winner": "companion",
+      "winnerName": "Pikachu",
+      "turns": 2,
+      "companion": "Pikachu (Lv50, Hardy)",
+      "enemy": "Pikachu (Lv50, Hardy)"
+    },
+    {
+      "testType": "speed_faster",
+      "description": "Faster Pokemon - Jolteon vs Pikachu",
+      "winner": "companion",
+      "winnerName": "Jolteon",
+      "turns": 1,
+      "companion": "Jolteon (Lv50, Hardy)",
+      "enemy": "Pikachu (Lv50, Hardy)"
+    },
+    {
+      "testType": "speed_slower",
+      "description": "Slower Pokemon - Snorlax vs Pikachu",
+      "winner": "companion",
+      "winnerName": "Snorlax",
+      "turns": 1,
+      "companion": "Snorlax (Lv50, Hardy)",
+      "enemy": "Pikachu (Lv50, Hardy)"
+    },
+    {
+      "testType": "fully_trained",
+      "description": "Fully Trained - Lv100 max EVs vs untrained",
+      "winner": "companion",
+      "winnerName": "Pikachu",
+      "turns": 1,
+      "companion": "Pikachu (Lv100, Jolly)",
+      "enemy": "Pikachu (Lv100, Hardy)"
+    },
+    {
+      "testType": "tank_vs_sweeper",
+      "description": "Tank vs Sweeper - Defensive vs Offensive build",
+      "winner": "enemy",
+      "winnerName": "Pikachu",
+      "turns": 2,
+      "companion": "Pikachu (Lv50, Bold)",
+      "enemy": "Pikachu (Lv50, Jolly)"
+    }
+  ]
+}

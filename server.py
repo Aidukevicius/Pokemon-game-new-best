@@ -1198,7 +1198,68 @@ def start_test_battle():
 
 DEFAULT_ABILITY = 'Static'
 
-TEST_MOVES = ['Thunderbolt', 'Quick Attack', 'Iron Tail', 'Volt Tackle']
+def simulate_battle(companion, enemy):
+    """Simulate a full battle between companion and enemy, return winner info."""
+    companion_hp = companion['stats']['hp']
+    enemy_hp = enemy['stats']['hp']
+    
+    companion_speed = companion['stats']['speed']
+    enemy_speed = enemy['stats']['speed']
+    
+    companion_atk = max(companion['stats']['attack'], companion['stats']['spAttack'])
+    enemy_atk = max(enemy['stats']['attack'], enemy['stats']['spAttack'])
+    companion_def = (companion['stats']['defense'] + companion['stats']['spDefense']) // 2
+    enemy_def = (enemy['stats']['defense'] + enemy['stats']['spDefense']) // 2
+    
+    turn = 0
+    max_turns = 100
+    
+    while companion_hp > 0 and enemy_hp > 0 and turn < max_turns:
+        turn += 1
+        
+        if companion_speed >= enemy_speed:
+            first_attacker = 'companion'
+        else:
+            first_attacker = 'enemy'
+        
+        if first_attacker == 'companion':
+            damage = max(1, (companion_atk * companion['level'] // 50) - (enemy_def // 4) + random.randint(1, 10))
+            enemy_hp -= damage
+            if enemy_hp <= 0:
+                break
+            damage = max(1, (enemy_atk * enemy['level'] // 50) - (companion_def // 4) + random.randint(1, 10))
+            companion_hp -= damage
+        else:
+            damage = max(1, (enemy_atk * enemy['level'] // 50) - (companion_def // 4) + random.randint(1, 10))
+            companion_hp -= damage
+            if companion_hp <= 0:
+                break
+            damage = max(1, (companion_atk * companion['level'] // 50) - (enemy_def // 4) + random.randint(1, 10))
+            enemy_hp -= damage
+    
+    if companion_hp > 0 and enemy_hp <= 0:
+        winner = 'companion'
+        winner_name = companion['name']
+    elif enemy_hp > 0 and companion_hp <= 0:
+        winner = 'enemy'
+        winner_name = enemy['name']
+    elif companion_hp > enemy_hp:
+        winner = 'companion'
+        winner_name = companion['name']
+    elif enemy_hp > companion_hp:
+        winner = 'enemy'
+        winner_name = enemy['name']
+    else:
+        winner = 'tie'
+        winner_name = 'Tie'
+    
+    return {
+        'winner': winner,
+        'winnerName': winner_name,
+        'turns': turn,
+        'companionHpRemaining': max(0, companion_hp),
+        'enemyHpRemaining': max(0, enemy_hp)
+    }
 
 def run_single_battle_simulation(test_type, ability):
     config = TEST_BATTLE_CONFIGS[test_type]
@@ -1223,69 +1284,16 @@ def run_single_battle_simulation(test_type, ability):
     )
     enemy['ability'] = ability
     
-    battle_results = []
-    
-    for move_name in TEST_MOVES:
-        try:
-            response = requests.post(
-                f'{BATTLE_CALC_URL}/api/calculate-damage',
-                json={
-                    'attacker': {
-                        'name': companion['name'],
-                        'level': companion['level'],
-                        'nature': companion['nature'],
-                        'evs': companion['evs'],
-                        'ivs': companion['ivs']
-                    },
-                    'defender': {
-                        'name': enemy['name'],
-                        'level': enemy['level'],
-                        'nature': enemy['nature'],
-                        'evs': enemy['evs'],
-                        'ivs': enemy['ivs']
-                    },
-                    'move': {'name': move_name}
-                },
-                timeout=5
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                battle_results.append({
-                    'move': move_name,
-                    'damage': data.get('damage', 0),
-                    'minDamage': data.get('minDamage', 0),
-                    'maxDamage': data.get('maxDamage', 0),
-                    'avgDamage': data.get('avgDamage', 0)
-                })
-            else:
-                battle_results.append({
-                    'move': move_name,
-                    'error': 'Calculation failed'
-                })
-        except Exception as e:
-            battle_results.append({
-                'move': move_name,
-                'error': str(e)
-            })
+    battle_result = simulate_battle(companion, enemy)
     
     return {
         'testType': test_type,
         'description': config['description'],
-        'ability': ability,
-        'companion': {
-            'name': companion['name'],
-            'level': companion['level'],
-            'stats': companion['stats'],
-            'nature': companion['nature']
-        },
-        'enemy': {
-            'name': enemy['name'],
-            'level': enemy['level'],
-            'stats': enemy['stats'],
-            'nature': enemy['nature']
-        },
-        'moveResults': battle_results
+        'winner': battle_result['winner'],
+        'winnerName': battle_result['winnerName'],
+        'turns': battle_result['turns'],
+        'companion': f"{companion['name']} (Lv{companion['level']}, {companion['nature']})",
+        'enemy': f"{enemy['name']} (Lv{enemy['level']}, {enemy['nature']})"
     }
 
 
@@ -1297,19 +1305,21 @@ def run_all_tests():
         ability = data.get('ability', DEFAULT_ABILITY)
         
         all_results = []
+        companion_wins = 0
+        enemy_wins = 0
+        ties = 0
         
         for iteration in range(iterations):
-            iteration_results = {
-                'iteration': iteration + 1,
-                'timestamp': datetime.utcnow().isoformat(),
-                'tests': []
-            }
-            
             for test_type in TEST_BATTLE_CONFIGS.keys():
                 result = run_single_battle_simulation(test_type, ability)
-                iteration_results['tests'].append(result)
-            
-            all_results.append(iteration_results)
+                all_results.append(result)
+                
+                if result['winner'] == 'companion':
+                    companion_wins += 1
+                elif result['winner'] == 'enemy':
+                    enemy_wins += 1
+                else:
+                    ties += 1
         
         results_filename = f'test_results_{datetime.utcnow().strftime("%Y%m%d_%H%M%S")}.json'
         results_path = os.path.join(os.path.dirname(__file__), 'static', 'test_results')
@@ -1320,10 +1330,14 @@ def run_all_tests():
             import json
             json.dump({
                 'generatedAt': datetime.utcnow().isoformat(),
-                'ability': ability,
-                'totalIterations': iterations,
-                'totalTests': len(TEST_BATTLE_CONFIGS) * iterations,
-                'results': all_results
+                'iterations': iterations,
+                'summary': {
+                    'companionWins': companion_wins,
+                    'enemyWins': enemy_wins,
+                    'ties': ties,
+                    'totalBattles': len(all_results)
+                },
+                'battles': all_results
             }, f, indent=2)
         
         return jsonify({
@@ -1331,10 +1345,10 @@ def run_all_tests():
             'message': f'Completed {iterations} iteration(s) of all tests',
             'resultsFile': f'/static/test_results/{results_filename}',
             'summary': {
-                'totalIterations': iterations,
-                'testsPerIteration': len(TEST_BATTLE_CONFIGS),
-                'totalTests': len(TEST_BATTLE_CONFIGS) * iterations,
-                'ability': ability
+                'companionWins': companion_wins,
+                'enemyWins': enemy_wins,
+                'ties': ties,
+                'totalBattles': len(all_results)
             }
         })
         
