@@ -9,13 +9,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(0,0,0,0.3);
 }
 
 .settings-title {
   font-size: 14px;
   margin: 0;
-  color: #fff;
+  color: #333;
 }
 
 .settings-content {
@@ -25,7 +24,7 @@
 }
 
 .settings-section {
-  background: rgba(0,0,0,0.3);
+  background: rgba(255,255,255,0.7);
   border-radius: 6px;
   padding: 12px;
   margin-bottom: 10px;
@@ -33,13 +32,13 @@
 
 .section-title {
   font-size: 12px;
-  color: #fff;
+  color: #333;
   margin: 0 0 4px 0;
 }
 
 .section-desc {
   font-size: 10px;
-  color: rgba(255,255,255,0.8);
+  color: #666;
   margin: 0 0 10px 0;
 }
 
@@ -80,7 +79,7 @@
 
 .about-text {
   font-size: 10px;
-  color: rgba(255,255,255,0.8);
+  color: #666;
   margin: 4px 0;
 }
 
@@ -101,7 +100,7 @@
 
 .test-category-title {
   font-size: 11px;
-  color: rgba(255,255,255,0.9);
+  color: #555;
   margin: 0 0 8px 0;
   font-weight: 600;
   text-transform: uppercase;
@@ -115,11 +114,11 @@
 }
 
 .test-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-  color: white !important;
+  background: #ffffff !important;
+  color: #333 !important;
   padding: 8px 10px;
   font-size: 9px;
-  border: none;
+  border: 1px solid #ddd;
   border-radius: 4px;
   cursor: pointer;
   text-align: left;
@@ -127,11 +126,13 @@
   flex-direction: column;
   gap: 2px;
   transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .test-btn:hover {
-  background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%) !important;
+  background: #f5f5f5 !important;
   transform: translateX(2px);
+  border-color: #ccc;
 }
 
 .test-btn:disabled {

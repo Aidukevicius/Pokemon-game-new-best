@@ -156,14 +156,20 @@ export class SettingsScreen {
     const seedBtn = this.container.querySelector('#seedPokemonBtn');
     if (seedBtn) {
       seedBtn.addEventListener('click', async () => {
+        console.log('[SettingsScreen] Seed button clicked');
         await this.seedPokemon();
       });
     }
 
     const testBtns = this.container.querySelectorAll('.test-btn');
+    console.log('[SettingsScreen] Found test buttons:', testBtns.length);
     testBtns.forEach(btn => {
       btn.addEventListener('click', async (e) => {
-        const testType = btn.dataset.test;
+        e.preventDefault();
+        e.stopPropagation();
+        const button = e.currentTarget;
+        const testType = button.dataset.test;
+        console.log('[SettingsScreen] Test button clicked:', testType);
         await this.startTestBattle(testType);
       });
     });
