@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 import os
 import random
+import requests
 from datetime import datetime
 from flask import Flask, jsonify, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
+
+BATTLE_CALC_URL = os.environ.get('BATTLE_CALC_URL', 'http://localhost:3001')
 
 class Base(DeclarativeBase):
     pass
@@ -909,6 +912,51 @@ def get_pokedex_stats():
         'encounterPercent': round((encountered / total) * 100, 1),
         'catchPercent': round((caught / total) * 100, 1)
     })
+
+
+@app.route('/api/battle/calculate-damage', methods=['POST'])
+def calculate_damage():
+    try:
+        response = requests.post(f'{BATTLE_CALC_URL}/api/calculate-damage', json=request.json, timeout=5)
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({'success': False, 'error': f'Battle calculator unavailable: {str(e)}'}), 503
+
+
+@app.route('/api/battle/calculate-stats', methods=['POST'])
+def calculate_stats():
+    try:
+        response = requests.post(f'{BATTLE_CALC_URL}/api/calculate-stats', json=request.json, timeout=5)
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({'success': False, 'error': f'Battle calculator unavailable: {str(e)}'}), 503
+
+
+@app.route('/api/battle/move-info', methods=['POST'])
+def get_move_info():
+    try:
+        response = requests.post(f'{BATTLE_CALC_URL}/api/get-move-info', json=request.json, timeout=5)
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({'success': False, 'error': f'Battle calculator unavailable: {str(e)}'}), 503
+
+
+@app.route('/api/battle/type-effectiveness', methods=['POST'])
+def get_type_effectiveness():
+    try:
+        response = requests.post(f'{BATTLE_CALC_URL}/api/type-effectiveness', json=request.json, timeout=5)
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({'success': False, 'error': f'Battle calculator unavailable: {str(e)}'}), 503
+
+
+@app.route('/api/battle/health', methods=['GET'])
+def battle_health():
+    try:
+        response = requests.get(f'{BATTLE_CALC_URL}/api/health', timeout=5)
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({'success': False, 'error': f'Battle calculator unavailable: {str(e)}'}), 503
 
 
 if __name__ == '__main__':

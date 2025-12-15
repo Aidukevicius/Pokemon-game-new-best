@@ -1,0 +1,16 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "A lofi SNES-style Pokemon catching game that runs as a Chrome extension. Encounter and catch Pokemon while browsing the web!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@smogon/calc": "^0.10.0",
+    "express": "^5.2.1"
+  }
+}
