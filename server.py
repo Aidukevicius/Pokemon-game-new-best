@@ -1383,6 +1383,294 @@ def list_test_results():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+# ============================================
+# BATTLE MECHANICS API ENDPOINTS
+# ============================================
+
+STAT_STAGE_MOVES = {
+    'swords-dance': {'target': 'self', 'stat': 'attack', 'change': 2},
+    'dragon-dance': {'target': 'self', 'stats': [{'stat': 'attack', 'change': 1}, {'stat': 'speed', 'change': 1}]},
+    'calm-mind': {'target': 'self', 'stats': [{'stat': 'spAttack', 'change': 1}, {'stat': 'spDefense', 'change': 1}]},
+    'nasty-plot': {'target': 'self', 'stat': 'spAttack', 'change': 2},
+    'agility': {'target': 'self', 'stat': 'speed', 'change': 2},
+    'iron-defense': {'target': 'self', 'stat': 'defense', 'change': 2},
+    'amnesia': {'target': 'self', 'stat': 'spDefense', 'change': 2},
+    'bulk-up': {'target': 'self', 'stats': [{'stat': 'attack', 'change': 1}, {'stat': 'defense', 'change': 1}]},
+    'growl': {'target': 'enemy', 'stat': 'attack', 'change': -1},
+    'leer': {'target': 'enemy', 'stat': 'defense', 'change': -1},
+    'tail-whip': {'target': 'enemy', 'stat': 'defense', 'change': -1},
+    'screech': {'target': 'enemy', 'stat': 'defense', 'change': -2},
+    'sand-attack': {'target': 'enemy', 'stat': 'accuracy', 'change': -1},
+    'flash': {'target': 'enemy', 'stat': 'accuracy', 'change': -1},
+    'smokescreen': {'target': 'enemy', 'stat': 'accuracy', 'change': -1},
+    'double-team': {'target': 'self', 'stat': 'evasion', 'change': 1},
+    'minimize': {'target': 'self', 'stat': 'evasion', 'change': 2},
+    'charm': {'target': 'enemy', 'stat': 'attack', 'change': -2},
+    'fake-tears': {'target': 'enemy', 'stat': 'spDefense', 'change': -2},
+    'metal-sound': {'target': 'enemy', 'stat': 'spDefense', 'change': -2},
+    'shell-smash': {'target': 'self', 'stats': [
+        {'stat': 'attack', 'change': 2}, {'stat': 'spAttack', 'change': 2}, {'stat': 'speed', 'change': 2},
+        {'stat': 'defense', 'change': -1}, {'stat': 'spDefense', 'change': -1}
+    ]}
+}
+
+STATUS_MOVES = {
+    'thunder-wave': {'status': 'paralysis', 'accuracy': 90},
+    'stun-spore': {'status': 'paralysis', 'accuracy': 75},
+    'glare': {'status': 'paralysis', 'accuracy': 100},
+    'will-o-wisp': {'status': 'burn', 'accuracy': 85},
+    'poison-powder': {'status': 'poison', 'accuracy': 75},
+    'toxic': {'status': 'badly-poisoned', 'accuracy': 90},
+    'sleep-powder': {'status': 'sleep', 'accuracy': 75},
+    'hypnosis': {'status': 'sleep', 'accuracy': 60},
+    'sing': {'status': 'sleep', 'accuracy': 55},
+    'spore': {'status': 'sleep', 'accuracy': 100},
+    'lovely-kiss': {'status': 'sleep', 'accuracy': 75},
+    'confuse-ray': {'status': 'confusion', 'accuracy': 100},
+    'supersonic': {'status': 'confusion', 'accuracy': 55},
+    'sweet-kiss': {'status': 'confusion', 'accuracy': 75}
+}
+
+STATUS_EFFECTS = {
+    'paralysis': {
+        'name': 'paralysis',
+        'speedMultiplier': 0.5,
+        'skipTurnChance': 0.25,
+        'message': 'is paralyzed! It may not be able to move!'
+    },
+    'burn': {
+        'name': 'burn',
+        'attackMultiplier': 0.5,
+        'endTurnDamagePercent': 0.0625,
+        'message': 'was burned!'
+    },
+    'poison': {
+        'name': 'poison',
+        'endTurnDamagePercent': 0.125,
+        'message': 'was poisoned!'
+    },
+    'badly-poisoned': {
+        'name': 'badly-poisoned',
+        'endTurnDamageMultiplier': True,
+        'baseDamagePercent': 0.0625,
+        'message': 'was badly poisoned!'
+    },
+    'sleep': {
+        'name': 'sleep',
+        'skipTurn': True,
+        'turnsRemaining': 2,
+        'message': 'fell asleep!'
+    },
+    'freeze': {
+        'name': 'freeze',
+        'skipTurn': True,
+        'thawChance': 0.2,
+        'message': 'was frozen solid!'
+    },
+    'confusion': {
+        'name': 'confusion',
+        'hitSelfChance': 0.33,
+        'turnsRemaining': 3,
+        'message': 'became confused!'
+    }
+}
+
+def get_stat_stage_multiplier(stage):
+    """Pokemon formula for stat stage multipliers"""
+    clamped = max(-6, min(6, stage))
+    if clamped >= 0:
+        return (2 + clamped) / 2
+    return 2 / (2 - clamped)
+
+def get_accuracy_evasion_multiplier(stage):
+    """Pokemon formula for accuracy/evasion multipliers"""
+    clamped = max(-6, min(6, stage))
+    if clamped >= 0:
+        return (3 + clamped) / 3
+    return 3 / (3 - clamped)
+
+@app.route('/api/battle/stat-stage-multiplier', methods=['POST'])
+def api_stat_stage_multiplier():
+    try:
+        data = request.get_json()
+        stage = data.get('stage', 0)
+        multiplier = get_stat_stage_multiplier(stage)
+        return jsonify({'success': True, 'multiplier': multiplier})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/battle/accuracy-evasion-multiplier', methods=['POST'])
+def api_accuracy_evasion_multiplier():
+    try:
+        data = request.get_json()
+        stage = data.get('stage', 0)
+        multiplier = get_accuracy_evasion_multiplier(stage)
+        return jsonify({'success': True, 'multiplier': multiplier})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/battle/apply-stat-change', methods=['POST'])
+def api_apply_stat_change():
+    try:
+        data = request.get_json()
+        current_stages = data.get('currentStages', {'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0, 'accuracy': 0, 'evasion': 0})
+        stat = data.get('stat', 'attack')
+        change = data.get('change', 0)
+        
+        old_stage = current_stages.get(stat, 0)
+        new_stage = max(-6, min(6, old_stage + change))
+        current_stages[stat] = new_stage
+        actual_change = new_stage - old_stage
+        
+        if actual_change == 0:
+            message = f"{stat.capitalize()} won't go any {'higher' if change > 0 else 'lower'}!"
+        elif abs(actual_change) >= 3:
+            message = f"{stat.capitalize()} {'rose drastically' if actual_change > 0 else 'severely fell'}!"
+        elif abs(actual_change) >= 2:
+            message = f"{stat.capitalize()} {'sharply rose' if actual_change > 0 else 'harshly fell'}!"
+        else:
+            message = f"{stat.capitalize()} {'rose' if actual_change > 0 else 'fell'}!"
+        
+        return jsonify({
+            'success': True,
+            'stages': current_stages,
+            'message': message,
+            'changed': actual_change != 0
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/battle/get-stat-move-effects', methods=['POST'])
+def api_get_stat_move_effects():
+    try:
+        data = request.get_json()
+        move_name = data.get('moveName', '')
+        normalized = move_name.lower().replace(' ', '-')
+        
+        effects = STAT_STAGE_MOVES.get(normalized)
+        return jsonify({'success': True, 'effects': effects})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/battle/get-status-effect', methods=['POST'])
+def api_get_status_effect():
+    try:
+        data = request.get_json()
+        status = data.get('status', '')
+        
+        effect = STATUS_EFFECTS.get(status)
+        if effect and status == 'sleep':
+            effect = dict(effect)
+            effect['turnsRemaining'] = random.randint(1, 3)
+        elif effect and status == 'confusion':
+            effect = dict(effect)
+            effect['turnsRemaining'] = random.randint(1, 4)
+            
+        return jsonify({'success': True, 'effect': effect})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/battle/get-status-move-effects', methods=['POST'])
+def api_get_status_move_effects():
+    try:
+        data = request.get_json()
+        move_name = data.get('moveName', '')
+        normalized = move_name.lower().replace(' ', '-')
+        
+        effects = STATUS_MOVES.get(normalized)
+        return jsonify({'success': True, 'effects': effects})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/battle/process-status-on-turn', methods=['POST'])
+def api_process_status_on_turn():
+    try:
+        data = request.get_json()
+        status = data.get('status')
+        max_hp = data.get('maxHp', 100)
+        turn_count = data.get('turnCount', 1)
+        
+        result = {'canMove': True, 'damage': 0, 'message': '', 'cured': False}
+        
+        if not status:
+            return jsonify({'success': True, 'result': result})
+        
+        status_name = status.get('name', '')
+        
+        if status_name == 'paralysis':
+            if random.random() < status.get('skipTurnChance', 0.25):
+                result['canMove'] = False
+                result['message'] = "is paralyzed! It can't move!"
+                
+        elif status_name == 'burn':
+            result['damage'] = int(max_hp * status.get('endTurnDamagePercent', 0.0625))
+            result['message'] = 'is hurt by its burn!'
+            
+        elif status_name == 'poison':
+            result['damage'] = int(max_hp * status.get('endTurnDamagePercent', 0.125))
+            result['message'] = 'is hurt by poison!'
+            
+        elif status_name == 'badly-poisoned':
+            result['damage'] = int(max_hp * status.get('baseDamagePercent', 0.0625) * turn_count)
+            result['message'] = 'is hurt by poison!'
+            
+        elif status_name == 'sleep':
+            turns_remaining = status.get('turnsRemaining', 1)
+            if turns_remaining <= 0:
+                result['cured'] = True
+                result['message'] = 'woke up!'
+            else:
+                result['canMove'] = False
+                result['message'] = 'is fast asleep.'
+                
+        elif status_name == 'freeze':
+            if random.random() < status.get('thawChance', 0.2):
+                result['cured'] = True
+                result['message'] = 'thawed out!'
+            else:
+                result['canMove'] = False
+                result['message'] = 'is frozen solid!'
+                
+        elif status_name == 'confusion':
+            turns_remaining = status.get('turnsRemaining', 1)
+            if turns_remaining <= 0:
+                result['cured'] = True
+                result['message'] = 'snapped out of confusion!'
+            elif random.random() < status.get('hitSelfChance', 0.33):
+                result['canMove'] = False
+                result['damage'] = int(max_hp * 0.1)
+                result['message'] = 'hurt itself in its confusion!'
+        
+        return jsonify({'success': True, 'result': result})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/battle/calculate-accuracy-with-stages', methods=['POST'])
+def api_calculate_accuracy_with_stages():
+    try:
+        data = request.get_json()
+        base_accuracy = data.get('baseAccuracy', 100)
+        attacker_accuracy_stage = data.get('attackerAccuracyStage', 0)
+        defender_evasion_stage = data.get('defenderEvasionStage', 0)
+        
+        accuracy_multiplier = get_accuracy_evasion_multiplier(attacker_accuracy_stage)
+        evasion_multiplier = get_accuracy_evasion_multiplier(defender_evasion_stage)
+        
+        final_accuracy = base_accuracy * (accuracy_multiplier / evasion_multiplier)
+        final_accuracy = min(100, max(0, final_accuracy))
+        
+        return jsonify({'success': True, 'accuracy': final_accuracy})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/battle/init-stat-stages', methods=['GET'])
+def api_init_stat_stages():
+    return jsonify({
+        'success': True,
+        'stages': {'attack': 0, 'defense': 0, 'spAttack': 0, 'spDefense': 0, 'speed': 0, 'accuracy': 0, 'evasion': 0}
+    })
+
+
 if __name__ == '__main__':
     print("Starting PokeBrowse server on port 5000...")
     print("Open http://0.0.0.0:5000/preview.html to view the extension")

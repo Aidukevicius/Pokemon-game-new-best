@@ -492,6 +492,392 @@ export class BattleServiceAPI {
 
     return validMoves[0];
   }
+
+  // ============================================
+  // STAT STAGE MODIFIERS (with API fallback)
+  // ============================================
+
+  initStatStages() {
+    return { attack: 0, defense: 0, spAttack: 0, spDefense: 0, speed: 0, accuracy: 0, evasion: 0 };
+  }
+
+  async initStatStagesAPI() {
+    try {
+      const response = await fetch(`${getApiBaseUrl()}/api/battle/init-stat-stages`);
+      if (!response.ok) throw new Error('API request failed');
+      const result = await response.json();
+      if (result.success) return result.stages;
+      throw new Error(result.error);
+    } catch (error) {
+      console.warn('[BattleServiceAPI] initStatStages API failed, using fallback:', error.message);
+      return this.initStatStages();
+    }
+  }
+
+  getStatStageMultiplier(stage) {
+    const clampedStage = Math.max(-6, Math.min(6, stage));
+    if (clampedStage >= 0) {
+      return (2 + clampedStage) / 2;
+    }
+    return 2 / (2 - clampedStage);
+  }
+
+  async getStatStageMultiplierAPI(stage) {
+    try {
+      const response = await fetch(`${getApiBaseUrl()}/api/battle/stat-stage-multiplier`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stage })
+      });
+      if (!response.ok) throw new Error('API request failed');
+      const result = await response.json();
+      if (result.success) return result.multiplier;
+      throw new Error(result.error);
+    } catch (error) {
+      console.warn('[BattleServiceAPI] getStatStageMultiplier API failed, using fallback:', error.message);
+      return this.getStatStageMultiplier(stage);
+    }
+  }
+
+  getAccuracyEvasionMultiplier(stage) {
+    const clampedStage = Math.max(-6, Math.min(6, stage));
+    if (clampedStage >= 0) {
+      return (3 + clampedStage) / 3;
+    }
+    return 3 / (3 - clampedStage);
+  }
+
+  async getAccuracyEvasionMultiplierAPI(stage) {
+    try {
+      const response = await fetch(`${getApiBaseUrl()}/api/battle/accuracy-evasion-multiplier`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stage })
+      });
+      if (!response.ok) throw new Error('API request failed');
+      const result = await response.json();
+      if (result.success) return result.multiplier;
+      throw new Error(result.error);
+    } catch (error) {
+      console.warn('[BattleServiceAPI] getAccuracyEvasionMultiplier API failed, using fallback:', error.message);
+      return this.getAccuracyEvasionMultiplier(stage);
+    }
+  }
+
+  applyStatStageChange(currentStages, stat, change) {
+    const newStage = Math.max(-6, Math.min(6, (currentStages[stat] || 0) + change));
+    const oldStage = currentStages[stat] || 0;
+    currentStages[stat] = newStage;
+    
+    let message = '';
+    const actualChange = newStage - oldStage;
+    
+    if (actualChange === 0) {
+      message = `${stat.charAt(0).toUpperCase() + stat.slice(1)} won't go any ${change > 0 ? 'higher' : 'lower'}!`;
+    } else if (Math.abs(actualChange) >= 3) {
+      message = `${stat.charAt(0).toUpperCase() + stat.slice(1)} ${actualChange > 0 ? 'rose drastically' : 'severely fell'}!`;
+    } else if (Math.abs(actualChange) >= 2) {
+      message = `${stat.charAt(0).toUpperCase() + stat.slice(1)} ${actualChange > 0 ? 'sharply rose' : 'harshly fell'}!`;
+    } else {
+      message = `${stat.charAt(0).toUpperCase() + stat.slice(1)} ${actualChange > 0 ? 'rose' : 'fell'}!`;
+    }
+    
+    return { stages: currentStages, message, changed: actualChange !== 0 };
+  }
+
+  async applyStatStageChangeAPI(currentStages, stat, change) {
+    try {
+      const response = await fetch(`${getApiBaseUrl()}/api/battle/apply-stat-change`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentStages, stat, change })
+      });
+      if (!response.ok) throw new Error('API request failed');
+      const result = await response.json();
+      if (result.success) return { stages: result.stages, message: result.message, changed: result.changed };
+      throw new Error(result.error);
+    } catch (error) {
+      console.warn('[BattleServiceAPI] applyStatStageChange API failed, using fallback:', error.message);
+      return this.applyStatStageChange(currentStages, stat, change);
+    }
+  }
+
+  getStatMoveEffects(moveName) {
+    const statMoves = {
+      'swords-dance': { target: 'self', stat: 'attack', change: 2 },
+      'Swords Dance': { target: 'self', stat: 'attack', change: 2 },
+      'dragon-dance': { target: 'self', stats: [{ stat: 'attack', change: 1 }, { stat: 'speed', change: 1 }] },
+      'Dragon Dance': { target: 'self', stats: [{ stat: 'attack', change: 1 }, { stat: 'speed', change: 1 }] },
+      'calm-mind': { target: 'self', stats: [{ stat: 'spAttack', change: 1 }, { stat: 'spDefense', change: 1 }] },
+      'Calm Mind': { target: 'self', stats: [{ stat: 'spAttack', change: 1 }, { stat: 'spDefense', change: 1 }] },
+      'nasty-plot': { target: 'self', stat: 'spAttack', change: 2 },
+      'Nasty Plot': { target: 'self', stat: 'spAttack', change: 2 },
+      'agility': { target: 'self', stat: 'speed', change: 2 },
+      'Agility': { target: 'self', stat: 'speed', change: 2 },
+      'growl': { target: 'enemy', stat: 'attack', change: -1 },
+      'Growl': { target: 'enemy', stat: 'attack', change: -1 },
+      'leer': { target: 'enemy', stat: 'defense', change: -1 },
+      'Leer': { target: 'enemy', stat: 'defense', change: -1 },
+      'tail-whip': { target: 'enemy', stat: 'defense', change: -1 },
+      'Tail Whip': { target: 'enemy', stat: 'defense', change: -1 },
+      'sand-attack': { target: 'enemy', stat: 'accuracy', change: -1 },
+      'Sand Attack': { target: 'enemy', stat: 'accuracy', change: -1 },
+      'double-team': { target: 'self', stat: 'evasion', change: 1 },
+      'Double Team': { target: 'self', stat: 'evasion', change: 1 },
+      'screech': { target: 'enemy', stat: 'defense', change: -2 },
+      'Screech': { target: 'enemy', stat: 'defense', change: -2 },
+      'charm': { target: 'enemy', stat: 'attack', change: -2 },
+      'Charm': { target: 'enemy', stat: 'attack', change: -2 }
+    };
+    return statMoves[moveName] || statMoves[moveName.toLowerCase().replace(/\s+/g, '-')] || null;
+  }
+
+  async getStatMoveEffectsAPI(moveName) {
+    try {
+      const response = await fetch(`${getApiBaseUrl()}/api/battle/get-stat-move-effects`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ moveName })
+      });
+      if (!response.ok) throw new Error('API request failed');
+      const result = await response.json();
+      if (result.success) return result.effects;
+      throw new Error(result.error);
+    } catch (error) {
+      console.warn('[BattleServiceAPI] getStatMoveEffects API failed, using fallback:', error.message);
+      return this.getStatMoveEffects(moveName);
+    }
+  }
+
+  // ============================================
+  // STATUS EFFECTS SYSTEM (with API fallback)
+  // ============================================
+
+  applyStatusEffect(target, status) {
+    const statusEffects = {
+      'paralysis': {
+        name: 'paralysis',
+        speedMultiplier: 0.5,
+        skipTurnChance: 0.25,
+        message: 'is paralyzed! It may not be able to move!'
+      },
+      'burn': {
+        name: 'burn',
+        attackMultiplier: 0.5,
+        endTurnDamagePercent: 0.0625,
+        message: 'was burned!'
+      },
+      'poison': {
+        name: 'poison',
+        endTurnDamagePercent: 0.125,
+        message: 'was poisoned!'
+      },
+      'badly-poisoned': {
+        name: 'badly-poisoned',
+        endTurnDamageMultiplier: true,
+        baseDamagePercent: 0.0625,
+        message: 'was badly poisoned!'
+      },
+      'sleep': {
+        name: 'sleep',
+        skipTurn: true,
+        turnsRemaining: Math.floor(Math.random() * 3) + 1,
+        message: 'fell asleep!'
+      },
+      'freeze': {
+        name: 'freeze',
+        skipTurn: true,
+        thawChance: 0.2,
+        message: 'was frozen solid!'
+      },
+      'confusion': {
+        name: 'confusion',
+        hitSelfChance: 0.33,
+        turnsRemaining: Math.floor(Math.random() * 4) + 1,
+        message: 'became confused!'
+      }
+    };
+    return statusEffects[status] || null;
+  }
+
+  async applyStatusEffectAPI(target, status) {
+    try {
+      const response = await fetch(`${getApiBaseUrl()}/api/battle/get-status-effect`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      if (!response.ok) throw new Error('API request failed');
+      const result = await response.json();
+      if (result.success) return result.effect;
+      throw new Error(result.error);
+    } catch (error) {
+      console.warn('[BattleServiceAPI] applyStatusEffect API failed, using fallback:', error.message);
+      return this.applyStatusEffect(target, status);
+    }
+  }
+
+  getStatusMoveEffects(moveName) {
+    const statusMoves = {
+      'thunder-wave': { status: 'paralysis', accuracy: 90 },
+      'Thunder Wave': { status: 'paralysis', accuracy: 90 },
+      'stun-spore': { status: 'paralysis', accuracy: 75 },
+      'Stun Spore': { status: 'paralysis', accuracy: 75 },
+      'will-o-wisp': { status: 'burn', accuracy: 85 },
+      'Will-O-Wisp': { status: 'burn', accuracy: 85 },
+      'poison-powder': { status: 'poison', accuracy: 75 },
+      'Poison Powder': { status: 'poison', accuracy: 75 },
+      'toxic': { status: 'badly-poisoned', accuracy: 90 },
+      'Toxic': { status: 'badly-poisoned', accuracy: 90 },
+      'sleep-powder': { status: 'sleep', accuracy: 75 },
+      'Sleep Powder': { status: 'sleep', accuracy: 75 },
+      'hypnosis': { status: 'sleep', accuracy: 60 },
+      'Hypnosis': { status: 'sleep', accuracy: 60 },
+      'confuse-ray': { status: 'confusion', accuracy: 100 },
+      'Confuse Ray': { status: 'confusion', accuracy: 100 }
+    };
+    return statusMoves[moveName] || statusMoves[moveName.toLowerCase().replace(/\s+/g, '-')] || null;
+  }
+
+  async getStatusMoveEffectsAPI(moveName) {
+    try {
+      const response = await fetch(`${getApiBaseUrl()}/api/battle/get-status-move-effects`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ moveName })
+      });
+      if (!response.ok) throw new Error('API request failed');
+      const result = await response.json();
+      if (result.success) return result.effects;
+      throw new Error(result.error);
+    } catch (error) {
+      console.warn('[BattleServiceAPI] getStatusMoveEffects API failed, using fallback:', error.message);
+      return this.getStatusMoveEffects(moveName);
+    }
+  }
+
+  processStatusEffectOnTurn(status, maxHp, turnCount = 1) {
+    const result = { canMove: true, damage: 0, message: '', cured: false };
+    
+    if (!status) return result;
+    
+    switch (status.name) {
+      case 'paralysis':
+        if (Math.random() < status.skipTurnChance) {
+          result.canMove = false;
+          result.message = 'is paralyzed! It can\'t move!';
+        }
+        break;
+        
+      case 'burn':
+        result.damage = Math.floor(maxHp * status.endTurnDamagePercent);
+        result.message = 'is hurt by its burn!';
+        break;
+        
+      case 'poison':
+        result.damage = Math.floor(maxHp * status.endTurnDamagePercent);
+        result.message = 'is hurt by poison!';
+        break;
+        
+      case 'badly-poisoned':
+        result.damage = Math.floor(maxHp * status.baseDamagePercent * turnCount);
+        result.message = 'is hurt by poison!';
+        break;
+        
+      case 'sleep':
+        if (status.turnsRemaining <= 0) {
+          result.cured = true;
+          result.message = 'woke up!';
+        } else {
+          result.canMove = false;
+          result.message = 'is fast asleep.';
+          status.turnsRemaining--;
+        }
+        break;
+        
+      case 'freeze':
+        if (Math.random() < status.thawChance) {
+          result.cured = true;
+          result.message = 'thawed out!';
+        } else {
+          result.canMove = false;
+          result.message = 'is frozen solid!';
+        }
+        break;
+        
+      case 'confusion':
+        if (status.turnsRemaining <= 0) {
+          result.cured = true;
+          result.message = 'snapped out of confusion!';
+        } else {
+          status.turnsRemaining--;
+          if (Math.random() < status.hitSelfChance) {
+            result.canMove = false;
+            result.damage = Math.floor(maxHp * 0.1);
+            result.message = 'hurt itself in its confusion!';
+          }
+        }
+        break;
+    }
+    
+    return result;
+  }
+
+  async processStatusEffectOnTurnAPI(status, maxHp, turnCount = 1) {
+    try {
+      const response = await fetch(`${getApiBaseUrl()}/api/battle/process-status-on-turn`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, maxHp, turnCount })
+      });
+      if (!response.ok) throw new Error('API request failed');
+      const result = await response.json();
+      if (result.success) return result.result;
+      throw new Error(result.error);
+    } catch (error) {
+      console.warn('[BattleServiceAPI] processStatusEffectOnTurn API failed, using fallback:', error.message);
+      return this.processStatusEffectOnTurn(status, maxHp, turnCount);
+    }
+  }
+
+  applyStatusModifiersToDamage(damage, attacker, move, status) {
+    let modifiedDamage = damage;
+    if (status?.name === 'burn' && move.damageClass === 'physical') {
+      modifiedDamage = Math.floor(modifiedDamage * 0.5);
+    }
+    return modifiedDamage;
+  }
+
+  applyStatusModifiersToSpeed(speed, status) {
+    if (status?.name === 'paralysis') {
+      return Math.floor(speed * 0.5);
+    }
+    return speed;
+  }
+
+  calculateAccuracyWithStages(baseAccuracy, attackerAccuracyStage, defenderEvasionStage) {
+    const accuracyMultiplier = this.getAccuracyEvasionMultiplier(attackerAccuracyStage);
+    const evasionMultiplier = this.getAccuracyEvasionMultiplier(defenderEvasionStage);
+    const finalAccuracy = baseAccuracy * (accuracyMultiplier / evasionMultiplier);
+    return Math.min(100, Math.max(0, finalAccuracy));
+  }
+
+  async calculateAccuracyWithStagesAPI(baseAccuracy, attackerAccuracyStage, defenderEvasionStage) {
+    try {
+      const response = await fetch(`${getApiBaseUrl()}/api/battle/calculate-accuracy-with-stages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ baseAccuracy, attackerAccuracyStage, defenderEvasionStage })
+      });
+      if (!response.ok) throw new Error('API request failed');
+      const result = await response.json();
+      if (result.success) return result.accuracy;
+      throw new Error(result.error);
+    } catch (error) {
+      console.warn('[BattleServiceAPI] calculateAccuracyWithStages API failed, using fallback:', error.message);
+      return this.calculateAccuracyWithStages(baseAccuracy, attackerAccuracyStage, defenderEvasionStage);
+    }
+  }
 }
 
 export { BattleServiceAPI as BattleService };
