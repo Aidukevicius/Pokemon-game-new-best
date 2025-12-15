@@ -521,6 +521,17 @@ def delete_pokemon(db_id):
     return jsonify({'message': 'Pokemon released'}), 200
 
 
+@app.route('/api/favorites', methods=['GET'])
+def get_favorites():
+    favorite_pokemon = Pokemon.query.filter_by(is_favorite=True).order_by(Pokemon.level.desc()).limit(6).all()
+    
+    if len(favorite_pokemon) == 0:
+        top_pokemon = Pokemon.query.order_by(Pokemon.level.desc()).limit(6).all()
+        return jsonify([p.to_dict() for p in top_pokemon])
+    
+    return jsonify([p.to_dict() for p in favorite_pokemon])
+
+
 @app.route('/api/party', methods=['GET'])
 def get_party():
     party_pokemon = Pokemon.query.filter_by(in_party=True).order_by(Pokemon.level.desc()).limit(6).all()

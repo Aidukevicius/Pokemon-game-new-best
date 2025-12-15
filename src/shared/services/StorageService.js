@@ -26,6 +26,17 @@ export class StorageService {
         console.log('[StorageService] API not available, using local storage');
       }
     }
+
+    if (key === 'favorite_pokemon') {
+      try {
+        const response = await fetch(`${this.apiBase}/api/favorites`);
+        if (response.ok) {
+          return await response.json();
+        }
+      } catch (e) {
+        console.log('[StorageService] API not available, using local storage');
+      }
+    }
     
     if (this.useChrome) {
       return new Promise((resolve) => {
